@@ -3,14 +3,26 @@ import "@/App.css";
 
 import { Outlet, createRootRoute } from "@tanstack/react-router";
 
-import { MantineProvider } from "@mantine/core";
+import { Center, Loader, MantineProvider } from "@mantine/core";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import theme from "@/theme";
+import { bootstrapOidc, getOidcConfig, OidcInitializationGate } from "@/oidc";
 
 export const Route = createRootRoute({
+  beforeLoad: async () => {
+    await bootstrapOidc(getOidcConfig());
+  },
   component: () => (
     <MantineProvider theme={theme}>
-      <Outlet />
+      <OidcInitializationGate
+        fallback={
+          <Center h="100vh">
+            <Loader />
+          </Center>
+        }
+      >
+        <Outlet />
+      </OidcInitializationGate>
       {import.meta.env.DEV ? <TanStackRouterDevtools /> : null}
     </MantineProvider>
   ),

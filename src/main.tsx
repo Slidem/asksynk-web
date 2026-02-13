@@ -1,3 +1,7 @@
+import { oidcEarlyInit } from "oidc-spa/entrypoint";
+
+oidcEarlyInit({ BASE_URL: "/" });
+
 import "@/index.css";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
