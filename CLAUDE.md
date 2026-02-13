@@ -16,4 +16,4 @@
 - **Never fix linting issue** Skip linting issues, I'll fix any linting issue myself
 - **Never fix import ordering, or unused imports** I'll fix those myself
 - **User import aliases** Avoid relative imports, use import aliases as defined in tsconfig
-- **Always prompt me for testing commands** Never run any commands to test implementation like "pnpm run dev:api" or running migrations yourself; prompt me so i can do it manually; and then continue after i done so
+- **Always prompt me for testing commands** Never run any commands to test implementation like "pnpm run dev"; prompt me so i can do it manually; and then continue after i done so
