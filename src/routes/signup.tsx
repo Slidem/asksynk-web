@@ -1,6 +1,7 @@
 import { Center, Loader, Stack, Text } from "@mantine/core";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { getOidc, useOidc } from "@/oidc";
+
 import { useEffect } from "react";
 
 export const Route = createFileRoute("/signup")({
