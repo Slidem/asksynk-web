@@ -1,12 +1,12 @@
 import "@mantine/core/styles.css";
 import "@/App.css";
 
+import { Center, Loader, MantineProvider } from "@mantine/core";
+import { OidcInitializationGate, bootstrapOidc, getOidcConfig } from "@/oidc";
 import { Outlet, createRootRoute } from "@tanstack/react-router";
 
-import { Center, Loader, MantineProvider } from "@mantine/core";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import theme from "@/theme";
-import { bootstrapOidc, getOidcConfig, OidcInitializationGate } from "@/oidc";
 
 export const Route = createRootRoute({
   beforeLoad: async () => {
