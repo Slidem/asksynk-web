@@ -9,12 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from "./routes/__root"
+import { Route as VerifyEmailRouteImport } from "./routes/verify-email"
 import { Route as SignupRouteImport } from "./routes/signup"
 import { Route as SigninRouteImport } from "./routes/signin"
 import { Route as AuthenticatedRouteImport } from "./routes/_authenticated"
 import { Route as IndexRouteImport } from "./routes/index"
 import { Route as AuthenticatedDashboardRouteImport } from "./routes/_authenticated/dashboard"
 
+const VerifyEmailRoute = VerifyEmailRouteImport.update({
+  id: "/verify-email",
+  path: "/verify-email",
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupRoute = SignupRouteImport.update({
   id: "/signup",
   path: "/signup",
@@ -44,12 +50,14 @@ export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
   "/signin": typeof SigninRoute
   "/signup": typeof SignupRoute
+  "/verify-email": typeof VerifyEmailRoute
   "/dashboard": typeof AuthenticatedDashboardRoute
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
   "/signin": typeof SigninRoute
   "/signup": typeof SignupRoute
+  "/verify-email": typeof VerifyEmailRoute
   "/dashboard": typeof AuthenticatedDashboardRoute
 }
 export interface FileRoutesById {
@@ -58,19 +66,21 @@ export interface FileRoutesById {
   "/_authenticated": typeof AuthenticatedRouteWithChildren
   "/signin": typeof SigninRoute
   "/signup": typeof SignupRoute
+  "/verify-email": typeof VerifyEmailRoute
   "/_authenticated/dashboard": typeof AuthenticatedDashboardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: "/" | "/signin" | "/signup" | "/dashboard"
+  fullPaths: "/" | "/signin" | "/signup" | "/verify-email" | "/dashboard"
   fileRoutesByTo: FileRoutesByTo
-  to: "/" | "/signin" | "/signup" | "/dashboard"
+  to: "/" | "/signin" | "/signup" | "/verify-email" | "/dashboard"
   id:
     | "__root__"
     | "/"
     | "/_authenticated"
     | "/signin"
     | "/signup"
+    | "/verify-email"
     | "/_authenticated/dashboard"
   fileRoutesById: FileRoutesById
 }
@@ -79,10 +89,18 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
+  VerifyEmailRoute: typeof VerifyEmailRoute
 }
 
 declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
+    "/verify-email": {
+      id: "/verify-email"
+      path: "/verify-email"
+      fullPath: "/verify-email"
+      preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     "/signup": {
       id: "/signup"
       path: "/signup"
@@ -138,6 +156,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
+  VerifyEmailRoute: VerifyEmailRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,10 +1,12 @@
 import { Avatar, Badge, Group, Menu, Text, UnstyledButton } from "@mantine/core";
-import { useOidc } from "@/oidc";
+import { useNavigate } from "@tanstack/react-router";
+import { authClient, useSession } from "@/auth";
 
 export function AuthStatusBadge() {
-  const oidc = useOidc();
+  const { data: session } = useSession();
+  const navigate = useNavigate();
 
-  if (!oidc.isUserLoggedIn) {
+  if (!session) {
     return (
       <Badge variant="light" color="gray">
         Guest
@@ -12,15 +14,10 @@ export function AuthStatusBadge() {
     );
   }
 
-  const { decodedIdToken, logout } = oidc;
-  const displayName =
-    decodedIdToken.name ||
-    decodedIdToken.preferred_username ||
-    decodedIdToken.email ||
-    "User";
+  const displayName = session.user?.name || session.user?.email || "User";
   const initials = displayName
     .split(" ")
-    .map((n) => n[0])
+    .map((name: string) => name[0])
     .join("")
     .toUpperCase()
     .slice(0, 2);
@@ -43,23 +40,26 @@ export function AuthStatusBadge() {
         </UnstyledButton>
       </Menu.Target>
 
-      <Menu.Dropdown>
-        <Menu.Label>Account</Menu.Label>
-        {decodedIdToken.email && (
-          <Menu.Item disabled>
-            <Text size="xs" c="dimmed">
-              {decodedIdToken.email}
-            </Text>
+        <Menu.Dropdown>
+          <Menu.Label>Account</Menu.Label>
+          {session.user?.email && (
+            <Menu.Item disabled>
+              <Text size="xs" c="dimmed">
+                {session.user.email}
+              </Text>
+            </Menu.Item>
+          )}
+          <Menu.Divider />
+          <Menu.Item
+            color="red"
+            onClick={async () => {
+              await authClient.signOut();
+              navigate({ to: "/" });
+            }}
+          >
+            Sign out
           </Menu.Item>
-        )}
-        <Menu.Divider />
-        <Menu.Item
-          color="red"
-          onClick={() => logout({ redirectTo: "specific url", url: "/" })}
-        >
-          Sign out
-        </Menu.Item>
-      </Menu.Dropdown>
+        </Menu.Dropdown>
     </Menu>
   );
 }

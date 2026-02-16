@@ -1,14 +1,15 @@
 import { Card, Stack, Text, Title } from "@mantine/core";
 
 import { createFileRoute } from "@tanstack/react-router";
-import { useOidc } from "@/oidc";
+import { useSession } from "@/auth";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
 });
 
 function DashboardPage() {
-  const oidc = useOidc({ assert: "user logged in" });
+  const { data: session } = useSession();
+  const user = session?.user;
 
   return (
     <Stack gap="md">
@@ -20,10 +21,7 @@ function DashboardPage() {
           <Text c="dimmed" size="sm">
             You are signed in as{" "}
             <Text component="span" fw={500}>
-              {oidc.decodedIdToken.email ||
-                oidc.decodedIdToken.preferred_username ||
-                oidc.decodedIdToken.name ||
-                "User"}
+              {user?.email || user?.name || "User"}
             </Text>
           </Text>
         </Stack>
@@ -33,35 +31,27 @@ function DashboardPage() {
         <Stack gap="sm">
           <Text fw={500}>Your Profile</Text>
           <Stack gap="xs">
-            {oidc.decodedIdToken.name && (
+            {user?.name && (
               <Text size="sm">
                 <Text component="span" c="dimmed">
                   Name:
                 </Text>{" "}
-                {oidc.decodedIdToken.name}
+                {user.name}
               </Text>
             )}
-            {oidc.decodedIdToken.email && (
+            {user?.email && (
               <Text size="sm">
                 <Text component="span" c="dimmed">
                   Email:
                 </Text>{" "}
-                {oidc.decodedIdToken.email}
-              </Text>
-            )}
-            {oidc.decodedIdToken.preferred_username && (
-              <Text size="sm">
-                <Text component="span" c="dimmed">
-                  Username:
-                </Text>{" "}
-                {oidc.decodedIdToken.preferred_username}
+                {user.email}
               </Text>
             )}
             <Text size="sm">
               <Text component="span" c="dimmed">
                 User ID:
               </Text>{" "}
-              {oidc.decodedIdToken.sub}
+              {user?.id ?? "-"}
             </Text>
           </Stack>
         </Stack>

@@ -1,22 +1,20 @@
-import { getOidc } from "@/oidc";
+import { authClient } from "@/auth";
 
 export async function fetchWithAuth(
   url: string,
   options: RequestInit = {}
 ): Promise<Response> {
-  const oidc = await getOidc();
+  const { data: session } = await authClient.getSession();
 
-  if (!oidc.isUserLoggedIn) {
+  if (!session) {
     throw new Error("User is not logged in");
   }
 
-  const accessToken = await oidc.getAccessToken();
-
   return fetch(url, {
     ...options,
+    credentials: options.credentials ?? "include",
     headers: {
       ...options.headers,
-      Authorization: `Bearer ${accessToken}`,
     },
   });
 }

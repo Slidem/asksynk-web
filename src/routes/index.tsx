@@ -9,25 +9,25 @@ import {
 } from "@mantine/core";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { AuthStatusBadge } from "@/components/AuthStatusBadge";
-import { useOidc } from "@/oidc";
+import { useSession } from "@/auth";
 
 export const Route = createFileRoute("/")({
   component: IndexPage,
 });
 
 function IndexPage() {
-  const oidc = useOidc();
+  const { data: session } = useSession();
 
   return (
     <Container py="xl">
       <Stack gap="lg">
         <Group justify="space-between" align="center">
           <Title order={1}>asksynk</Title>
-          <Group gap="sm">
-            <AuthStatusBadge />
-            {!oidc.isUserLoggedIn && (
-              <>
-                <Button
+            <Group gap="sm">
+              <AuthStatusBadge />
+              {!session && (
+                <>
+                  <Button
                   component={Link}
                   to="/signin"
                   variant="subtle"
@@ -38,15 +38,15 @@ function IndexPage() {
                 <Button component={Link} to="/signup" size="sm">
                   Sign Up
                 </Button>
-              </>
-            )}
-            {oidc.isUserLoggedIn && (
-              <Button component={Link} to="/dashboard" size="sm">
-                Dashboard
-              </Button>
-            )}
+                </>
+              )}
+              {session && (
+                <Button component={Link} to="/dashboard" size="sm">
+                  Dashboard
+                </Button>
+              )}
+            </Group>
           </Group>
-        </Group>
 
         <Stack gap="md">
           <Text size="lg">
@@ -54,7 +54,7 @@ function IndexPage() {
             authentication.
           </Text>
 
-          {!oidc.isUserLoggedIn && (
+          {!session && (
             <Text c="dimmed">
               <Anchor component={Link} to="/signin">
                 Sign in
@@ -67,7 +67,7 @@ function IndexPage() {
             </Text>
           )}
 
-          {oidc.isUserLoggedIn && (
+          {session && (
             <Text c="dimmed">
               You're signed in. Go to your{" "}
               <Anchor component={Link} to="/dashboard">
