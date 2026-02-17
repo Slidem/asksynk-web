@@ -1,5 +1,6 @@
 import { Button, Card, Group, Stack, Text } from "@mantine/core";
-import { memo } from "react";
+
+import { memo, type SubmitEvent } from "react";
 
 interface Props {
   mode: "password" | "magic";
@@ -8,7 +9,7 @@ interface Props {
   renderForm: () => React.ReactNode;
   submitLabel: string;
   isSubmitting: boolean;
-  handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  handleSubmit: (event: SubmitEvent) => void;
 }
 
 const SignUpFormContainer = ({

@@ -12,6 +12,11 @@
 
 - **Keep components focused and testable**
 - **Follow the established patterns for consistency**
+- **Feature-based structure**: `signin`, `signup`, `verify-email`
+- **Feature folders include**: `components`, `models`, `queries`, `utils` (folders or files)
+- **Shared components**: `src/components`
+- **Shared lib functions**: `src/lib`
+- **Shared utils**: `src/utils`
 - **DON'T USE BARREL EXPORTS**
 - **Never fix linting issue** Skip linting issues, I'll fix any linting issue myself
 - **Never fix import ordering, or unused imports** I'll fix those myself

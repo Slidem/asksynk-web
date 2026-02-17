@@ -1,4 +1,5 @@
 import { Anchor, Group, Text } from "@mantine/core";
+
 import { memo } from "react";
 
 interface Props {
