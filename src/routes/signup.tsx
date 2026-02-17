@@ -39,6 +39,10 @@ function SignUpPage() {
         : "/dashboard",
     }),
   });
+  const emailVerificationCallback = `/signin?${new URLSearchParams({
+    redirect: redirectTo,
+    verified: "1",
+  }).toString()}`;
   const [mode, setMode] = useState<"password" | "magic">("password");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -76,19 +80,21 @@ function SignUpPage() {
           setMagicSent(true);
         }
       } else {
-        const { error } = await authClient.signUp.email({
+        const { error, data } = await authClient.signUp.email({
           name: values.name,
           email: values.email,
           password: values.password,
-          callbackURL: redirectTo,
+          callbackURL: emailVerificationCallback,
         });
         if (error) {
           setFormError(error.message || "");
         } else {
-          const { data } = await authClient.getSession();
-          if (data?.user?.emailVerified) {
+          if (data.user.emailVerified) {
             navigate({ to: redirectTo });
           } else {
+            console.info(
+              "Email not verified, redirecting to verify email page",
+            );
             navigate({
               to: "/verify-email",
               search: { redirect: redirectTo },

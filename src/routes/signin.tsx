@@ -5,6 +5,7 @@ import {
   Card,
   Container,
   Group,
+  Paper,
   PasswordInput,
   Stack,
   Text,
@@ -12,7 +13,7 @@ import {
   Title,
 } from "@mantine/core";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import type { FormEvent } from "react";
 import { authClient } from "@/auth";
@@ -20,6 +21,7 @@ import { authClient } from "@/auth";
 export const Route = createFileRoute("/signin")({
   validateSearch: (search: Record<string, string | undefined>) => ({
     redirect: search.redirect,
+    verified: search.verified,
   }),
   beforeLoad: async () => {
     const { data } = await authClient.getSession();
@@ -32,22 +34,35 @@ export const Route = createFileRoute("/signin")({
 
 function SignInPage() {
   const navigate = useNavigate();
-  const { redirect: redirectTo } = Route.useSearch({
+  const { redirect: redirectTo, verified } = Route.useSearch({
     select: (search) => ({
       redirect: search.redirect?.startsWith("/")
         ? search.redirect
         : "/dashboard",
+      verified: search.verified === "1",
     }),
   });
   const [mode, setMode] = useState<"password" | "magic">("password");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [magicSent, setMagicSent] = useState(false);
+  const [showVerified, setShowVerified] = useState(verified);
   const [values, setValues] = useState({
     email: "",
     password: "",
     name: "",
   });
+
+  useEffect(() => {
+    if (!verified) {
+      return;
+    }
+    setShowVerified(true);
+    const timer = window.setTimeout(() => {
+      setShowVerified(false);
+    }, 4500);
+    return () => window.clearTimeout(timer);
+  }, [verified]);
 
   const isMagicMode = mode === "magic";
   const submitLabel = useMemo(() => {
@@ -144,6 +159,28 @@ function SignInPage() {
               <Alert color="green" variant="light">
                 Check your email for a sign in link.
               </Alert>
+            ) : null}
+
+            {showVerified ? (
+              <Paper
+                radius="md"
+                p="md"
+                style={{
+                  background:
+                    "linear-gradient(135deg, rgba(230, 245, 255, 0.95), rgba(220, 255, 236, 0.95))",
+                  border: "1px solid rgba(90, 200, 120, 0.35)",
+                  boxShadow: "0 12px 28px rgba(35, 150, 100, 0.12)",
+                }}
+              >
+                <Stack gap={6}>
+                  <Text fw={600} size="sm">
+                    Email verified
+                  </Text>
+                  <Text size="sm" c="dimmed">
+                    Your account is verified. Sign in to continue.
+                  </Text>
+                </Stack>
+              </Paper>
             ) : null}
 
             <form onSubmit={handleSubmit}>

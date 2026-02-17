@@ -8,15 +8,9 @@ export const Route = createFileRoute("/verify-email")({
     redirect: search.redirect,
   }),
 
-  beforeLoad: async (ctx) => {
+  beforeLoad: async () => {
     const { data } = await authClient.getSession();
-    if (!data) {
-      throw redirect({
-        to: "/signin",
-        search: { redirect: ctx.location.pathname },
-      });
-    }
-    if (data.user?.emailVerified) {
+    if (data?.user?.emailVerified) {
       throw redirect({ to: "/dashboard" });
     }
   },
