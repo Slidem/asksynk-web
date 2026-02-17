@@ -1,7 +1,6 @@
 import {
   Alert,
   Anchor,
-  alpha,
   Button,
   Card,
   Container,
@@ -12,6 +11,7 @@ import {
   Text,
   TextInput,
   Title,
+  alpha,
   useMantineColorScheme,
   useMantineTheme,
 } from "@mantine/core";

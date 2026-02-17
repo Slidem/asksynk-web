@@ -1,5 +1,4 @@
 import "@mantine/core/styles.css";
-import "@/App.css";
 
 import { Center, Loader, MantineProvider } from "@mantine/core";
 import { Outlet, createRootRoute } from "@tanstack/react-router";
@@ -16,9 +15,9 @@ function RootLayout() {
   const { isPending } = useSession();
 
   return (
-    <MantineProvider defaultColorScheme="auto" theme={theme}>
+    <MantineProvider defaultColorScheme="light" theme={theme}>
       {isPending ? (
-        <Center h="100vh">
+        <Center h="100vh" w="100vw">
           <Loader />
         </Center>
       ) : (

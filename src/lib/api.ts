@@ -2,7 +2,7 @@ import { authClient } from "@/auth";
 
 export async function fetchWithAuth(
   url: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<Response> {
   const { data: session } = await authClient.getSession();
 
