@@ -13,7 +13,7 @@ import {
   Title,
 } from "@mantine/core";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import type { FormEvent } from "react";
 import { authClient } from "@/auth";
@@ -39,30 +39,18 @@ function SignInPage() {
       redirect: search.redirect?.startsWith("/")
         ? search.redirect
         : "/dashboard",
-      verified: search.verified === "1",
+      verified: !!search.verified,
     }),
   });
   const [mode, setMode] = useState<"password" | "magic">("password");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [magicSent, setMagicSent] = useState(false);
-  const [showVerified, setShowVerified] = useState(verified);
   const [values, setValues] = useState({
     email: "",
     password: "",
     name: "",
   });
-
-  useEffect(() => {
-    if (!verified) {
-      return;
-    }
-    setShowVerified(true);
-    const timer = window.setTimeout(() => {
-      setShowVerified(false);
-    }, 4500);
-    return () => window.clearTimeout(timer);
-  }, [verified]);
 
   const isMagicMode = mode === "magic";
   const submitLabel = useMemo(() => {
@@ -161,7 +149,7 @@ function SignInPage() {
               </Alert>
             ) : null}
 
-            {showVerified ? (
+            {verified ? (
               <Paper
                 radius="md"
                 p="md"

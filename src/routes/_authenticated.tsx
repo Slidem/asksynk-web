@@ -32,7 +32,7 @@ export const Route = createFileRoute("/_authenticated")({
     if (!data) {
       throw redirect({
         to: "/signin",
-        search: { redirect: redirectTarget },
+        search: { redirect: redirectTarget, verified: undefined },
       });
     }
     if (!data.user?.emailVerified) {
