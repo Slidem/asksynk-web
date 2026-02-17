@@ -1,7 +1,7 @@
-import { Container, Group, Stack, Title } from "@mantine/core";
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
 
-import { AuthStatusBadge } from "@/components/AuthStatusBadge";
+import { Box } from "@mantine/core";
+import { Navbar } from "@/app/components/Navbar/Navbar";
 import { authClient } from "@/auth";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -47,14 +47,14 @@ export const Route = createFileRoute("/_authenticated")({
 
 function AuthenticatedLayout() {
   return (
-    <Container py="xl">
-      <Stack gap="lg">
-        <Group justify="space-between" align="center">
-          <Title order={1}>asksynk</Title>
-          <AuthStatusBadge />
-        </Group>
+    <Box style={{ display: "flex" }}>
+      <Navbar />
+      <Box
+        component="main"
+        style={{ flex: 1, padding: "var(--mantine-spacing-md)" }}
+      >
         <Outlet />
-      </Stack>
-    </Container>
+      </Box>
+    </Box>
   );
 }

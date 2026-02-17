@@ -14,6 +14,12 @@ import { Route as SignupRouteImport } from "./routes/signup"
 import { Route as SigninRouteImport } from "./routes/signin"
 import { Route as AuthenticatedRouteImport } from "./routes/_authenticated"
 import { Route as IndexRouteImport } from "./routes/index"
+import { Route as AuthenticatedTimerRouteImport } from "./routes/_authenticated/timer"
+import { Route as AuthenticatedTagsRouteImport } from "./routes/_authenticated/tags"
+import { Route as AuthenticatedScheduleRouteImport } from "./routes/_authenticated/schedule"
+import { Route as AuthenticatedNetworkRouteImport } from "./routes/_authenticated/network"
+import { Route as AuthenticatedMessagesRouteImport } from "./routes/_authenticated/messages"
+import { Route as AuthenticatedIntegrationsRouteImport } from "./routes/_authenticated/integrations"
 import { Route as AuthenticatedDashboardRouteImport } from "./routes/_authenticated/dashboard"
 
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
@@ -40,6 +46,37 @@ const IndexRoute = IndexRouteImport.update({
   path: "/",
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTimerRoute = AuthenticatedTimerRouteImport.update({
+  id: "/timer",
+  path: "/timer",
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedTagsRoute = AuthenticatedTagsRouteImport.update({
+  id: "/tags",
+  path: "/tags",
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedScheduleRoute = AuthenticatedScheduleRouteImport.update({
+  id: "/schedule",
+  path: "/schedule",
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedNetworkRoute = AuthenticatedNetworkRouteImport.update({
+  id: "/network",
+  path: "/network",
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedMessagesRoute = AuthenticatedMessagesRouteImport.update({
+  id: "/messages",
+  path: "/messages",
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedIntegrationsRoute =
+  AuthenticatedIntegrationsRouteImport.update({
+    id: "/integrations",
+    path: "/integrations",
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: "/dashboard",
   path: "/dashboard",
@@ -52,6 +89,12 @@ export interface FileRoutesByFullPath {
   "/signup": typeof SignupRoute
   "/verify-email": typeof VerifyEmailRoute
   "/dashboard": typeof AuthenticatedDashboardRoute
+  "/integrations": typeof AuthenticatedIntegrationsRoute
+  "/messages": typeof AuthenticatedMessagesRoute
+  "/network": typeof AuthenticatedNetworkRoute
+  "/schedule": typeof AuthenticatedScheduleRoute
+  "/tags": typeof AuthenticatedTagsRoute
+  "/timer": typeof AuthenticatedTimerRoute
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
@@ -59,6 +102,12 @@ export interface FileRoutesByTo {
   "/signup": typeof SignupRoute
   "/verify-email": typeof VerifyEmailRoute
   "/dashboard": typeof AuthenticatedDashboardRoute
+  "/integrations": typeof AuthenticatedIntegrationsRoute
+  "/messages": typeof AuthenticatedMessagesRoute
+  "/network": typeof AuthenticatedNetworkRoute
+  "/schedule": typeof AuthenticatedScheduleRoute
+  "/tags": typeof AuthenticatedTagsRoute
+  "/timer": typeof AuthenticatedTimerRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -68,12 +117,40 @@ export interface FileRoutesById {
   "/signup": typeof SignupRoute
   "/verify-email": typeof VerifyEmailRoute
   "/_authenticated/dashboard": typeof AuthenticatedDashboardRoute
+  "/_authenticated/integrations": typeof AuthenticatedIntegrationsRoute
+  "/_authenticated/messages": typeof AuthenticatedMessagesRoute
+  "/_authenticated/network": typeof AuthenticatedNetworkRoute
+  "/_authenticated/schedule": typeof AuthenticatedScheduleRoute
+  "/_authenticated/tags": typeof AuthenticatedTagsRoute
+  "/_authenticated/timer": typeof AuthenticatedTimerRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: "/" | "/signin" | "/signup" | "/verify-email" | "/dashboard"
+  fullPaths:
+    | "/"
+    | "/signin"
+    | "/signup"
+    | "/verify-email"
+    | "/dashboard"
+    | "/integrations"
+    | "/messages"
+    | "/network"
+    | "/schedule"
+    | "/tags"
+    | "/timer"
   fileRoutesByTo: FileRoutesByTo
-  to: "/" | "/signin" | "/signup" | "/verify-email" | "/dashboard"
+  to:
+    | "/"
+    | "/signin"
+    | "/signup"
+    | "/verify-email"
+    | "/dashboard"
+    | "/integrations"
+    | "/messages"
+    | "/network"
+    | "/schedule"
+    | "/tags"
+    | "/timer"
   id:
     | "__root__"
     | "/"
@@ -82,6 +159,12 @@ export interface FileRouteTypes {
     | "/signup"
     | "/verify-email"
     | "/_authenticated/dashboard"
+    | "/_authenticated/integrations"
+    | "/_authenticated/messages"
+    | "/_authenticated/network"
+    | "/_authenticated/schedule"
+    | "/_authenticated/tags"
+    | "/_authenticated/timer"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -129,6 +212,48 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    "/_authenticated/timer": {
+      id: "/_authenticated/timer"
+      path: "/timer"
+      fullPath: "/timer"
+      preLoaderRoute: typeof AuthenticatedTimerRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    "/_authenticated/tags": {
+      id: "/_authenticated/tags"
+      path: "/tags"
+      fullPath: "/tags"
+      preLoaderRoute: typeof AuthenticatedTagsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    "/_authenticated/schedule": {
+      id: "/_authenticated/schedule"
+      path: "/schedule"
+      fullPath: "/schedule"
+      preLoaderRoute: typeof AuthenticatedScheduleRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    "/_authenticated/network": {
+      id: "/_authenticated/network"
+      path: "/network"
+      fullPath: "/network"
+      preLoaderRoute: typeof AuthenticatedNetworkRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    "/_authenticated/messages": {
+      id: "/_authenticated/messages"
+      path: "/messages"
+      fullPath: "/messages"
+      preLoaderRoute: typeof AuthenticatedMessagesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    "/_authenticated/integrations": {
+      id: "/_authenticated/integrations"
+      path: "/integrations"
+      fullPath: "/integrations"
+      preLoaderRoute: typeof AuthenticatedIntegrationsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     "/_authenticated/dashboard": {
       id: "/_authenticated/dashboard"
       path: "/dashboard"
@@ -141,10 +266,22 @@ declare module "@tanstack/react-router" {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedIntegrationsRoute: typeof AuthenticatedIntegrationsRoute
+  AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
+  AuthenticatedNetworkRoute: typeof AuthenticatedNetworkRoute
+  AuthenticatedScheduleRoute: typeof AuthenticatedScheduleRoute
+  AuthenticatedTagsRoute: typeof AuthenticatedTagsRoute
+  AuthenticatedTimerRoute: typeof AuthenticatedTimerRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedIntegrationsRoute: AuthenticatedIntegrationsRoute,
+  AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
+  AuthenticatedNetworkRoute: AuthenticatedNetworkRoute,
+  AuthenticatedScheduleRoute: AuthenticatedScheduleRoute,
+  AuthenticatedTagsRoute: AuthenticatedTagsRoute,
+  AuthenticatedTimerRoute: AuthenticatedTimerRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

@@ -22,6 +22,8 @@
 - **Never fix import ordering, or unused imports** I'll fix those myself
 - **User import aliases** Avoid relative imports, use import aliases as defined in tsconfig
 - **Always prompt me for testing commands** Never run any commands to test implementation like "pnpm run dev"; prompt me so i can do it manually; and then continue after i done so
+- **Always check for mantine ui components** whenever implementing a feature (https://ui.mantine.dev/) or any bigger changes than just small ones (adding a button, fixing a bug). Mantine ui components contain detailed examples of built components that can be used (such as navbar etc..)
+- **Keep components small and reusable** Avoid big components. One component per file as much as possible. Use proper design patterns to keep SRP.
 
 ## MCP
 
