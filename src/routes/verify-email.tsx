@@ -7,6 +7,7 @@ export const Route = createFileRoute("/verify-email")({
   validateSearch: (search: Record<string, string | undefined>) => ({
     redirect: search.redirect,
   }),
+
   beforeLoad: async (ctx) => {
     const { data } = await authClient.getSession();
     if (!data) {
@@ -23,7 +24,6 @@ export const Route = createFileRoute("/verify-email")({
 });
 
 function VerifyEmailPage() {
-
   return (
     <Container size="xs" py="xl">
       <Stack gap="lg">

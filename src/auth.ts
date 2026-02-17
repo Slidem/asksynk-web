@@ -8,24 +8,9 @@ if (!rawBaseURL) {
 }
 
 const normalizedBaseURL = rawBaseURL.replace(/\/$/, "");
-const apiBaseURL = `${normalizedBaseURL}/api/auth`;
-const shouldProxy =
-  import.meta.env.DEV &&
-  typeof window !== "undefined" &&
-  (() => {
-    try {
-      return new URL(normalizedBaseURL).origin !== window.location.origin;
-    } catch {
-      return false;
-    }
-  })();
-
-const baseURL = shouldProxy
-  ? new URL("/api/auth", window.location.origin).toString()
-  : apiBaseURL;
 
 export const authClient = createAuthClient({
-  baseURL,
+  baseURL: normalizedBaseURL,
   plugins: [magicLinkClient()],
   fetchOptions: {
     credentials: "include",

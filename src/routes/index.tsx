@@ -8,6 +8,7 @@ import {
   Title,
 } from "@mantine/core";
 import { Link, createFileRoute } from "@tanstack/react-router";
+
 import { AuthStatusBadge } from "@/components/AuthStatusBadge";
 import { useSession } from "@/auth";
 
@@ -23,11 +24,11 @@ function IndexPage() {
       <Stack gap="lg">
         <Group justify="space-between" align="center">
           <Title order={1}>asksynk</Title>
-            <Group gap="sm">
-              <AuthStatusBadge />
-              {!session && (
-                <>
-                  <Button
+          <Group gap="sm">
+            <AuthStatusBadge />
+            {!session && (
+              <>
+                <Button
                   component={Link}
                   to="/signin"
                   variant="subtle"
@@ -38,15 +39,15 @@ function IndexPage() {
                 <Button component={Link} to="/signup" size="sm">
                   Sign Up
                 </Button>
-                </>
-              )}
-              {session && (
-                <Button component={Link} to="/dashboard" size="sm">
-                  Dashboard
-                </Button>
-              )}
-            </Group>
+              </>
+            )}
+            {session && (
+              <Button component={Link} to="/dashboard" size="sm">
+                Dashboard
+              </Button>
+            )}
           </Group>
+        </Group>
 
         <Stack gap="md">
           <Text size="lg">
