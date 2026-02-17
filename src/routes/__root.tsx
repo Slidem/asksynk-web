@@ -16,7 +16,7 @@ function RootLayout() {
   const { isPending } = useSession();
 
   return (
-    <MantineProvider theme={theme}>
+    <MantineProvider defaultColorScheme="auto" theme={theme}>
       {isPending ? (
         <Center h="100vh">
           <Loader />

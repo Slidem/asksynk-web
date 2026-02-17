@@ -1,6 +1,7 @@
 import {
   Alert,
   Anchor,
+  alpha,
   Button,
   Card,
   Container,
@@ -11,6 +12,8 @@ import {
   Text,
   TextInput,
   Title,
+  useMantineColorScheme,
+  useMantineTheme,
 } from "@mantine/core";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
@@ -33,6 +36,8 @@ export const Route = createFileRoute("/signin")({
 });
 
 function SignInPage() {
+  const theme = useMantineTheme();
+  const { colorScheme } = useMantineColorScheme();
   const navigate = useNavigate();
   const { redirect: redirectTo, verified } = Route.useSearch({
     select: (search) => ({
@@ -51,6 +56,10 @@ function SignInPage() {
     password: "",
     name: "",
   });
+  const isUnverifiedError =
+    formError?.toLowerCase().includes("verify") ||
+    formError?.toLowerCase().includes("verified") ||
+    false;
 
   const isMagicMode = mode === "magic";
   const submitLabel = useMemo(() => {
@@ -138,9 +147,71 @@ function SignInPage() {
             </Group>
 
             {formError ? (
-              <Alert color="red" variant="light">
-                {formError}
-              </Alert>
+              isUnverifiedError ? (
+                <Paper
+                  radius="md"
+                  p="md"
+                  style={{
+                    background:
+                      colorScheme === "dark"
+                        ? `linear-gradient(135deg, ${alpha(
+                            theme.colors.yellow[9],
+                            0.32,
+                          )}, ${alpha(theme.colors.yellow[8], 0.2)})`
+                        : `linear-gradient(135deg, ${alpha(
+                            theme.colors.yellow[0],
+                            0.98,
+                          )}, ${alpha(theme.colors.yellow[2], 0.88)})`,
+                    border:
+                      colorScheme === "dark"
+                        ? `1px solid ${alpha(theme.colors.yellow[6], 0.5)}`
+                        : `1px solid ${alpha(theme.colors.yellow[4], 0.5)}`,
+                    boxShadow:
+                      colorScheme === "dark"
+                        ? `0 12px 28px ${alpha(theme.colors.yellow[9], 0.35)}`
+                        : `0 12px 28px ${alpha(theme.colors.yellow[7], 0.18)}`,
+                  }}
+                >
+                  <Stack gap={6}>
+                    <Text
+                      fw={600}
+                      size="sm"
+                      c={colorScheme === "dark" ? "yellow.1" : "dark"}
+                    >
+                      Email not verified
+                    </Text>
+                    <Text
+                      size="sm"
+                      c={colorScheme === "dark" ? "yellow.1" : "dimmed"}
+                    >
+                      This account needs a verified email before sign in is
+                      allowed.
+                    </Text>
+                    <Text
+                      size="sm"
+                      c={colorScheme === "dark" ? "yellow.1" : "dimmed"}
+                    >
+                      Check your inbox for the verification link, then return
+                      here to sign in. If it is missing, check spam or search
+                      for "asksynk".
+                    </Text>
+                    <Anchor
+                      size="sm"
+                      fw={500}
+                      c={colorScheme === "dark" ? "yellow.0" : "yellow.9"}
+                      href={`/verify-email?redirect=${encodeURIComponent(
+                        redirectTo,
+                      )}`}
+                    >
+                      Go to email verification steps
+                    </Anchor>
+                  </Stack>
+                </Paper>
+              ) : (
+                <Alert color="red" variant="light">
+                  {formError}
+                </Alert>
+              )
             ) : null}
 
             {magicSent ? (
