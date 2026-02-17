@@ -1,6 +1,14 @@
-import { Avatar, Badge, Group, Menu, Text, UnstyledButton } from "@mantine/core";
-import { useNavigate } from "@tanstack/react-router";
+import {
+  Avatar,
+  Badge,
+  Group,
+  Menu,
+  Text,
+  UnstyledButton,
+} from "@mantine/core";
 import { authClient, useSession } from "@/auth";
+
+import { useNavigate } from "@tanstack/react-router";
 
 export function AuthStatusBadge() {
   const { data: session } = useSession();
@@ -40,26 +48,26 @@ export function AuthStatusBadge() {
         </UnstyledButton>
       </Menu.Target>
 
-        <Menu.Dropdown>
-          <Menu.Label>Account</Menu.Label>
-          {session.user?.email && (
-            <Menu.Item disabled>
-              <Text size="xs" c="dimmed">
-                {session.user.email}
-              </Text>
-            </Menu.Item>
-          )}
-          <Menu.Divider />
-          <Menu.Item
-            color="red"
-            onClick={async () => {
-              await authClient.signOut();
-              navigate({ to: "/" });
-            }}
-          >
-            Sign out
+      <Menu.Dropdown>
+        <Menu.Label>Account</Menu.Label>
+        {session.user?.email && (
+          <Menu.Item disabled>
+            <Text size="xs" c="dimmed">
+              {session.user.email}
+            </Text>
           </Menu.Item>
-        </Menu.Dropdown>
+        )}
+        <Menu.Divider />
+        <Menu.Item
+          color="red"
+          onClick={async () => {
+            await authClient.signOut();
+            navigate({ to: "/" });
+          }}
+        >
+          Sign out
+        </Menu.Item>
+      </Menu.Dropdown>
     </Menu>
   );
 }

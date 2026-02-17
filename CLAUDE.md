@@ -22,3 +22,7 @@
 - **Never fix import ordering, or unused imports** I'll fix those myself
 - **User import aliases** Avoid relative imports, use import aliases as defined in tsconfig
 - **Always prompt me for testing commands** Never run any commands to test implementation like "pnpm run dev"; prompt me so i can do it manually; and then continue after i done so
+
+## MCP
+
+- For good understanding of library usage, use context7 where possible

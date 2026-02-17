@@ -1,84 +1,28 @@
-import {
-  Anchor,
-  Button,
-  Container,
-  Group,
-  Stack,
-  Text,
-  Title,
-} from "@mantine/core";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { Box, Stack } from "@mantine/core";
 
-import { AuthStatusBadge } from "@/components/AuthStatusBadge";
-import { useSession } from "@/auth";
+import { CTASection } from "@/landing/components/CTASection";
+import { FeaturesSection } from "@/landing/components/FeaturesSection";
+import { Footer } from "@/landing/components/Footer";
+import { Header } from "@/landing/components/Header";
+import { HeroSection } from "@/landing/components/HeroSection";
+import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
   component: IndexPage,
 });
 
 function IndexPage() {
-  const { data: session } = useSession();
-
   return (
-    <Container py="xl">
-      <Stack gap="lg">
-        <Group justify="space-between" align="center">
-          <Title order={1}>asksynk</Title>
-          <Group gap="sm">
-            <AuthStatusBadge />
-            {!session && (
-              <>
-                <Button
-                  component={Link}
-                  to="/signin"
-                  variant="subtle"
-                  size="sm"
-                >
-                  Sign In
-                </Button>
-                <Button component={Link} to="/signup" size="sm">
-                  Sign Up
-                </Button>
-              </>
-            )}
-            {session && (
-              <Button component={Link} to="/dashboard" size="sm">
-                Dashboard
-              </Button>
-            )}
-          </Group>
-        </Group>
-
-        <Stack gap="md">
-          <Text size="lg">
-            Welcome to asksynk. A modern web application with secure
-            authentication.
-          </Text>
-
-          {!session && (
-            <Text c="dimmed">
-              <Anchor component={Link} to="/signin">
-                Sign in
-              </Anchor>{" "}
-              or{" "}
-              <Anchor component={Link} to="/signup">
-                create an account
-              </Anchor>{" "}
-              to access your dashboard.
-            </Text>
-          )}
-
-          {session && (
-            <Text c="dimmed">
-              You're signed in. Go to your{" "}
-              <Anchor component={Link} to="/dashboard">
-                dashboard
-              </Anchor>{" "}
-              to get started.
-            </Text>
-          )}
+    <Stack gap={0}>
+      <Header />
+      <Box flex={1}>
+        <Stack gap="xl">
+          <HeroSection />
+          <FeaturesSection />
+          <CTASection />
         </Stack>
-      </Stack>
-    </Container>
+      </Box>
+      <Footer />
+    </Stack>
   );
 }
