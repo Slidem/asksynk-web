@@ -1,4 +1,13 @@
 import {
+  Avatar,
+  Center,
+  Menu,
+  Stack,
+  Text,
+  Tooltip,
+  UnstyledButton,
+} from "@mantine/core";
+import {
   IconCalendar,
   IconClock,
   IconDashboard,
@@ -7,9 +16,10 @@ import {
   IconPlugConnected,
   IconTags,
 } from "@tabler/icons-react";
-import { Avatar, Center, Menu, Stack, Text, Tooltip, UnstyledButton } from "@mantine/core";
 import { Link, useLocation } from "@tanstack/react-router";
 import { authClient, useSession } from "@/auth";
+
+import { ColorSchemeToggle } from "@/components/ColorSchemeToggle";
 import classes from "./Navbar.module.css";
 
 interface NavbarLinkProps {
@@ -62,7 +72,11 @@ function UserProfile() {
     <Menu shadow="md" width={200} position="right-end">
       <Menu.Target>
         <UnstyledButton className={classes.profileButton}>
-          <Tooltip label={displayName} position="right" transitionProps={{ duration: 0 }}>
+          <Tooltip
+            label={displayName}
+            position="right"
+            transitionProps={{ duration: 0 }}
+          >
             <Avatar size="md" radius="xl" color="blue">
               {initials}
             </Avatar>
@@ -109,6 +123,18 @@ export function Navbar() {
     <nav className={classes.navbar}>
       <Center>
         <UserProfile />
+      </Center>
+
+      <Center mt="lg">
+        <Tooltip
+          label="Toggle theme"
+          position="right"
+          transitionProps={{ duration: 0 }}
+        >
+          <div className={classes.themeToggle}>
+            <ColorSchemeToggle />
+          </div>
+        </Tooltip>
       </Center>
 
       <div className={classes.navbarMain}>
