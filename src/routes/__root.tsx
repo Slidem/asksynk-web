@@ -1,6 +1,6 @@
 import "@mantine/core/styles.css";
 
-import { Center, Loader, MantineProvider } from "@mantine/core";
+import { MantineProvider } from "@mantine/core";
 import { Outlet, createRootRoute } from "@tanstack/react-router";
 
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
@@ -15,7 +15,9 @@ export const Route = createRootRoute({
 });
 
 function RootLayout() {
-  const { isPending } = useSession();
+  // Keep useSession() here to trigger the initial fetch and keep the session atom alive.
+  // Auth-protected routes handle their own loading state.
+  useSession();
 
   return (
     <MantineProvider
@@ -23,13 +25,7 @@ function RootLayout() {
       theme={theme}
       colorSchemeManager={colorSchemeManager}
     >
-      {isPending ? (
-        <Center h="100vh" w="100vw">
-          <Loader />
-        </Center>
-      ) : (
-        <Outlet />
-      )}
+      <Outlet />
       {import.meta.env.DEV ? <TanStackRouterDevtools /> : null}
     </MantineProvider>
   );

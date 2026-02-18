@@ -1,15 +1,21 @@
-import { authClient } from "@/auth";
+const rawApiURL = import.meta.env.VITE_API_URL;
 
-export async function fetchWithAuth(
+if (!rawApiURL) {
+  throw new Error("VITE_API_URL is required");
+}
+
+export const apiBaseUrl = rawApiURL.replace(/\/$/, "");
+
+export function buildApiUrl(path: string) {
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+
+  return `${apiBaseUrl}${normalizedPath}`;
+}
+
+export async function apiFetch(
   url: string,
   options: RequestInit = {},
 ): Promise<Response> {
-  const { data: session } = await authClient.getSession();
-
-  if (!session) {
-    throw new Error("User is not logged in");
-  }
-
   return fetch(url, {
     ...options,
     credentials: options.credentials ?? "include",
