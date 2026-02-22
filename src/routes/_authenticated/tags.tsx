@@ -7,7 +7,6 @@ import {
   Text,
 } from "@mantine/core";
 import type { TagCreateInput, TagDto } from "@/tags/models/tag";
-import { tagFormValuesToInput } from "@/tags/utils/tagFormMapper";
 import { tagsQueryKey, useTagsQuery } from "@/tags/hooks/queries";
 import {
   useCreateTagMutation,
@@ -22,6 +21,7 @@ import { TagDetailsModal } from "@/tags/components/TagDetailsModal";
 import type { TagsFiltersValue } from "@/tags/components/TagsFilters";
 import { TagsPageHeader } from "@/tags/components/TagsPageHeader";
 import { createFileRoute } from "@tanstack/react-router";
+import { tagFormValuesToInput } from "@/tags/utils/tagFormMapper";
 
 export const Route = createFileRoute("/_authenticated/tags")({
   component: TagsPage,
