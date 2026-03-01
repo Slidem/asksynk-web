@@ -1,37 +1,8 @@
-import type {
-  TagCreateInput,
-  TagDto,
-  TagUpdateInput,
-} from "@/tags/models/tag";
+import type { TagCreateInput, TagDto, TagUpdateInput } from "@/tags/models/tag";
 import { apiFetch, buildApiUrl } from "@/lib/api";
-import { useOptimisticMutation } from "@/lib/useOptimisticMutation";
+
 import { tagsQueryKey } from "@/tags/hooks/queries";
-
-function createTempId() {
-  if (typeof crypto !== "undefined" && crypto.randomUUID) {
-    return `temp-${crypto.randomUUID()}`;
-  }
-
-  return `temp-${Math.random().toString(36).slice(2)}`;
-}
-
-function addOptimisticTag(
-  previous: TagDto[] | undefined,
-  input: TagCreateInput,
-): TagDto[] {
-  const nextTag: TagDto = {
-    id: createTempId(),
-    userId: "pending",
-    name: input.name,
-    description: input.description,
-    color: input.color,
-    answerMode: input.answerMode,
-    responseTimeMillis: input.responseTimeMillis,
-    notificationsSettings: input.notificationsSettings,
-  };
-
-  return [...(previous ?? []), nextTag];
-}
+import { useOptimisticMutation } from "@/lib/useOptimisticMutation";
 
 function updateOptimisticTag(
   previous: TagDto[] | undefined,
@@ -117,7 +88,31 @@ export function useCreateTagMutation(
   return useOptimisticMutation<TagDto[], TagCreateInput>({
     queryKey,
     mutationFn: createTag,
-    updater: addOptimisticTag,
+    updater: (previous, input) => {
+      const nextTag: TagDto = {
+        id: input.tempId,
+        userId: "pending",
+        name: input.name,
+        description: input.description,
+        color: input.color,
+        answerMode: input.answerMode,
+        responseTimeMillis: input.responseTimeMillis,
+        notificationsSettings: input.notificationsSettings,
+      };
+
+      return [...(previous ?? []), nextTag];
+    },
+    onSuccessUpdater: (
+      newTag: unknown,
+      oldData: TagDto[] | undefined,
+      input: TagCreateInput,
+    ) => {
+      const replaceWithActualTagWithId = newTag as TagDto;
+      if (!oldData) return [replaceWithActualTagWithId];
+      return oldData.map((tag) =>
+        tag.id === input.tempId ? replaceWithActualTagWithId : tag,
+      );
+    },
     skipInvalidateOnSuccess: true,
   });
 }

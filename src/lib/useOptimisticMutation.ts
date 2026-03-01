@@ -8,6 +8,11 @@ interface UseOptimisticMutationOptions<TData, TVariables> {
   queryKey: QueryKey;
   mutationFn: (variables: TVariables) => Promise<unknown>;
   updater: (oldData: TData | undefined, variables: TVariables) => TData;
+  onSuccessUpdater?: (
+    mutationResult: unknown,
+    queryData: TData | undefined,
+    mutationInput: TVariables,
+  ) => TData;
   skipInvalidateOnSuccess?: boolean;
 }
 
@@ -15,6 +20,7 @@ export function useOptimisticMutation<TData, TVariables>({
   queryKey,
   mutationFn,
   updater,
+  onSuccessUpdater,
   skipInvalidateOnSuccess = false,
 }: UseOptimisticMutationOptions<TData, TVariables>) {
   const queryClient = useQueryClient();
@@ -42,7 +48,13 @@ export function useOptimisticMutation<TData, TVariables>({
       }
       queryClient.invalidateQueries({ queryKey });
     },
-    onSuccess: () => {
+    onSuccess: (mutationFnResult, variables) => {
+      if (onSuccessUpdater) {
+        queryClient.setQueryData(queryKey, (oldData: TData | undefined) =>
+          onSuccessUpdater(mutationFnResult, oldData, variables),
+        );
+      }
+
       if (!skipInvalidateOnSuccess) {
         queryClient.invalidateQueries({ queryKey });
       }

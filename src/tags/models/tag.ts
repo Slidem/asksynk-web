@@ -17,6 +17,7 @@ export interface TagDto {
 }
 
 export interface TagCreateInput {
+  tempId: string;
   name: string;
   description?: string;
   color: string;

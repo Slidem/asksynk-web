@@ -8,7 +8,6 @@ import {
   Paper,
   Stack,
   Text,
-  Title,
   alpha,
 } from "@mantine/core";
 import {
@@ -52,12 +51,7 @@ export function TagDetailsModal({
   };
 
   return (
-    <Modal
-      opened={opened}
-      onClose={onClose}
-      title={<Title order={3}>Tag details</Title>}
-      size="lg"
-    >
+    <Modal opened={opened} onClose={onClose} title="Tag details" size="lg">
       <Stack gap="md">
         <Paper p="md" radius="md" withBorder>
           <Group align="center" gap="md">

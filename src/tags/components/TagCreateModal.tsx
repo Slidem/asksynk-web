@@ -1,10 +1,11 @@
-import { Button, Group, Modal, Title } from "@mantine/core";
-import { useForm } from "@mantine/form";
-import type { TagCreateInput } from "@/tags/models/tag";
-import type { TagFormValues } from "@/tags/models/tagForm";
+import { Button, Group, Modal } from "@mantine/core";
+
 import { DEFAULT_TAG_FORM_VALUES } from "@/tags/models/tagForm";
+import type { TagCreateInput } from "@/tags/models/tag";
 import { TagForm } from "@/tags/components/TagForm";
+import type { TagFormValues } from "@/tags/models/tagForm";
 import { tagFormValuesToInput } from "@/tags/utils/tagFormMapper";
+import { useForm } from "@mantine/form";
 
 interface TagCreateModalProps {
   opened: boolean;
@@ -31,12 +32,7 @@ export function TagCreateModal({
   };
 
   return (
-    <Modal
-      opened={opened}
-      onClose={onClose}
-      title={<Title order={3}>Create tag</Title>}
-      size="lg"
-    >
+    <Modal opened={opened} onClose={onClose} title={"Create new tag"} size="lg">
       <TagForm form={form} />
 
       <Group justify="flex-end" mt="sm">
