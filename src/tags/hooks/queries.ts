@@ -16,6 +16,23 @@ export function tagsQueryKey(filters: TagsFilters) {
   return ["tags", filters] as const;
 }
 
+export function useTagsQuery(filters: TagsFilters) {
+  return useQuery({
+    queryKey: tagsQueryKey(filters),
+    queryFn: () => fetchTags(filters),
+  });
+}
+
+async function fetchTags(filters: TagsFilters): Promise<TagDto[]> {
+  const response = await apiFetch(getTagsUrl(filters));
+
+  if (!response.ok) {
+    throw new Error("Failed to load tags");
+  }
+
+  return response.json();
+}
+
 function getTagsUrl(filters: TagsFilters) {
   const params = new URLSearchParams();
 
@@ -42,21 +59,4 @@ function getTagsUrl(filters: TagsFilters) {
   const suffix = params.toString();
 
   return buildApiUrl(`/tags${suffix ? `?${suffix}` : ""}`);
-}
-
-async function fetchTags(filters: TagsFilters): Promise<TagDto[]> {
-  const response = await apiFetch(getTagsUrl(filters));
-
-  if (!response.ok) {
-    throw new Error("Failed to load tags");
-  }
-
-  return response.json();
-}
-
-export function useTagsQuery(filters: TagsFilters) {
-  return useQuery({
-    queryKey: tagsQueryKey(filters),
-    queryFn: () => fetchTags(filters),
-  });
 }

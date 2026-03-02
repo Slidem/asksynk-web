@@ -12,9 +12,9 @@ import {
   alpha,
 } from "@mantine/core";
 import {
-  IconBolt,
   IconBell,
   IconBellOff,
+  IconBolt,
   IconClock,
   IconClockHour4,
   IconDotsVertical,
@@ -50,7 +50,7 @@ export function TagCard({ tag, onOpen, onEdit, onDelete }: TagCardProps) {
       onClick={() => onOpen(tag)}
     >
       <Stack gap="md">
-        <Group justify="space-between" align="flex-start">
+        <Group justify="space-between" align="flex-start" wrap="nowrap">
           <Group gap="sm" align="center">
             <Box
               w={44}
@@ -113,10 +113,7 @@ export function TagCard({ tag, onOpen, onEdit, onDelete }: TagCardProps) {
           >
             {answerModeLabel}
           </Badge>
-          <Badge
-            variant="light"
-            leftSection={<IconClockHour4 size={12} />}
-          >
+          <Badge variant="light" leftSection={<IconClockHour4 size={12} />}>
             {formatResponseTime(tag.responseTimeMillis)}
           </Badge>
           <Tooltip
@@ -132,7 +129,11 @@ export function TagCard({ tag, onOpen, onEdit, onDelete }: TagCardProps) {
               size={30}
               color={browserEnabled ? "green" : "gray"}
             >
-              {browserEnabled ? <IconBell size={16} /> : <IconBellOff size={16} />}
+              {browserEnabled ? (
+                <IconBell size={16} />
+              ) : (
+                <IconBellOff size={16} />
+              )}
             </ThemeIcon>
           </Tooltip>
           <Tooltip

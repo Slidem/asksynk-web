@@ -1,5 +1,5 @@
-import type { TagAnswerMode } from "@/tags/models/tag";
 import type { ResponseTimeUnit } from "@/tags/utils/responseTime";
+import type { TagAnswerMode } from "@/tags/models/tag";
 
 export interface TagFormValues {
   name: string;

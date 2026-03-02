@@ -9,8 +9,9 @@ import {
   Textarea,
 } from "@mantine/core";
 import { IconBolt, IconClock } from "@tabler/icons-react";
-import type { UseFormReturnType } from "@mantine/form";
+
 import type { TagFormValues } from "@/tags/models/tagForm";
+import type { UseFormReturnType } from "@mantine/form";
 
 interface TagFormProps {
   form: UseFormReturnType<TagFormValues>;
