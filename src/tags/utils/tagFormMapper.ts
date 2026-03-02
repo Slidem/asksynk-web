@@ -8,12 +8,16 @@ import type { TagFormValues } from "@/tags/models/tagForm";
 import { createTempId } from "@/lib/id";
 
 export function tagDtoToFormValues(tag: TagDto): TagFormValues {
-  const rt = responseTimeToUnit(tag.responseTimeMillis);
+  const rtMillis =
+    tag.answerMode.type === "immediately"
+      ? tag.answerMode.responseTimeMillis
+      : 0;
+  const rt = responseTimeToUnit(rtMillis);
   return {
     name: tag.name,
     description: tag.description ?? "",
     color: tag.color,
-    answerMode: tag.answerMode,
+    answerMode: tag.answerMode.type,
     responseValue: rt.value,
     responseUnit: rt.unit,
     browserNotificationEnabled:
@@ -29,11 +33,16 @@ export function tagFormValuesToInput(values: TagFormValues) {
     name: values.name.trim(),
     description: values.description.trim() || undefined,
     color: values.color,
-    answerMode: values.answerMode,
-    responseTimeMillis: responseTimeToMillis(
-      values.responseValue,
-      values.responseUnit,
-    ),
+    answerMode:
+      values.answerMode === "immediately"
+        ? {
+            type: "immediately" as const,
+            responseTimeMillis: responseTimeToMillis(
+              values.responseValue,
+              values.responseUnit,
+            ),
+          }
+        : { type: "timeblock" as const },
     notificationsSettings: {
       browserNotificationEnabled: values.browserNotificationEnabled,
       soundNotificationEnabled: values.soundNotificationEnabled,

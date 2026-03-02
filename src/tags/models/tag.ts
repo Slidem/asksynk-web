@@ -1,5 +1,16 @@
 export type TagAnswerMode = "timeblock" | "immediately";
 
+export interface AnswerModeImmediate {
+  type: "immediately";
+  responseTimeMillis: number;
+}
+
+export interface AnswerModeTimeblock {
+  type: "timeblock";
+}
+
+export type TagAnswerModeObj = AnswerModeImmediate | AnswerModeTimeblock;
+
 export interface TagNotificationSettings {
   browserNotificationEnabled: boolean;
   soundNotificationEnabled: boolean;
@@ -11,8 +22,7 @@ export interface TagDto {
   userId: string;
   description?: string;
   color: string;
-  answerMode: TagAnswerMode;
-  responseTimeMillis: number;
+  answerMode: TagAnswerModeObj;
   notificationsSettings: TagNotificationSettings;
 }
 
@@ -21,8 +31,7 @@ export interface TagCreateInput {
   name: string;
   description?: string;
   color: string;
-  answerMode: TagAnswerMode;
-  responseTimeMillis: number;
+  answerMode: TagAnswerModeObj;
   notificationsSettings: TagNotificationSettings;
 }
 
@@ -31,7 +40,6 @@ export interface TagUpdateInput {
   name?: string;
   description?: string;
   color?: string;
-  answerMode?: TagAnswerMode;
-  responseTimeMillis?: number;
+  answerMode?: TagAnswerModeObj;
   notificationsSettings?: TagNotificationSettings;
 }

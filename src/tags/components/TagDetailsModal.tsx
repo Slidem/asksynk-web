@@ -69,11 +69,15 @@ export function TagDetailsModal({
               )}
               <Group gap="xs" mt={8}>
                 <Badge variant="light">
-                  {tag.answerMode === "immediately" ? "Immediate" : "Timeblock"}
+                  {tag.answerMode.type === "immediately"
+                    ? "Immediate"
+                    : "Timeblock"}
                 </Badge>
-                <Badge variant="light">
-                  {formatResponseTime(tag.responseTimeMillis)}
-                </Badge>
+                {tag.answerMode.type === "immediately" && (
+                  <Badge variant="light">
+                    {formatResponseTime(tag.answerMode.responseTimeMillis)}
+                  </Badge>
+                )}
               </Group>
             </Stack>
           </Group>

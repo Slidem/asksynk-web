@@ -58,7 +58,6 @@ async function updateTag(input: TagUpdateInput) {
       description: input.description,
       color: input.color,
       answerMode: input.answerMode,
-      responseTimeMillis: input.responseTimeMillis,
       notificationsSettings: input.notificationsSettings,
     }),
   });
@@ -96,7 +95,6 @@ export function useCreateTagMutation(
         description: input.description,
         color: input.color,
         answerMode: input.answerMode,
-        responseTimeMillis: input.responseTimeMillis,
         notificationsSettings: input.notificationsSettings,
       };
 

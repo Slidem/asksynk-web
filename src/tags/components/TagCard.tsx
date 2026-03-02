@@ -35,7 +35,7 @@ interface TagCardProps {
 
 export function TagCard({ tag, onOpen, onEdit, onDelete }: TagCardProps) {
   const answerModeLabel =
-    tag.answerMode === "immediately" ? "Immediate" : "Timeblock";
+    tag.answerMode.type === "immediately" ? "Immediate" : "Timeblock";
   const browserEnabled = tag.notificationsSettings.browserNotificationEnabled;
   const soundEnabled = tag.notificationsSettings.soundNotificationEnabled;
 
@@ -97,7 +97,7 @@ export function TagCard({ tag, onOpen, onEdit, onDelete }: TagCardProps) {
           <Badge
             variant="light"
             leftSection={
-              tag.answerMode === "immediately" ? (
+              tag.answerMode.type === "immediately" ? (
                 <IconBolt size={12} />
               ) : (
                 <IconClock size={12} />
@@ -106,9 +106,11 @@ export function TagCard({ tag, onOpen, onEdit, onDelete }: TagCardProps) {
           >
             {answerModeLabel}
           </Badge>
-          <Badge variant="light" leftSection={<IconClockHour4 size={12} />}>
-            {formatResponseTime(tag.responseTimeMillis)}
-          </Badge>
+          {tag.answerMode.type === "immediately" && (
+            <Badge variant="light" leftSection={<IconClockHour4 size={12} />}>
+              {formatResponseTime(tag.answerMode.responseTimeMillis)}
+            </Badge>
+          )}
           <Tooltip
             label={
               browserEnabled
