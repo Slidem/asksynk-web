@@ -1,6 +1,5 @@
 import {
   Badge,
-  Box,
   Button,
   Divider,
   Group,
@@ -8,13 +7,14 @@ import {
   Paper,
   Stack,
   Text,
-  alpha,
+  ThemeIcon,
 } from "@mantine/core";
 import {
   tagDtoToFormValues,
   tagFormValuesToInput,
 } from "@/tags/utils/tagFormMapper";
 
+import { IconTag } from "@tabler/icons-react";
 import type { TagDto } from "@/tags/models/tag";
 import { TagForm } from "@/tags/components/TagForm";
 import type { TagFormValues } from "@/tags/models/tagForm";
@@ -54,25 +54,20 @@ export function TagDetailsModal({
     <Modal opened={opened} onClose={onClose} title="Tag details" size="lg">
       <Stack gap="md">
         <Paper p="md" radius="md" withBorder>
-          <Group align="center" gap="md">
-            <Box
-              w={56}
-              h={56}
-              style={{
-                borderRadius: 16,
-                background: `linear-gradient(135deg, ${tag.color} 0%, ${alpha(
-                  tag.color,
-                  0.6,
-                )} 100%)`,
-                boxShadow: `0 4px 8px ${alpha(tag.color, 0.15)}`,
-              }}
-            />
+          <Group align="center" gap="md" wrap="nowrap">
+            <ThemeIcon variant="light" color={tag.color} radius="xl" size={48}>
+              <IconTag size={24} />
+            </ThemeIcon>
             <Stack gap={4}>
-              <Text fw={600}>{tag.name}</Text>
-              <Text size="sm" c="dimmed">
-                {tag.description || "No description set."}
+              <Text fw={700} size="md">
+                {tag.name}
               </Text>
-              <Group gap="xs">
+              {tag.description && (
+                <Text size="sm" c="dimmed">
+                  {tag.description}
+                </Text>
+              )}
+              <Group gap="xs" mt={8}>
                 <Badge variant="light">
                   {tag.answerMode === "immediately" ? "Immediate" : "Timeblock"}
                 </Badge>

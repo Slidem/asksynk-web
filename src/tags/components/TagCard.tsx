@@ -1,7 +1,6 @@
 import {
   ActionIcon,
   Badge,
-  Box,
   Card,
   Group,
   Menu,
@@ -9,7 +8,6 @@ import {
   Text,
   ThemeIcon,
   Tooltip,
-  alpha,
 } from "@mantine/core";
 import {
   IconBell,
@@ -19,6 +17,7 @@ import {
   IconClockHour4,
   IconDotsVertical,
   IconPencil,
+  IconTag,
   IconTrash,
   IconVolume,
   IconVolumeOff,
@@ -50,26 +49,14 @@ export function TagCard({ tag, onOpen, onEdit, onDelete }: TagCardProps) {
       onClick={() => onOpen(tag)}
     >
       <Stack gap="md">
-        <Group justify="space-between" align="flex-start" wrap="nowrap">
-          <Group gap="sm" align="center">
-            <Box
-              w={44}
-              h={44}
-              style={{
-                borderRadius: 14,
-                background: `linear-gradient(135deg, ${tag.color} 0%, ${alpha(
-                  tag.color,
-                  0.6,
-                )} 100%)`,
-                boxShadow: `0 4px 8px ${alpha(tag.color, 0.15)}`,
-              }}
-            />
-            <Stack gap={4}>
-              <Text fw={600}>{tag.name}</Text>
-              <Text size="xs" c="dimmed" lineClamp={2}>
-                {tag.description || "No description yet."}
-              </Text>
-            </Stack>
+        <Group justify="space-between" align="center" wrap="nowrap">
+          <Group gap="sm" align="center" wrap="nowrap">
+            <ThemeIcon variant="light" color={tag.color} radius="xl" size={40}>
+              <IconTag size={20} />
+            </ThemeIcon>
+            <Text fw={700} size="md">
+              {tag.name}
+            </Text>
           </Group>
 
           <Menu position="bottom-end" shadow="md" withinPortal>
@@ -99,6 +86,12 @@ export function TagCard({ tag, onOpen, onEdit, onDelete }: TagCardProps) {
             </Menu.Dropdown>
           </Menu>
         </Group>
+
+        {tag.description && (
+          <Text size="sm" c="dimmed" lineClamp={2}>
+            {tag.description}
+          </Text>
+        )}
 
         <Group gap="sm" wrap="wrap">
           <Badge
