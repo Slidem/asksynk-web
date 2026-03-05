@@ -1,22 +1,13 @@
-import { Button, Group, Paper, Stack, Text, Title } from "@mantine/core";
+import { Button, Group, Paper, Stack, Title } from "@mantine/core";
 import { IconPlus, IconTags } from "@tabler/icons-react";
 
+import { TagsFilteredTotalCount } from "./TagsFilteredTotalCount";
 import { TagsFilters } from "@/tags/components/TagsFilters";
-import type { TagsFiltersValue } from "@/tags/components/TagsFilters";
+import { useCreateTagDialogHandlers } from "@/tags/hooks/dialogs";
 
-interface TagsPageHeaderProps {
-  totalCount: number;
-  filters: TagsFiltersValue;
-  onFiltersChange: (value: TagsFiltersValue) => void;
-  onCreate: () => void;
-}
+export function TagsPageHeader() {
+  const { open: openCreateDialog } = useCreateTagDialogHandlers();
 
-export function TagsPageHeader({
-  totalCount,
-  filters,
-  onFiltersChange,
-  onCreate,
-}: TagsPageHeaderProps) {
   return (
     <Paper p="lg" radius="lg" shadow="sm">
       <Stack gap="md">
@@ -26,17 +17,18 @@ export function TagsPageHeader({
               <IconTags size={22} />
               <Title order={2}>Tags</Title>
             </Group>
-            <Text size="sm" c="dimmed">
-              {totalCount} tags powering your focus.
-            </Text>
+            <TagsFilteredTotalCount />
           </Stack>
 
-          <Button leftSection={<IconPlus size={18} />} onClick={onCreate}>
+          <Button
+            leftSection={<IconPlus size={18} />}
+            onClick={openCreateDialog}
+          >
             Create new
           </Button>
         </Group>
 
-        <TagsFilters value={filters} onChange={onFiltersChange} />
+        <TagsFilters />
       </Stack>
     </Paper>
   );

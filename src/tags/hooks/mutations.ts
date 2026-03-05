@@ -1,7 +1,7 @@
 import type { TagCreateInput, TagDto, TagUpdateInput } from "@/tags/models/tag";
 import { apiFetch, buildApiUrl } from "@/lib/api";
 
-import { tagsQueryKey } from "@/tags/hooks/queries";
+import { useFilteredTagsQueryData } from "@/tags/hooks/queries";
 import { useOptimisticMutation } from "@/lib/useOptimisticMutation";
 
 function updateOptimisticTag(
@@ -81,9 +81,8 @@ async function deleteTag(tagId: string) {
   return response.json() as Promise<TagDto>;
 }
 
-export function useCreateTagMutation(
-  queryKey: ReturnType<typeof tagsQueryKey>,
-) {
+export function useCreateTagMutation() {
+  const { queryKey } = useFilteredTagsQueryData();
   return useOptimisticMutation<TagDto[], TagCreateInput>({
     queryKey,
     mutationFn: createTag,
@@ -115,9 +114,8 @@ export function useCreateTagMutation(
   });
 }
 
-export function useUpdateTagMutation(
-  queryKey: ReturnType<typeof tagsQueryKey>,
-) {
+export function useUpdateTagMutation() {
+  const { queryKey } = useFilteredTagsQueryData();
   return useOptimisticMutation<TagDto[], TagUpdateInput>({
     queryKey,
     mutationFn: updateTag,
@@ -126,9 +124,8 @@ export function useUpdateTagMutation(
   });
 }
 
-export function useDeleteTagMutation(
-  queryKey: ReturnType<typeof tagsQueryKey>,
-) {
+export function useDeleteTagMutation() {
+  const { queryKey } = useFilteredTagsQueryData();
   return useOptimisticMutation<TagDto[], string>({
     queryKey,
     mutationFn: deleteTag,

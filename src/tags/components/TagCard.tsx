@@ -25,19 +25,25 @@ import {
 
 import type { TagDto } from "@/tags/models/tag";
 import { formatResponseTime } from "@/tags/utils/responseTime";
+import { useDeleteTagMutation } from "../hooks/mutations";
+import { useEditTagDialogHandlers } from "@/tags/hooks/dialogs";
 
 interface TagCardProps {
   tag: TagDto;
-  onOpen: (tag: TagDto) => void;
-  onEdit: (tag: TagDto) => void;
-  onDelete: (tag: TagDto) => void;
 }
 
-export function TagCard({ tag, onOpen, onEdit, onDelete }: TagCardProps) {
+export function TagCard({ tag }: TagCardProps) {
   const answerModeLabel =
     tag.answerMode.type === "immediately" ? "Immediate" : "Timeblock";
   const browserEnabled = tag.notificationsSettings.browserNotificationEnabled;
   const soundEnabled = tag.notificationsSettings.soundNotificationEnabled;
+
+  const { open: openEditTagDialog } = useEditTagDialogHandlers();
+  const deleteMutation = useDeleteTagMutation();
+
+  const handleDelete = () => {
+    deleteMutation.mutate(tag.id);
+  };
 
   return (
     <Card
@@ -46,7 +52,7 @@ export function TagCard({ tag, onOpen, onEdit, onDelete }: TagCardProps) {
       padding="lg"
       withBorder
       style={{ cursor: "pointer" }}
-      onClick={() => onOpen(tag)}
+      onClick={() => openEditTagDialog(tag)}
     >
       <Stack gap="md">
         <Group justify="space-between" align="center" wrap="nowrap">
@@ -72,14 +78,14 @@ export function TagCard({ tag, onOpen, onEdit, onDelete }: TagCardProps) {
             <Menu.Dropdown onClick={(event) => event.stopPropagation()}>
               <Menu.Item
                 leftSection={<IconPencil size={16} />}
-                onClick={() => onEdit(tag)}
+                onClick={() => openEditTagDialog(tag)}
               >
                 Update
               </Menu.Item>
               <Menu.Item
                 leftSection={<IconTrash size={16} />}
                 color="red"
-                onClick={() => onDelete(tag)}
+                onClick={handleDelete}
               >
                 Delete
               </Menu.Item>

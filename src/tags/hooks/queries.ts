@@ -1,29 +1,37 @@
-import type { TagAnswerMode, TagDto } from "@/tags/models/tag";
 import { apiFetch, buildApiUrl } from "@/lib/api";
 
+import type { TagDto } from "@/tags/models/tag";
+import type { TagsFilters } from "@/tags/models/filters";
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-
-export interface TagsFilters {
-  answerMode?: TagAnswerMode | "all";
-  orderBy?: "createdAt" | "updatedAt";
-  orderDirection?: "asc" | "desc";
-  search?: string;
-  limit?: number;
-  offset?: number;
-}
+import { useTagsFilters } from "./filters";
 
 export function tagsQueryKey(filters: TagsFilters) {
   return ["tags", filters] as const;
 }
 
-export function useTagsQuery(filters: TagsFilters) {
+export const useFilteredTagsQueryData = () => {
+  const filters = useTagsFilters();
+  const queryKey = useMemo(() => tagsQueryKey(filters), [filters]);
+  return { filters, queryKey };
+};
+
+export function useFilteredTags<T>(select?: (data: TagDto[]) => T) {
+  const { filters, queryKey } = useFilteredTagsQueryData();
   return useQuery({
-    queryKey: tagsQueryKey(filters),
-    queryFn: () => fetchTags(filters),
+    queryKey,
+    queryFn: () => fetchFilteredTags(filters),
+    placeholderData: [],
+    select,
   });
 }
 
-async function fetchTags(filters: TagsFilters): Promise<TagDto[]> {
+export const useFilteredTagsCount = () => {
+  const { data: tagCount } = useFilteredTags((tags) => tags.length);
+  return tagCount ?? 0;
+};
+
+async function fetchFilteredTags(filters: TagsFilters): Promise<TagDto[]> {
   const response = await apiFetch(getTagsUrl(filters));
 
   if (!response.ok) {
@@ -40,9 +48,13 @@ function getTagsUrl(filters: TagsFilters) {
     params.set("answerMode", filters.answerMode);
   }
 
-  if (filters.orderBy) params.set("orderBy", filters.orderBy);
-  if (filters.orderDirection)
+  if (filters.orderBy) {
+    params.set("orderBy", filters.orderBy);
+  }
+
+  if (filters.orderDirection) {
     params.set("orderDirection", filters.orderDirection);
+  }
 
   if (filters.search && filters.search.trim().length >= 3) {
     params.set("search", filters.search.trim());

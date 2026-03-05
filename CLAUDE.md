@@ -10,20 +10,79 @@
 
 ## Development Notes
 
-- **Keep components focused and testable**
-- **Follow the established patterns for consistency**
-- **Feature-based structure**: `signin`, `signup`, `verify-email`
-- **Feature folders include**: `components`, `models`, `queries`, `utils` (folders or files)
+### Project Structure
+
+- **Feature-based structure**: `signin`, `signup`, `verify-email`, `tags`
+- **Feature folders include**: `components`, `models`, `hooks`, `store`, `utils` (folders or files)
 - **Shared components**: `src/components`
 - **Shared lib functions**: `src/lib`
 - **Shared utils**: `src/utils`
 - **DON'T USE BARREL EXPORTS**
-- **Never fix linting issue** Skip linting issues, I'll fix any linting issue myself
+- **Use import aliases** Avoid relative imports, use import aliases as defined in tsconfig
+
+### Component Architecture
+
+- **Keep components small and focused** One component per file. Single Responsibility Principle (SRP).
+- **No prop drilling** Use Zustand for shared state instead of passing props through multiple levels
+- **Extract sub-components** Split large components into smaller, focused pieces (e.g., `TagsFilters` → `SearchFilter`, `AnswerModeFilter`, etc.)
+- **Colocate related logic** Keep component-specific logic close to component usage
+- **One component per file** Maximum clarity and maintainability
+
+### State Management (Zustand)
+
+- **Use Zustand for global state** Filters, dialog states, shared UI state
+- **Separate stores by concern** Create focused stores (e.g., `tagsFiltersStore`, `editTagDialogStore`, `createTagDialogStore`)
+- **Use selectors to prevent re-renders** Subscribe only to needed state slices
+- **Use `useShallow` for object selectors** Prevents re-renders on object reference changes
+- **subscribeWithSelector middleware** When you need imperative subscriptions to store changes (e.g., syncing forms with store)
+- **Derive state in hooks** Create custom hooks that wrap store selectors (e.g., `useTagsFilter`, `useUpdateTagFilter`)
+
+### Performance Optimization
+
+- **Granular selectors** Subscribe to specific state slices, not entire store
+- **Memoize derived values** Use `useMemo` for computed values from filters/state
+- **Optimize query keys** Derive once, reuse across mutations and queries
+- **React Query placeholderData** Prevent loading flashes on refetch
+- **React Query select** Transform data close to query, not in components
+
+### Mantine UI
+
+- **Always check Mantine docs first** https://ui.mantine.dev/ for built-in components and patterns
+- **Use Mantine hooks** Leverage existing hooks instead of reinventing:
+  - `useDebouncedCallback` for search inputs
+  - `useForm` with `watch` for reactive form fields
+  - `useDisclosure` for modal/drawer states (or use Zustand if state needs to be shared)
+  - `useShallow` from zustand/react/shallow for object selectors
+- **Use Mantine components** Modal, Select, TextInput, etc. - fully featured, accessible
+- **Uncontrolled forms** Prefer `mode: "uncontrolled"` in `useForm` for better performance
+- **Form reactivity** Use `form.watch()` to react to field changes when needed
+
+### Hooks Patterns
+
+- **Custom hooks for store access** Wrap Zustand selectors in named hooks (e.g., `useTagsFilters`, `useEditTagDialogHandlers`)
+- **Hooks for mutations** Keep mutation logic in dedicated hooks (e.g., `useCreateTagMutation`)
+- **Hooks return focused data** Don't expose entire store, return specific values/functions
+- **Reusable, composable hooks** Build small hooks that can be composed together
+
+### Forms & Dialogs
+
+- **Reset forms on close** Always call `form.reset()` when closing dialogs
+- **Subscribe to store for form updates** Use Zustand subscribe with selector for reactive form values (see `TagEditDialog` pattern)
+- **Avoid form flash** Set form values synchronously via store subscriptions, not in render
+- **Modal transitions** Keep modals mounted but controlled by `opened` prop for smooth transitions
+- **Uncontrolled forms** Use Mantine's uncontrolled mode for better performance
+
+### Code Style
+
+- **Never fix linting issues** Skip linting issues, I'll fix any linting issue myself
 - **Never fix import ordering, or unused imports** I'll fix those myself
-- **User import aliases** Avoid relative imports, use import aliases as defined in tsconfig
+- **Always prompt for testing commands** Never run commands like "pnpm run dev"; prompt me so I can do it manually
+- **Type safety** Use explicit type aliases for union types (e.g., `TagAnserModeFilterValue`)
+- **Avoid premature optimization** Don't split components unless there's a clear re-render benefit
+
+### Testing & Verification
+
 - **Always prompt me for testing commands** Never run any commands to test implementation like "pnpm run dev"; prompt me so i can do it manually; and then continue after i done so
-- **Always check for mantine ui components** whenever implementing a feature (https://ui.mantine.dev/) or any bigger changes than just small ones (adding a button, fixing a bug). Mantine ui components contain detailed examples of built components that can be used (such as navbar etc..)
-- **Keep components small and reusable** Avoid big components. One component per file as much as possible. Use proper design patterns to keep SRP.
 
 ## MCP
 

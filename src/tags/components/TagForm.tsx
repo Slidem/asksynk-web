@@ -22,7 +22,6 @@ interface TagFormProps {
 
 export function TagForm({ form }: TagFormProps) {
   const [answerMode, setAnswerMode] = useState(form.getValues().answerMode);
-
   form.watch("answerMode", ({ value }) => setAnswerMode(value));
 
   return (
