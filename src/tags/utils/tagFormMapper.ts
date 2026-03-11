@@ -5,7 +5,6 @@ import {
 
 import type { TagDto } from "@/tags/models/tag";
 import type { TagFormValues } from "@/tags/models/tagForm";
-import { createTempId } from "@/lib/id";
 
 export function tagDtoToFormValues(tag: TagDto): TagFormValues {
   const rtMillis =
@@ -29,7 +28,6 @@ export function tagDtoToFormValues(tag: TagDto): TagFormValues {
 
 export function tagFormValuesToInput(values: TagFormValues) {
   return {
-    tempId: createTempId(),
     name: values.name.trim(),
     description: values.description.trim() || undefined,
     color: values.color,

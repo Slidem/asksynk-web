@@ -2,12 +2,13 @@ import { Button, Group, Modal } from "@mantine/core";
 import {
   useCreateTagDialogHandlers,
   useIsCreateTagDialogOpened,
-} from "../hooks/dialogs";
+} from "@/tags/hooks/dialogs";
 
 import { DEFAULT_TAG_FORM_VALUES } from "@/tags/models/tagForm";
 import { TagForm } from "@/tags/components/TagForm";
 import type { TagFormValues } from "@/tags/models/tagForm";
-import { tagFormValuesToInput } from "../utils/tagFormMapper";
+import { createUuidV7 } from "@/lib/id";
+import { tagFormValuesToInput } from "@/tags/utils/tagFormMapper";
 import { useCreateTagMutation } from "@/tags/hooks/mutations";
 import { useForm } from "@mantine/form";
 
@@ -31,7 +32,10 @@ export function TagCreateDialog() {
     if (!values.name.trim()) {
       return;
     }
-    createMutation.mutate(tagFormValuesToInput(values));
+    createMutation.mutate({
+      id: createUuidV7(),
+      ...tagFormValuesToInput(values),
+    });
     handleClose();
   };
 

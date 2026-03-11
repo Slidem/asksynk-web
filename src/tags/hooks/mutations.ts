@@ -1,6 +1,7 @@
 import type { TagCreateInput, TagDto, TagUpdateInput } from "@/tags/models/tag";
 import { apiFetch, buildApiUrl } from "@/lib/api";
 
+import { merge } from "lodash";
 import { useFilteredTagsQueryData } from "@/tags/hooks/queries";
 import { useOptimisticMutation } from "@/lib/useOptimisticMutation";
 
@@ -11,14 +12,7 @@ function updateOptimisticTag(
   if (!previous) return [];
 
   return previous.map((tag) =>
-    tag.id === input.id
-      ? {
-          ...tag,
-          ...input,
-          notificationsSettings:
-            input.notificationsSettings ?? tag.notificationsSettings,
-        }
-      : tag,
+    tag.id === input.id ? merge({}, tag, input) : tag,
   );
 }
 
@@ -88,8 +82,7 @@ export function useCreateTagMutation() {
     mutationFn: createTag,
     updater: (previous, input) => {
       const nextTag: TagDto = {
-        id: input.tempId,
-        userId: "pending",
+        id: input.id.toString(),
         name: input.name,
         description: input.description,
         color: input.color,
@@ -98,17 +91,6 @@ export function useCreateTagMutation() {
       };
 
       return [...(previous ?? []), nextTag];
-    },
-    onSuccessUpdater: (
-      newTag: unknown,
-      oldData: TagDto[] | undefined,
-      input: TagCreateInput,
-    ) => {
-      const replaceWithActualTagWithId = newTag as TagDto;
-      if (!oldData) return [replaceWithActualTagWithId];
-      return oldData.map((tag) =>
-        tag.id === input.tempId ? replaceWithActualTagWithId : tag,
-      );
     },
     skipInvalidateOnSuccess: true,
   });

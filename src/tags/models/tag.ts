@@ -1,3 +1,5 @@
+import { UUID } from "uuidv7";
+
 export type TagAnswerMode = "timeblock" | "immediately";
 
 export interface AnswerModeImmediate {
@@ -19,7 +21,6 @@ export interface TagNotificationSettings {
 export interface TagDto {
   id: string;
   name: string;
-  userId: string;
   description?: string;
   color: string;
   answerMode: TagAnswerModeObj;
@@ -27,7 +28,7 @@ export interface TagDto {
 }
 
 export interface TagCreateInput {
-  tempId: string;
+  id: UUID;
   name: string;
   description?: string;
   color: string;
