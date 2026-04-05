@@ -1,0 +1,136 @@
+.wrapper {
+  --fc-border-color: var(--mantine-color-default-border);
+  --fc-today-bg-color: color-mix(
+    in srgb,
+    var(--mantine-color-Remoraid-6) 8%,
+    transparent
+  );
+  --fc-event-bg-color: var(--mantine-color-Remoraid-6);
+  --fc-event-border-color: var(--mantine-color-Remoraid-7);
+  --fc-event-text-color: #fff;
+  --fc-page-bg-color: transparent;
+  --fc-neutral-bg-color: var(--mantine-color-default-hover);
+  --fc-list-event-hover-bg-color: var(--mantine-color-default-hover);
+  --fc-highlight-color: color-mix(
+    in srgb,
+    var(--mantine-color-Remoraid-6) 15%,
+    transparent
+  );
+  --fc-now-indicator-color: var(--mantine-color-Remoraid-6);
+
+  font-family: var(--mantine-font-family);
+  font-size: var(--mantine-font-size-sm);
+  color: var(--mantine-color-text);
+}
+
+/* Remove default table borders, use theme border */
+.wrapper :global(.fc-scrollgrid) {
+  border-radius: var(--mantine-radius-md);
+  overflow: hidden;
+}
+
+.wrapper :global(.fc-col-header-cell) {
+  background: var(--mantine-color-default-hover);
+  font-weight: 500;
+  font-size: var(--mantine-font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 6px 0;
+}
+
+.wrapper :global(.fc-timegrid-slot-label) {
+  font-size: var(--mantine-font-size-xs);
+  color: var(--mantine-color-dimmed);
+}
+
+.wrapper :global(.fc-event) {
+  border-radius: var(--mantine-radius-sm);
+  border: none;
+  padding: 2px 4px;
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  cursor: grab;
+}
+
+.wrapper :global(.fc-event:active) {
+  cursor: grabbing;
+}
+
+.wrapper :global(.fc-event-title) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wrapper :global(.fc-toolbar) {
+  margin-bottom: var(--mantine-spacing-md) !important;
+}
+
+.wrapper :global(.fc-button) {
+  background: var(--mantine-color-default) !important;
+  border: 1px solid var(--mantine-color-default-border) !important;
+  color: var(--mantine-color-text) !important;
+  border-radius: var(--mantine-radius-md) !important;
+  font-family: var(--mantine-font-family) !important;
+  font-size: var(--mantine-font-size-sm) !important;
+  font-weight: 500 !important;
+  padding: 4px 12px !important;
+  box-shadow: none !important;
+  transition: background 100ms ease !important;
+}
+
+.wrapper :global(.fc-button:hover) {
+  background: var(--mantine-color-default-hover) !important;
+}
+
+.wrapper :global(.fc-button-primary:not(:disabled).fc-button-active),
+.wrapper :global(.fc-button-primary:not(:disabled):active) {
+  background: var(--mantine-color-Remoraid-6) !important;
+  border-color: var(--mantine-color-Remoraid-7) !important;
+  color: #fff !important;
+}
+
+.wrapper :global(.fc-daygrid-day-number),
+.wrapper :global(.fc-daygrid-day-top) {
+  font-size: var(--mantine-font-size-xs);
+  color: var(--mantine-color-dimmed);
+}
+
+.wrapper :global(.fc-day-today .fc-daygrid-day-number) {
+  color: var(--mantine-color-Remoraid-6);
+  font-weight: 600;
+}
+
+.wrapper :global(.fc-col-header-cell-cushion) {
+  color: var(--mantine-color-dimmed);
+  text-decoration: none !important;
+}
+
+.wrapper :global(.fc-day-today .fc-col-header-cell-cushion) {
+  color: var(--mantine-color-Remoraid-6);
+  font-weight: 600;
+}
+
+.wrapper :global(.fc-timegrid-now-indicator-line) {
+  border-color: var(--mantine-color-Remoraid-6);
+}
+
+.wrapper :global(.fc-timegrid-now-indicator-arrow) {
+  border-top-color: var(--mantine-color-Remoraid-6);
+  border-bottom-color: var(--mantine-color-Remoraid-6);
+}
+
+.wrapper :global(.fc-selection-footer),
+.wrapper :global(.fc-popover) {
+  border-radius: var(--mantine-radius-md);
+  border-color: var(--mantine-color-default-border);
+  box-shadow: var(--mantine-shadow-sm);
+}
+
+.wrapper :global(.fc-event-mirror) {
+  background: var(--mantine-color-gray-1);
+  border: 2px dashed var(--mantine-color-gray-5);
+  box-shadow: none;
+  opacity: 0.7;
+}
