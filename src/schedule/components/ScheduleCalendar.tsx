@@ -67,7 +67,7 @@ export function ScheduleCalendar() {
   };
 
   return (
-    <Paper radius="lg" p="md" withBorder className={classes.wrapper}>
+    <Paper radius="lg" p="md" className={classes.wrapper}>
       <ScheduleToolbar calendarRef={calendarRef} title={title} />
       <FullCalendar
         ref={calendarRef}
@@ -79,6 +79,7 @@ export function ScheduleCalendar() {
         selectable
         selectMirror
         dayMaxEvents
+        slotLabelFormat={{ hour: "numeric", meridiem: "short" }}
         nowIndicator
         eventClassNames={(arg) =>
           arg.event.id === GHOST_EVENT_ID ? ["fc-event-mirror"] : []

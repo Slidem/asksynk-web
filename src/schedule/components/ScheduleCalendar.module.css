@@ -23,14 +23,44 @@
   color: var(--mantine-color-text);
 }
 
-/* Remove default table borders, use theme border */
+/* Remove default table borders */
 .wrapper :global(.fc-scrollgrid) {
+  border: none !important;
   border-radius: var(--mantine-radius-md);
   overflow: hidden;
 }
 
+/* Subtle vertical borders everywhere */
+.wrapper :global(.fc-scrollgrid td),
+.wrapper :global(.fc-scrollgrid th) {
+  border-color: color-mix(
+    in srgb,
+    var(--mantine-color-default-border) 40%,
+    transparent
+  ) !important;
+}
+
+/* Remove half-hour slot borders, keep only full-hour */
+.wrapper :global(.fc-timegrid-slot-minor) {
+  border-top: none !important;
+}
+
+/* Remove all scrollgrid section borders (header/body dividers) */
+.wrapper :global(.fc-scrollgrid-section > td) {
+  border: none !important;
+}
+
+/* Remove right-edge border (scrollbar placeholder cells) */
+.wrapper :global(.fc-scrollgrid-shrink + td),
+.wrapper :global(.fc-scrollgrid-shrink + th),
+.wrapper :global(td:last-child),
+.wrapper :global(th:last-child) {
+  border-right: none !important;
+}
+
 .wrapper :global(.fc-col-header-cell) {
-  background: var(--mantine-color-default-hover);
+  background: transparent;
+  border: none !important;
   font-weight: 500;
   font-size: var(--mantine-font-size-xs);
   text-transform: uppercase;
@@ -38,9 +68,31 @@
   padding: 6px 0;
 }
 
+/* Hide "all-day" label text */
+.wrapper :global(.fc-timegrid-axis-cushion) {
+  visibility: hidden;
+}
+
+/* Remove borders on time labels and axis cells */
+.wrapper :global(.fc-timegrid-slot-label),
+.wrapper :global(.fc-timegrid-axis) {
+  border: none !important;
+}
+
+/* Position time labels centered on the grid line */
 .wrapper :global(.fc-timegrid-slot-label) {
+  vertical-align: top;
   font-size: var(--mantine-font-size-xs);
   color: var(--mantine-color-dimmed);
+}
+
+.wrapper :global(.fc-timegrid-slot-label-cushion) {
+  transform: translateY(-50%);
+}
+
+/* Hide midnight label that would overflow above the calendar */
+.wrapper :global(.fc-timegrid-slot-label[data-time="00:00:00"] .fc-timegrid-slot-label-cushion) {
+  visibility: hidden;
 }
 
 .wrapper :global(.fc-event) {
