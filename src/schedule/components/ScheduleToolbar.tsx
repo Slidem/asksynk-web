@@ -70,7 +70,11 @@ export function ScheduleToolbar({ calendarRef, title }: ScheduleToolbarProps) {
           w={110}
           allowDeselect={false}
         />
-        <Button size="compact-sm" leftSection={<IconPlus size={14} />} onClick={handleNewEvent}>
+        <Button
+          size="compact-sm"
+          leftSection={<IconPlus size={14} />}
+          onClick={handleNewEvent}
+        >
           New event
         </Button>
       </Group>

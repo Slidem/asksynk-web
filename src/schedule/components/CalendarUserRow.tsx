@@ -1,9 +1,14 @@
-import { Avatar, Group, Paper, Stack, Text } from "@mantine/core";
+import { Avatar, Box, Group, Stack, Text } from "@mantine/core";
 import { IconCalendar } from "@tabler/icons-react";
 
 export function CalendarUserRow() {
   return (
-    <Paper p="sm" radius="lg" withBorder>
+    <Box
+      p="sm"
+      style={{
+        borderBottom: "1px solid var(--mantine-color-default-border)",
+      }}
+    >
       <Group gap="sm">
         <IconCalendar size={18} color="var(--mantine-color-dimmed)" />
         <Avatar size="sm" color="Remoraid" radius="xl">
@@ -18,6 +23,6 @@ export function CalendarUserRow() {
           </Text>
         </Stack>
       </Group>
-    </Paper>
+    </Box>
   );
 }

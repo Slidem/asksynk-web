@@ -17,7 +17,6 @@ import classes from "./ScheduleCalendar.module.css";
 export function ScheduleCalendar() {
   const calendarRef = useRef<FullCalendar>(null);
   const [title, setTitle] = useState("");
-
   const openDialog = useNewEventDialogStore((s) => s.open);
   const events = useScheduleStore((s) => s.events);
   const addEvent = useScheduleStore((s) => s.addEvent);
@@ -67,29 +66,36 @@ export function ScheduleCalendar() {
   };
 
   return (
-    <Paper radius="lg" p="md" className={classes.wrapper}>
+    <Paper
+      radius={0}
+      p="md"
+      className={classes.wrapper}
+      style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}
+    >
       <ScheduleToolbar calendarRef={calendarRef} title={title} />
-      <FullCalendar
-        ref={calendarRef}
-        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-        initialView={currentView}
-        headerToolbar={false}
-        events={events}
-        editable
-        selectable
-        selectMirror
-        dayMaxEvents
-        slotLabelFormat={{ hour: "numeric", meridiem: "short" }}
-        nowIndicator
-        eventClassNames={(arg) =>
-          arg.event.id === GHOST_EVENT_ID ? ["fc-event-mirror"] : []
-        }
-        select={handleSelect}
-        eventDrop={handleEventDrop}
-        eventResize={handleEventResize}
-        datesSet={handleDatesSet}
-        height="auto"
-      />
+      <div style={{ flex: 1, minHeight: 0 }}>
+        <FullCalendar
+          ref={calendarRef}
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+          initialView={currentView}
+          headerToolbar={false}
+          events={events}
+          editable
+          selectable
+          selectMirror
+          dayMaxEvents
+          slotLabelFormat={{ hour: "numeric", meridiem: "short" }}
+          nowIndicator
+          eventClassNames={(arg) =>
+            arg.event.id === GHOST_EVENT_ID ? ["fc-event-mirror"] : []
+          }
+          select={handleSelect}
+          eventDrop={handleEventDrop}
+          eventResize={handleEventResize}
+          datesSet={handleDatesSet}
+          height="100%"
+        />
+      </div>
     </Paper>
   );
 }
