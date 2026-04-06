@@ -1,3 +1,4 @@
+import type FullCalendar from "@fullcalendar/react";
 import { ActionIcon, Button, Group, Select, Text } from "@mantine/core";
 import {
   IconChevronLeft,
@@ -5,10 +6,9 @@ import {
   IconPlus,
 } from "@tabler/icons-react";
 import type { RefObject } from "react";
-import type FullCalendar from "@fullcalendar/react";
 
-import { useNewEventDialogStore } from "@/schedule/store/newEventDialogStore";
 import { useScheduleStore } from "@/schedule/store/scheduleStore";
+import { useOpenNewEventDialog } from "../hooks/useOpenNewEventDialog";
 
 const VIEW_OPTIONS = [
   { value: "dayGridMonth", label: "Month" },
@@ -18,14 +18,13 @@ const VIEW_OPTIONS = [
 
 type ScheduleToolbarProps = {
   calendarRef: RefObject<FullCalendar | null>;
-  title: string;
 };
 
-export function ScheduleToolbar({ calendarRef, title }: ScheduleToolbarProps) {
+export function ScheduleToolbar({ calendarRef }: ScheduleToolbarProps) {
+  const title = useScheduleStore((s) => s.calendarTitle);
   const currentView = useScheduleStore((s) => s.currentView);
   const setView = useScheduleStore((s) => s.setView);
-  const openDialog = useNewEventDialogStore((s) => s.open);
-
+  const openNewEventDialog = useOpenNewEventDialog();
   const getApi = () => calendarRef.current?.getApi() ?? null;
 
   const handleToday = () => getApi()?.today();
@@ -41,7 +40,7 @@ export function ScheduleToolbar({ calendarRef, title }: ScheduleToolbarProps) {
   const handleNewEvent = () => {
     const now = new Date();
     const end = new Date(now.getTime() + 60 * 60 * 1000);
-    openDialog(now, end);
+    openNewEventDialog(now, end);
   };
 
   return (

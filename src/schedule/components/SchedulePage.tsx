@@ -3,7 +3,7 @@ import { Container, Paper, Stack } from "@mantine/core";
 import { SchedulePageHeader } from "./SchedulePageHeader";
 import { CalendarUserRow } from "./CalendarUserRow";
 import { ScheduleCalendar } from "./ScheduleCalendar";
-import { NewEventDialog } from "./NewEventDialog";
+import { CalendarEventDialog } from "./CalendarEventDialog";
 
 export function SchedulePage() {
   return (
@@ -35,7 +35,7 @@ export function SchedulePage() {
         </Paper>
       </Stack>
 
-      <NewEventDialog />
+      <CalendarEventDialog />
     </Container>
   );
 }

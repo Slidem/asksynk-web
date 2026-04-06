@@ -1,31 +1,45 @@
-import { useEffect, useRef, useState } from "react";
-import FullCalendar from "@fullcalendar/react";
+import type {
+  DateSelectArg,
+  DatesSetArg,
+  EventClickArg,
+  EventDropArg,
+} from "@fullcalendar/core";
 import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
-import type { DateSelectArg, EventDropArg } from "@fullcalendar/core";
 import type { EventResizeDoneArg } from "@fullcalendar/interaction";
-import type { DatesSetArg } from "@fullcalendar/core";
+import interactionPlugin from "@fullcalendar/interaction";
+import FullCalendar from "@fullcalendar/react";
+import timeGridPlugin from "@fullcalendar/timegrid";
 import { Paper } from "@mantine/core";
+import { useEffect, useRef } from "react";
 
-import { GHOST_EVENT_ID } from "@/schedule/models/event";
-import { useNewEventDialogStore } from "@/schedule/store/newEventDialogStore";
+import {
+  GHOST_EVENT_ID,
+  type CalendarEvent,
+} from "@/schedule/models/calendarEvent";
+import { useCalendarEventDialogStore } from "@/schedule/store/calendarEventDialogStore";
 import { useScheduleStore } from "@/schedule/store/scheduleStore";
-import { ScheduleToolbar } from "./ScheduleToolbar";
+import { useAddCalendarEvent } from "../hooks/useAddCalendarEvent";
+import { useCalendarEvents } from "../hooks/useCalendarEvents";
+import { useOpenNewEventDialog } from "../hooks/useOpenNewEventDialog";
+import { useOpenEditEventDialog } from "../hooks/useOpenEditEventDialog";
+import { useRemoveCalendarEvent } from "../hooks/useRemoveCalendarEvent";
+import { useUpdateCalendarEvent } from "../hooks/useUpdateCalendarEvent";
 import classes from "./ScheduleCalendar.module.css";
+import { ScheduleToolbar } from "./ScheduleToolbar";
 
 export function ScheduleCalendar() {
   const calendarRef = useRef<FullCalendar>(null);
-  const [title, setTitle] = useState("");
-  const openDialog = useNewEventDialogStore((s) => s.open);
-  const events = useScheduleStore((s) => s.events);
-  const addEvent = useScheduleStore((s) => s.addEvent);
-  const removeEvent = useScheduleStore((s) => s.removeEvent);
-  const updateEvent = useScheduleStore((s) => s.updateEvent);
+  const openNewEventDialog = useOpenNewEventDialog();
+  const openEditEventDialog = useOpenEditEventDialog();
+  const events = useCalendarEvents();
+  const addEvent = useAddCalendarEvent();
+  const removeEvent = useRemoveCalendarEvent();
+  const updateEvent = useUpdateCalendarEvent();
   const currentView = useScheduleStore((s) => s.currentView);
+  const setTitle = useScheduleStore((s) => s.setCalendarTitle);
 
   useEffect(() => {
-    useNewEventDialogStore.subscribe(
+    const unsubscribe = useCalendarEventDialogStore.subscribe(
       (state) => state.opened,
       (opened, previouslyOpened) => {
         if (previouslyOpened && !opened) {
@@ -33,6 +47,7 @@ export function ScheduleCalendar() {
         }
       },
     );
+    return () => unsubscribe();
   }, [removeEvent]);
 
   const handleSelect = (arg: DateSelectArg) => {
@@ -40,24 +55,24 @@ export function ScheduleCalendar() {
     addEvent({
       id: GHOST_EVENT_ID,
       title: "",
-      start: arg.start.toISOString(),
-      end: arg.end.toISOString(),
+      start: arg.start,
+      end: arg.end,
     });
-    openDialog(arg.start, arg.end);
+    openNewEventDialog(arg.start, arg.end);
     calendarRef.current?.getApi().unselect();
   };
 
   const handleEventDrop = (arg: EventDropArg) => {
     updateEvent(arg.event.id, {
-      start: arg.event.startStr,
-      end: arg.event.endStr,
+      start: arg.event.start ?? undefined,
+      end: arg.event.end ?? undefined,
     });
   };
 
   const handleEventResize = (arg: EventResizeDoneArg) => {
     updateEvent(arg.event.id, {
-      start: arg.event.startStr,
-      end: arg.event.endStr,
+      start: arg.event.start ?? undefined,
+      end: arg.event.end ?? undefined,
     });
   };
 
@@ -65,14 +80,28 @@ export function ScheduleCalendar() {
     setTitle(arg.view.title);
   };
 
+  const handleEventClick = (arg: EventClickArg): void => {
+    const event: CalendarEvent | undefined = events.find(
+      (e) => e.id === arg.event.id,
+    );
+    if (event) {
+      openEditEventDialog(event);
+    }
+  };
+
   return (
     <Paper
       radius={0}
       p="md"
       className={classes.wrapper}
-      style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}
+      style={{
+        flex: 1,
+        minHeight: 0,
+        display: "flex",
+        flexDirection: "column",
+      }}
     >
-      <ScheduleToolbar calendarRef={calendarRef} title={title} />
+      <ScheduleToolbar calendarRef={calendarRef} />
       <div style={{ flex: 1, minHeight: 0 }}>
         <FullCalendar
           ref={calendarRef}
@@ -91,6 +120,7 @@ export function ScheduleCalendar() {
           }
           select={handleSelect}
           eventDrop={handleEventDrop}
+          eventClick={handleEventClick}
           eventResize={handleEventResize}
           datesSet={handleDatesSet}
           height="100%"

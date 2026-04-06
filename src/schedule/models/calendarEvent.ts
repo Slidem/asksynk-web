@@ -1,8 +1,8 @@
 export type CalendarEvent = {
   id: string;
   title: string;
-  start: string;
-  end: string;
+  start: Date;
+  end: Date;
   color?: string;
   display?: string;
 };
@@ -15,7 +15,7 @@ const day = (dayOffset: number, hour: number, minute = 0) => {
   const date = new Date(today);
   date.setDate(date.getDate() + dayOffset);
   date.setHours(hour, minute, 0, 0);
-  return date.toISOString();
+  return date;
 };
 
 export const DUMMY_EVENTS: CalendarEvent[] = [

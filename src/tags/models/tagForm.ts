@@ -15,7 +15,7 @@ export interface TagFormValues {
 export const DEFAULT_TAG_FORM_VALUES: TagFormValues = {
   name: "",
   description: "",
-  color: "#4ac26b",
+  color: "#8d6af7",
   answerMode: "timeblock",
   responseValue: 30,
   responseUnit: "minutes",

@@ -9,7 +9,7 @@ export function TagsPageHeader() {
   const { open: openCreateDialog } = useCreateTagDialogHandlers();
 
   return (
-    <Paper p="lg" radius="lg" shadow="sm">
+    <Paper p="lg" radius="lg" shadow="sm" withBorder>
       <Stack gap="md">
         <Group justify="space-between" align="center" wrap="wrap">
           <Stack gap={4}>

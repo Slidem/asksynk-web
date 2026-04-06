@@ -3,9 +3,7 @@ import { DateTimePicker } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { useEffect } from "react";
 
-import { createUuidV7 } from "@/lib/id";
-import { useNewEventDialogStore } from "@/schedule/store/newEventDialogStore";
-import { useScheduleStore } from "@/schedule/store/scheduleStore";
+import { useCalendarEventDialogStore } from "@/schedule/store/calendarEventDialogStore";
 import { shallow } from "zustand/shallow";
 
 type EventFormValues = {
@@ -14,11 +12,12 @@ type EventFormValues = {
   end: Date | null;
 };
 
-export function NewEventDialog() {
-  const opened = useNewEventDialogStore((s) => s.opened);
-  const closeDialog = useNewEventDialogStore((s) => s.close);
-  const addEvent = useScheduleStore((s) => s.addEvent);
-
+export function CalendarEventDialog() {
+  const eventId = useCalendarEventDialogStore((s) => s.openedEvent?.id || "");
+  const opened = useCalendarEventDialogStore((s) => s.opened);
+  const closeDialog = useCalendarEventDialogStore((s) => s.close);
+  const actionText = useCalendarEventDialogStore((s) => s.actionText);
+  const onAction = useCalendarEventDialogStore((s) => s.onAction);
   const form = useForm<EventFormValues>({
     mode: "uncontrolled",
     initialValues: {
@@ -29,15 +28,18 @@ export function NewEventDialog() {
   });
 
   useEffect(() => {
-    const unsubscribe = useNewEventDialogStore.subscribe(
+    const unsubscribe = useCalendarEventDialogStore.subscribe(
       (state) => ({
         opened: state.opened,
-        start: state.start,
-        end: state.end,
+        openedEvent: state.openedEvent,
       }),
       (state, prevState) => {
-        if (!prevState.opened && state.opened && state.start && state.end) {
-          form.setValues({ start: state.start, end: state.end });
+        if (!prevState.opened && state.opened && state.openedEvent) {
+          form.setValues({
+            title: state.openedEvent.title || "",
+            start: state.openedEvent.start,
+            end: state.openedEvent.end,
+          });
         }
       },
       { equalityFn: shallow },
@@ -50,16 +52,17 @@ export function NewEventDialog() {
     closeDialog();
   };
 
-  const handleCreate = () => {
+  const handleAction = () => {
     const values = form.getValues();
     if (!values.title.trim() || !values.start || !values.end) return;
 
-    addEvent({
-      id: createUuidV7().toString(),
+    onAction({
+      id: eventId,
       title: values.title,
-      start: values.start.toISOString(),
-      end: values.end.toISOString(),
+      start: values.start,
+      end: values.end,
     });
+
     handleClose();
   };
 
@@ -89,7 +92,7 @@ export function NewEventDialog() {
         <Button variant="default" onClick={handleClose}>
           Cancel
         </Button>
-        <Button onClick={handleCreate}>Create event</Button>
+        <Button onClick={handleAction}>{actionText}</Button>
       </Group>
     </Modal>
   );
