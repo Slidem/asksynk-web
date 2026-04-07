@@ -1,5 +1,15 @@
-import { useDummyCalendarStore } from "../store/dummyCalendarStore";
+import { useMemo } from "react";
 
-export const useCalendarEvents = () => {
-  return useDummyCalendarStore((s) => s.events);
-};
+import type { CalendarEvent } from "@/schedule/models/calendarEvent";
+import { useGhostEventStore } from "@/schedule/store/ghostEventStore";
+import { useCalendarEventsQuery } from "./queries";
+
+export function useCalendarEvents(): CalendarEvent[] {
+  const { data: serverEvents } = useCalendarEventsQuery();
+  const ghostEvent = useGhostEventStore((s) => s.ghostEvent);
+
+  return useMemo(() => {
+    const events = serverEvents ?? [];
+    return ghostEvent ? [...events, ghostEvent] : events;
+  }, [serverEvents, ghostEvent]);
+}

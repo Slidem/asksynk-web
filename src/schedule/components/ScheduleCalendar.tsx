@@ -12,18 +12,19 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import { Paper } from "@mantine/core";
 import { useEffect, useRef } from "react";
 
+import { useUpdateCalendarEventMutation } from "@/schedule/hooks/mutations";
+import { useCalendarEvents } from "@/schedule/hooks/useCalendarEvents";
+import { useOpenEditEventDialog } from "@/schedule/hooks/useOpenEditEventDialog";
+import { useOpenNewEventDialog } from "@/schedule/hooks/useOpenNewEventDialog";
 import {
   GHOST_EVENT_ID,
   type CalendarEvent,
 } from "@/schedule/models/calendarEvent";
 import { useCalendarEventDialogStore } from "@/schedule/store/calendarEventDialogStore";
+import { useGhostEventStore } from "@/schedule/store/ghostEventStore";
+import { useRecurringConfirmDialogStore } from "@/schedule/store/recurringConfirmDialogStore";
 import { useScheduleStore } from "@/schedule/store/scheduleStore";
-import { useAddCalendarEvent } from "../hooks/useAddCalendarEvent";
-import { useCalendarEvents } from "../hooks/useCalendarEvents";
-import { useOpenNewEventDialog } from "../hooks/useOpenNewEventDialog";
-import { useOpenEditEventDialog } from "../hooks/useOpenEditEventDialog";
-import { useRemoveCalendarEvent } from "../hooks/useRemoveCalendarEvent";
-import { useUpdateCalendarEvent } from "../hooks/useUpdateCalendarEvent";
+import { formToUpdateInput } from "@/schedule/utils/calendarEventMapper";
 import classes from "./ScheduleCalendar.module.css";
 import { ScheduleToolbar } from "./ScheduleToolbar";
 
@@ -32,9 +33,11 @@ export function ScheduleCalendar() {
   const openNewEventDialog = useOpenNewEventDialog();
   const openEditEventDialog = useOpenEditEventDialog();
   const events = useCalendarEvents();
-  const addEvent = useAddCalendarEvent();
-  const removeEvent = useRemoveCalendarEvent();
-  const updateEvent = useUpdateCalendarEvent();
+  const setGhostEvent = useGhostEventStore((s) => s.setGhostEvent);
+  const clearGhostEvent = useGhostEventStore((s) => s.clearGhostEvent);
+  const setDateRange = useScheduleStore((s) => s.setViewRange);
+  const updateMutation = useUpdateCalendarEventMutation();
+  const openRecurringConfirm = useRecurringConfirmDialogStore((s) => s.open);
   const currentView = useScheduleStore((s) => s.currentView);
   const setTitle = useScheduleStore((s) => s.setCalendarTitle);
 
@@ -43,41 +46,84 @@ export function ScheduleCalendar() {
       (state) => state.opened,
       (opened, previouslyOpened) => {
         if (previouslyOpened && !opened) {
-          removeEvent(GHOST_EVENT_ID);
+          clearGhostEvent();
         }
       },
     );
     return () => unsubscribe();
-  }, [removeEvent]);
+  }, [clearGhostEvent]);
 
   const handleSelect = (arg: DateSelectArg) => {
-    removeEvent(GHOST_EVENT_ID);
-    addEvent({
+    clearGhostEvent();
+    setGhostEvent({
       id: GHOST_EVENT_ID,
+      eventId: GHOST_EVENT_ID,
       title: "",
       start: arg.start,
       end: arg.end,
+      rrule: null,
+      durationSeconds: Math.round(
+        (arg.end.getTime() - arg.start.getTime()) / 1000,
+      ),
+      instanceStart: arg.start.toISOString(),
     });
     openNewEventDialog(arg.start, arg.end);
     calendarRef.current?.getApi().unselect();
   };
 
   const handleEventDrop = (arg: EventDropArg) => {
-    updateEvent(arg.event.id, {
-      start: arg.event.start ?? undefined,
-      end: arg.event.end ?? undefined,
-    });
+    const event = events.find((e) => e.id === arg.event.id);
+    if (!event) return;
+    const newStart = arg.event.start;
+    const newEnd = arg.event.end;
+    if (!newStart || !newEnd) return;
+
+    if (event.rrule) {
+      openRecurringConfirm({
+        mode: "edit",
+        eventId: event.eventId,
+        instanceStart: event.instanceStart,
+        pendingUpdate: formToUpdateInput({
+          start: newStart,
+          end: newEnd,
+        }),
+      });
+    } else {
+      updateMutation.mutate({
+        eventId: event.eventId,
+        update: formToUpdateInput({ start: newStart, end: newEnd }),
+      });
+    }
   };
 
   const handleEventResize = (arg: EventResizeDoneArg) => {
-    updateEvent(arg.event.id, {
-      start: arg.event.start ?? undefined,
-      end: arg.event.end ?? undefined,
-    });
+    const event = events.find((e) => e.id === arg.event.id);
+    if (!event) return;
+    const newStart = arg.event.start;
+    const newEnd = arg.event.end;
+    if (!newStart || !newEnd) return;
+
+    if (event.rrule) {
+      openRecurringConfirm({
+        mode: "edit",
+        eventId: event.eventId,
+        instanceStart: event.instanceStart,
+        pendingUpdate: formToUpdateInput({
+          start: newStart,
+          end: newEnd,
+        }),
+      });
+    } else {
+      updateMutation.mutate({
+        eventId: event.eventId,
+        update: formToUpdateInput({ start: newStart, end: newEnd }),
+      });
+    }
   };
 
   const handleDatesSet = (arg: DatesSetArg) => {
     setTitle(arg.view.title);
+    setDateRange(arg.start, arg.end);
   };
 
   const handleEventClick = (arg: EventClickArg): void => {

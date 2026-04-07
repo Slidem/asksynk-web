@@ -1,17 +1,9 @@
-import { useCalendarEventDialogStore } from "../store/calendarEventDialogStore";
-import { useAddCalendarEvent } from "./useAddCalendarEvent";
+import { useCalendarEventDialogStore } from "@/schedule/store/calendarEventDialogStore";
 
-export const useOpenNewEventDialog = () => {
-  const openDialog = useCalendarEventDialogStore((s) => s.open);
-  const addEvent = useAddCalendarEvent();
+export function useOpenNewEventDialog() {
+  const open = useCalendarEventDialogStore((s) => s.open);
 
   return (start: Date, end: Date) => {
-    openDialog({
-      mode: "create",
-      actionText: "Create",
-      onAction: addEvent,
-      start,
-      end,
-    });
+    open({ mode: "create", start, end });
   };
-};
+}

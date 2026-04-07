@@ -1,19 +1,10 @@
-import type { CalendarEvent } from "../models/calendarEvent";
-import { useCalendarEventDialogStore } from "../store/calendarEventDialogStore";
-import { useUpdateCalendarEvent } from "./useUpdateCalendarEvent";
+import type { CalendarEvent } from "@/schedule/models/calendarEvent";
+import { useCalendarEventDialogStore } from "@/schedule/store/calendarEventDialogStore";
 
-export const useOpenEditEventDialog = () => {
-  const openDialog = useCalendarEventDialogStore((s) => s.open);
-  const updateEvent = useUpdateCalendarEvent();
+export function useOpenEditEventDialog() {
+  const open = useCalendarEventDialogStore((s) => s.open);
 
   return (event: CalendarEvent) => {
-    openDialog({
-      mode: "edit",
-      event,
-      actionText: "Update",
-      onAction: (updatedEvent) => {
-        updateEvent(event.id, updatedEvent);
-      },
-    });
+    open({ mode: "edit", event });
   };
-};
+}

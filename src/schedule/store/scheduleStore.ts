@@ -1,22 +1,21 @@
 import { create } from "zustand";
 
-import {
-  DUMMY_EVENTS,
-  type CalendarEvent,
-} from "@/schedule/models/calendarEvent";
-
 type ScheduleState = {
+  viewStart: Date;
+  viewEnd: Date;
   calendarTitle: string;
   currentView: string;
-  events: CalendarEvent[];
   setView: (view: string) => void;
   setCalendarTitle: (title: string) => void;
+  setViewRange: (start: Date, end: Date) => void;
 };
 
 export const useScheduleStore = create<ScheduleState>((set) => ({
   calendarTitle: "",
-  events: DUMMY_EVENTS,
   currentView: "timeGridWeek",
+  viewStart: new Date(),
+  viewEnd: new Date(),
   setView: (view) => set({ currentView: view }),
   setCalendarTitle: (title) => set({ calendarTitle: title }),
+  setViewRange: (viewStart, viewEnd) => set({ viewStart, viewEnd }),
 }));
