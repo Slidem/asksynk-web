@@ -39,9 +39,7 @@ export function CalendarEventDialog() {
   const mode = useCalendarEventDialogStore((s) => s.mode);
   const openedEvent = useCalendarEventDialogStore((s) => s.openedEvent);
   const closeDialog = useCalendarEventDialogStore((s) => s.close);
-
   const openRecurringConfirm = useRecurringConfirmDialogStore((s) => s.open);
-
   const createMutation = useCreateCalendarEventMutation();
   const updateMutation = useUpdateCalendarEventMutation();
   const deleteMutation = useDeleteCalendarEventMutation();
@@ -76,27 +74,29 @@ export function CalendarEventDialog() {
         mode: state.mode,
       }),
       (state, prevState) => {
-        if (!prevState.opened && state.opened && state.openedEvent) {
-          if (state.mode === "edit") {
-            form.setValues({
-              title: state.openedEvent.title || "",
-              description: state.openedEvent.description ?? "",
-              location: state.openedEvent.location ?? "",
-              link: state.openedEvent.link ?? "",
-              color: state.openedEvent.color ?? "#4285f4",
-              start: state.openedEvent.start,
-              end: state.openedEvent.end,
-              tagIds: state.openedEvent.tagIds ?? [],
-              isRecurring: state.openedEvent.rrule !== null,
-              recurrence: "WEEKLY",
-            });
-          } else {
-            form.setValues({
-              ...DEFAULT_FORM_VALUES,
-              start: state.openedEvent.start,
-              end: state.openedEvent.end,
-            });
-          }
+        if (prevState.opened || !state.opened || !state.openedEvent) {
+          return;
+        }
+
+        if (state.mode === "edit") {
+          form.setValues({
+            title: state.openedEvent.title || "",
+            description: state.openedEvent.description ?? "",
+            location: state.openedEvent.location ?? "",
+            link: state.openedEvent.link ?? "",
+            color: state.openedEvent.color ?? "#4285f4",
+            start: state.openedEvent.start,
+            end: state.openedEvent.end,
+            tagIds: state.openedEvent.tagIds ?? [],
+            isRecurring: state.openedEvent.rrule !== null,
+            recurrence: "WEEKLY",
+          });
+        } else {
+          form.setValues({
+            ...DEFAULT_FORM_VALUES,
+            start: state.openedEvent.start,
+            end: state.openedEvent.end,
+          });
         }
       },
       { equalityFn: shallow },

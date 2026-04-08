@@ -42,9 +42,7 @@ async function searchTags(search: string): Promise<TagDto[]> {
   if (search.trim().length >= 1) {
     params.set("search", search.trim());
   }
-  const response = await apiFetch(
-    buildApiUrl(`/tags?${params.toString()}`),
-  );
+  const response = await apiFetch(buildApiUrl(`/tags?${params.toString()}`));
   if (!response.ok) throw new Error("Failed to search tags");
   return response.json();
 }
@@ -164,11 +162,7 @@ export function TagSelector({ selectedTagIds, onChange }: TagSelectorProps) {
                   </UnstyledButton>
                 ))}
                 {showCreate && (
-                  <UnstyledButton
-                    onClick={handleCreate}
-                    py="xs"
-                    px="sm"
-                  >
+                  <UnstyledButton onClick={handleCreate} py="xs" px="sm">
                     <Group gap="sm">
                       <IconPlus size={16} />
                       <Text size="sm">Create tag: {search.trim()}</Text>
