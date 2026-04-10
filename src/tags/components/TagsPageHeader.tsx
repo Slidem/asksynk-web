@@ -3,7 +3,7 @@ import { IconPlus, IconTags } from "@tabler/icons-react";
 
 import { TagsFilteredTotalCount } from "./TagsFilteredTotalCount";
 import { TagsFilters } from "@/tags/components/TagsFilters";
-import { useCreateTagDialogHandlers } from "@/tags/hooks/dialogs";
+import { useCreateTagDialogHandlers } from "../hooks/dialogs/createTagDialogHooks";
 
 export function TagsPageHeader() {
   const { open: openCreateDialog } = useCreateTagDialogHandlers();

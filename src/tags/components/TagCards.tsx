@@ -1,10 +1,10 @@
 import { Center, Loader, SimpleGrid, Text } from "@mantine/core";
 
 import { TagCard } from "./TagCard";
-import { useFilteredTags } from "../hooks/queries";
+import { useFilteredTags } from "../hooks/queries/useFilteredTags";
 
 export const TagCards = () => {
-  const { data: tags, isLoading, isError } = useFilteredTags((tags) => tags);
+  const { data: tags, isLoading, isError } = useFilteredTags();
   return (
     <>
       {isLoading ? (

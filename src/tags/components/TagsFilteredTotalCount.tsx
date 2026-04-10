@@ -1,5 +1,5 @@
 import { Text } from "@mantine/core";
-import { useFilteredTagsCount } from "@/tags/hooks/queries";
+import { useFilteredTagsCount } from "../hooks/queries/useFiltertedTagsCount";
 
 export const TagsFilteredTotalCount = () => {
   const totalFilteredTags = useFilteredTagsCount();

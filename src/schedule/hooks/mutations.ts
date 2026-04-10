@@ -45,12 +45,27 @@ export function useUpdateCalendarEventMutation() {
         return {
           ...dto,
           title: input.update.title ?? dto.title,
-          description: input.update.description !== undefined ? input.update.description ?? null : dto.description,
-          location: input.update.location !== undefined ? input.update.location ?? null : dto.location,
-          link: input.update.link !== undefined ? input.update.link ?? null : dto.link,
-          color: input.update.color !== undefined ? input.update.color ?? null : dto.color,
+          description:
+            input.update.description !== undefined
+              ? (input.update.description ?? null)
+              : dto.description,
+          location:
+            input.update.location !== undefined
+              ? (input.update.location ?? null)
+              : dto.location,
+          link:
+            input.update.link !== undefined
+              ? (input.update.link ?? null)
+              : dto.link,
+          color:
+            input.update.color !== undefined
+              ? (input.update.color ?? null)
+              : dto.color,
           tagIds: input.update.tagIds ?? dto.tagIds,
-          rrule: input.update.rrule !== undefined ? input.update.rrule ?? null : dto.rrule,
+          rrule:
+            input.update.rrule !== undefined
+              ? (input.update.rrule ?? null)
+              : dto.rrule,
           instanceStart: input.update.start ?? dto.instanceStart,
           durationSeconds: input.update.durationSeconds ?? dto.durationSeconds,
         };
@@ -79,7 +94,10 @@ type CancelOccurrenceInput = {
 
 export function useCancelOccurrenceMutation() {
   const { queryKey } = useCalendarEventsQueryData();
-  return useOptimisticMutation<CalendarEventInstanceDto[], CancelOccurrenceInput>({
+  return useOptimisticMutation<
+    CalendarEventInstanceDto[],
+    CancelOccurrenceInput
+  >({
     queryKey,
     mutationFn: ({ eventId, occurrenceStart }) =>
       cancelOccurrence(eventId, occurrenceStart),

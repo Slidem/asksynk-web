@@ -8,7 +8,7 @@ import {
   useIsEditTagDialogOpened,
   useOnSelectedEditedTagChange,
   useOpenedEditTag,
-} from "../hooks/dialogs";
+} from "../hooks/dialogs/editTagDialogHooks";
 
 import { TagForm } from "@/tags/components/TagForm";
 import {
@@ -16,7 +16,7 @@ import {
   type TagFormValues,
 } from "@/tags/models/tagForm";
 import { useForm } from "@mantine/form";
-import { useUpdateTagMutation } from "../hooks/mutations";
+import { useUpdateTagMutation } from "../hooks/mutations/useUpdateTag";
 import { TagEditDialogHeader } from "./TagEditDialogHeader";
 
 export function TagEditDialog() {

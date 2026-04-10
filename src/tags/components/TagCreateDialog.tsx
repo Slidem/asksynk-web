@@ -2,18 +2,18 @@ import { Button, Group, Modal } from "@mantine/core";
 import {
   useCreateTagDialogHandlers,
   useIsCreateTagDialogOpened,
-} from "@/tags/hooks/dialogs";
+} from "../hooks/dialogs/createTagDialogHooks";
 
 import { DEFAULT_TAG_FORM_VALUES } from "@/tags/models/tagForm";
 import { TagForm } from "@/tags/components/TagForm";
 import type { TagFormValues } from "@/tags/models/tagForm";
 import { createUuidV7 } from "@/lib/id";
 import { tagFormValuesToInput } from "@/tags/utils/tagFormMapper";
-import { useCreateTagMutation } from "@/tags/hooks/mutations";
+import { useCreateTag } from "../hooks/mutations/useCreateTag";
 import { useForm } from "@mantine/form";
 
 export function TagCreateDialog() {
-  const createMutation = useCreateTagMutation();
+  const { createTag, isCreating } = useCreateTag();
   const isOpened = useIsCreateTagDialogOpened();
   const { close: closeDialog } = useCreateTagDialogHandlers();
 
@@ -29,10 +29,12 @@ export function TagCreateDialog() {
 
   const handleCreate = () => {
     const values = form.getValues();
+
     if (!values.name.trim()) {
       return;
     }
-    createMutation.mutate({
+
+    createTag({
       id: createUuidV7(),
       ...tagFormValuesToInput(values),
     });
@@ -52,7 +54,7 @@ export function TagCreateDialog() {
         <Button variant="default" onClick={handleClose}>
           Cancel
         </Button>
-        <Button loading={createMutation.isPending} onClick={handleCreate}>
+        <Button loading={isCreating} onClick={handleCreate}>
           Create tag
         </Button>
       </Group>

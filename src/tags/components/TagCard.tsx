@@ -25,8 +25,8 @@ import {
 
 import type { TagDto } from "@/tags/models/tag";
 import { formatResponseTime } from "@/tags/utils/responseTime";
-import { useDeleteTagMutation } from "../hooks/mutations";
-import { useEditTagDialogHandlers } from "@/tags/hooks/dialogs";
+import { useDeleteTagMutation } from "../hooks/mutations/useDeleteTag";
+import { useEditTagDialogHandlers } from "../hooks/dialogs/editTagDialogHooks";
 
 interface TagCardProps {
   tag: TagDto;

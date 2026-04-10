@@ -32,7 +32,7 @@ import {
   useDeleteCalendarEventMutation,
 } from "@/schedule/hooks/mutations";
 import { useCalendarEventDetail } from "@/schedule/hooks/queries";
-import { TagSelector } from "./TagSelector";
+import { TagSelector } from "../../tags/components/TagSelector";
 
 export function CalendarEventDialog() {
   const opened = useCalendarEventDialogStore((s) => s.opened);

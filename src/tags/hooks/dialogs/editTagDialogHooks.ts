@@ -1,5 +1,4 @@
-import type { TagDto } from "../models/tag";
-import { useCreateTagDialogStore } from "@/tags/store/createTagDialogStore";
+import type { TagDto } from "@/tags/models/tag";
 import { useEditTagDialogStore } from "@/tags/store/editTagDialogStore";
 import { useEffect } from "react";
 import { useShallow } from "zustand/shallow";
@@ -30,14 +29,4 @@ export const useOnSelectedEditedTagChange = (
     );
     return unsubscribe;
   }, [callback]);
-};
-
-export const useCreateTagDialogHandlers = () => {
-  return useCreateTagDialogStore(
-    useShallow((state) => ({ open: state.open, close: state.close })),
-  );
-};
-
-export const useIsCreateTagDialogOpened = () => {
-  return useCreateTagDialogStore((state) => state.opened);
 };
