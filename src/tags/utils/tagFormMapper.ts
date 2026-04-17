@@ -1,3 +1,4 @@
+import { cleanString } from "@/lib/optional";
 import {
   responseTimeToMillis,
   responseTimeToUnit,
@@ -29,7 +30,7 @@ export function tagDtoToFormValues(tag: TagDto): TagFormValues {
 export function tagFormValuesToInput(values: TagFormValues) {
   return {
     name: values.name.trim(),
-    description: values.description.trim() || undefined,
+    description: cleanString(values.description),
     color: values.color,
     answerMode:
       values.answerMode === "immediately"

@@ -15,31 +15,31 @@ import { shallow } from "zustand/shallow";
 
 import { createUuidV7 } from "@/lib/id";
 import {
+  useCreateCalendarEventMutation,
+  useDeleteCalendarEventMutation,
+  useUpdateCalendarEventMutation,
+} from "@/schedule/hooks/mutations";
+import { useCalendarEventDetail } from "@/schedule/hooks/queries";
+import {
   DEFAULT_FORM_VALUES,
   RECURRENCE_OPTIONS,
   type CalendarEventFormValues,
 } from "@/schedule/models/calendarEventForm";
 import { useCalendarEventDialogStore } from "@/schedule/store/calendarEventDialogStore";
-import { useRecurringConfirmDialogStore } from "@/schedule/store/recurringConfirmDialogStore";
 import {
   formToCreateInput,
   formToUpdateInput,
   rruleToRecurrence,
 } from "@/schedule/utils/calendarEventMapper";
-import {
-  useCreateCalendarEventMutation,
-  useUpdateCalendarEventMutation,
-  useDeleteCalendarEventMutation,
-} from "@/schedule/hooks/mutations";
-import { useCalendarEventDetail } from "@/schedule/hooks/queries";
 import { TagSelector } from "../../tags/components/TagSelector";
+import { useCloseEventDialog } from "../hooks/useCloseEventDialog";
+import { useEventDialogData } from "../hooks/useEventDialogData";
+import { useManageRecurringEventDialog } from "../hooks/useManageRecurringEventDialog";
 
 export function CalendarEventDialog() {
-  const opened = useCalendarEventDialogStore((s) => s.opened);
-  const mode = useCalendarEventDialogStore((s) => s.mode);
-  const openedEvent = useCalendarEventDialogStore((s) => s.openedEvent);
-  const closeDialog = useCalendarEventDialogStore((s) => s.close);
-  const openRecurringConfirm = useRecurringConfirmDialogStore((s) => s.open);
+  const { opened, mode, openedEvent } = useEventDialogData();
+  const closeDialog = useCloseEventDialog();
+  const { open: openRecurringConfirm } = useManageRecurringEventDialog();
   const createMutation = useCreateCalendarEventMutation();
   const updateMutation = useUpdateCalendarEventMutation();
   const deleteMutation = useDeleteCalendarEventMutation();
@@ -54,13 +54,11 @@ export function CalendarEventDialog() {
     initialValues: DEFAULT_FORM_VALUES,
   });
 
-  // Track isRecurring reactively via form.watch
   const [showRecurrence, setShowRecurrence] = useState(false);
-  form.watch("isRecurring", ({ value }) => {
-    setShowRecurrence(value);
+  form.watch("recurrence", ({ value }) => {
+    setShowRecurrence(!!value);
   });
 
-  // Track tagIds reactively for TagSelector
   const [currentTagIds, setCurrentTagIds] = useState<string[]>([]);
   form.watch("tagIds", ({ value }) => {
     setCurrentTagIds(value);
@@ -88,8 +86,9 @@ export function CalendarEventDialog() {
             start: state.openedEvent.start,
             end: state.openedEvent.end,
             tagIds: state.openedEvent.tagIds ?? [],
-            isRecurring: state.openedEvent.rrule !== null,
-            recurrence: "WEEKLY",
+            recurrence: state.openedEvent.rrule
+              ? rruleToRecurrence(state.openedEvent.rrule)
+              : "",
           });
         } else {
           form.setValues({
@@ -103,16 +102,6 @@ export function CalendarEventDialog() {
     );
     return () => unsubscribe();
   }, [form]);
-
-  // Update isRecurring + recurrence from full event detail when it loads
-  useEffect(() => {
-    if (eventDetail && mode === "edit" && opened) {
-      form.setFieldValue("isRecurring", eventDetail.rrule !== null);
-      if (eventDetail.rrule) {
-        form.setFieldValue("recurrence", rruleToRecurrence(eventDetail.rrule));
-      }
-    }
-  }, [eventDetail, mode, opened, form]);
 
   const handleClose = () => {
     form.reset();
@@ -220,8 +209,13 @@ export function CalendarEventDialog() {
       <Group mb="sm" gap="md">
         <Checkbox
           label="Recurring event"
-          key={form.key("isRecurring")}
-          {...form.getInputProps("isRecurring", { type: "checkbox" })}
+          checked={showRecurrence}
+          onChange={(e) => {
+            form.setFieldValue(
+              "recurrence",
+              e.currentTarget.checked ? "WEEKLY" : "",
+            );
+          }}
         />
         {showRecurrence && (
           <Select

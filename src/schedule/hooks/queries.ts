@@ -1,9 +1,9 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
-import { useScheduleStore } from "../store/scheduleStore";
 import { dtoToCalendarEvent } from "@/schedule/utils/calendarEventMapper";
 import { ensureCalendar, fetchCalendarEvent, fetchCalendarEvents } from "./api";
+import { useScheduleView } from "./useScheduleView";
 
 export function calendarEventsQueryKey(start: Date, end: Date) {
   return [
@@ -13,8 +13,7 @@ export function calendarEventsQueryKey(start: Date, end: Date) {
 }
 
 export function useCalendarEventsQueryData() {
-  const viewStart = useScheduleStore((s) => s.viewStart);
-  const viewEnd = useScheduleStore((s) => s.viewEnd);
+  const { viewStart, viewEnd } = useScheduleView();
   const queryKey = useMemo(
     () => calendarEventsQueryKey(viewStart, viewEnd),
     [viewStart, viewEnd],

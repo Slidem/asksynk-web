@@ -3,21 +3,6 @@ import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 import type { CalendarEvent } from "@/schedule/models/calendarEvent";
 
-type OpenedEvent = {
-  id: string;
-  eventId: string;
-  title: string;
-  start: Date;
-  end: Date;
-  description?: string;
-  location?: string;
-  link?: string;
-  color?: string;
-  tagIds?: string[];
-  rrule: string | null;
-  instanceStart: string;
-};
-
 type OpenDialogProps =
   | {
       mode: "create";
@@ -32,7 +17,7 @@ type OpenDialogProps =
 type CalendarEventDialogState = {
   opened: boolean;
   mode: "create" | "edit";
-  openedEvent: OpenedEvent | null;
+  openedEvent: CalendarEvent | null;
   open: (props: OpenDialogProps) => void;
   close: () => void;
 };
@@ -43,9 +28,13 @@ export const useCalendarEventDialogStore = create<CalendarEventDialogState>()(
     mode: "create",
     openedEvent: null,
     open: (props) => {
-      let openedEvent: OpenedEvent;
+      let openedEvent: CalendarEvent;
 
       if (props.mode === "edit") {
+        const durationSeconds = Math.floor(
+          (props.event.end.getTime() - props.event.start.getTime()) / 1000,
+        );
+
         openedEvent = {
           id: props.event.id,
           eventId: props.event.eventId,
@@ -58,10 +47,14 @@ export const useCalendarEventDialogStore = create<CalendarEventDialogState>()(
           color: props.event.color,
           tagIds: props.event.tagIds,
           rrule: props.event.rrule,
+          durationSeconds,
           instanceStart: props.event.instanceStart,
         };
       } else {
         const tempId = createTempId();
+        const durationSeconds = Math.floor(
+          (props.end.getTime() - props.start.getTime()) / 1000,
+        );
         openedEvent = {
           id: tempId,
           eventId: tempId,
@@ -69,7 +62,8 @@ export const useCalendarEventDialogStore = create<CalendarEventDialogState>()(
           start: props.start,
           end: props.end,
           rrule: null,
-          instanceStart: props.start.toISOString(),
+          durationSeconds,
+          instanceStart: props.start,
         };
       }
 

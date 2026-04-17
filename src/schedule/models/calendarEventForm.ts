@@ -7,7 +7,6 @@ export type CalendarEventFormValues = {
   start: Date | null;
   end: Date | null;
   tagIds: string[];
-  isRecurring: boolean;
   recurrence: string;
 };
 
@@ -27,6 +26,5 @@ export const DEFAULT_FORM_VALUES: CalendarEventFormValues = {
   start: null,
   end: null,
   tagIds: [],
-  isRecurring: false,
-  recurrence: "WEEKLY",
+  recurrence: "",
 };

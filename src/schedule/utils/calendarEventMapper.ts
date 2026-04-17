@@ -1,4 +1,10 @@
 import { toISOStringWithTimezone } from "@/lib/date";
+import {
+  cleanString,
+  fromNullable,
+  mapDefined,
+  nonEmptyArray,
+} from "@/lib/optional";
 import type { CalendarEvent } from "@/schedule/models/calendarEvent";
 import type {
   CalendarEventInstanceDto,
@@ -11,20 +17,21 @@ export function dtoToCalendarEvent(
   dto: CalendarEventInstanceDto,
 ): CalendarEvent {
   const start = new Date(dto.instanceStart);
+  const end = new Date(start.getTime() + dto.durationSeconds * 1000);
   return {
     id: dto.instanceId,
     eventId: dto.eventId,
     title: dto.title,
     start,
-    end: new Date(start.getTime() + dto.durationSeconds * 1000),
-    color: dto.color ?? undefined,
-    description: dto.description ?? undefined,
-    location: dto.location ?? undefined,
-    link: dto.link ?? undefined,
+    end,
+    color: fromNullable(dto.color),
+    description: fromNullable(dto.description),
+    location: fromNullable(dto.location),
+    link: fromNullable(dto.link),
     tagIds: dto.tagIds,
     rrule: dto.rrule,
     durationSeconds: dto.durationSeconds,
-    instanceStart: dto.instanceStart,
+    instanceStart: start,
   };
 }
 
@@ -40,49 +47,44 @@ export function formToCreateInput(
   return {
     id,
     title: form.title.trim(),
-    description: form.description.trim() || undefined,
-    location: form.location.trim() || undefined,
-    link: form.link.trim() || undefined,
+    description: cleanString(form.description),
+    location: cleanString(form.location),
+    link: cleanString(form.link),
     start: toISOStringWithTimezone(start),
     durationSeconds,
     timezone,
-    rrule: form.isRecurring ? recurrenceToRrule(form.recurrence) : undefined,
+    rrule: cleanString(form.recurrence)
+      ? recurrenceToRrule(form.recurrence)
+      : undefined,
     color: form.color || undefined,
-    tagIds: form.tagIds.length > 0 ? form.tagIds : undefined,
+    tagIds: nonEmptyArray(form.tagIds),
   };
 }
 
 export function formToUpdateInput(
   form: Partial<CalendarEventFormValues>,
 ): UpdateCalendarEventInput {
-  const input: UpdateCalendarEventInput = {};
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  if (form.title !== undefined) input.title = form.title.trim();
-  if (form.description !== undefined)
-    input.description = form.description.trim() || undefined;
-  if (form.location !== undefined)
-    input.location = form.location.trim() || undefined;
-  if (form.link !== undefined) input.link = form.link.trim() || undefined;
-
-  if (form.start && form.end) {
-    input.start = toISOStringWithTimezone(form.start);
-    input.durationSeconds = Math.round(
-      (form.end.getTime() - form.start.getTime()) / 1000,
-    );
-    input.timezone = timezone;
-  }
-
-  if (form.color !== undefined) input.color = form.color || undefined;
-  if (form.tagIds !== undefined) input.tagIds = form.tagIds;
-
-  if (form.isRecurring !== undefined && form.recurrence !== undefined) {
-    input.rrule = form.isRecurring
-      ? recurrenceToRrule(form.recurrence)
-      : undefined;
-  }
-
-  return input;
+  return {
+    title: mapDefined(form.title, (v) => v.trim()),
+    description: mapDefined(form.description, cleanString),
+    location: mapDefined(form.location, cleanString),
+    link: mapDefined(form.link, cleanString),
+    color: mapDefined(form.color, (v) => v || undefined),
+    tagIds: nonEmptyArray(form.tagIds),
+    rrule: mapDefined(form.recurrence, (v) =>
+      v ? recurrenceToRrule(v) : undefined,
+    ),
+    ...(form.start &&
+      form.end && {
+        start: toISOStringWithTimezone(form.start),
+        durationSeconds: Math.round(
+          (form.end.getTime() - form.start.getTime()) / 1000,
+        ),
+        timezone,
+      }),
+  };
 }
 
 export function calendarEventToFormValues(
@@ -97,8 +99,7 @@ export function calendarEventToFormValues(
     start: event.start,
     end: event.end,
     tagIds: event.tagIds ?? [],
-    isRecurring: event.rrule !== null,
-    recurrence: event.rrule ? rruleToRecurrence(event.rrule) : "WEEKLY",
+    recurrence: event.rrule ? rruleToRecurrence(event.rrule) : "",
   };
 }
 

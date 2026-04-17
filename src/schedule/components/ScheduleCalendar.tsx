@@ -10,7 +10,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { Paper } from "@mantine/core";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 
 import { useUpdateCalendarEventMutation } from "@/schedule/hooks/mutations";
 import { useCalendarEvents } from "@/schedule/hooks/useCalendarEvents";
@@ -20,11 +20,11 @@ import {
   GHOST_EVENT_ID,
   type CalendarEvent,
 } from "@/schedule/models/calendarEvent";
-import { useCalendarEventDialogStore } from "@/schedule/store/calendarEventDialogStore";
-import { useGhostEventStore } from "@/schedule/store/ghostEventStore";
-import { useRecurringConfirmDialogStore } from "@/schedule/store/recurringConfirmDialogStore";
-import { useScheduleStore } from "@/schedule/store/scheduleStore";
 import { formToUpdateInput } from "@/schedule/utils/calendarEventMapper";
+import { useGhostEvent } from "../hooks/useGhostEvent";
+import { useManageRecurringEventDialog } from "../hooks/useManageRecurringEventDialog";
+import { useManageScheduleView } from "../hooks/useManageScheduleView";
+import { useScheduleView } from "../hooks/useScheduleView";
 import classes from "./ScheduleCalendar.module.css";
 import { ScheduleToolbar } from "./ScheduleToolbar";
 
@@ -33,53 +33,32 @@ export function ScheduleCalendar() {
   const openNewEventDialog = useOpenNewEventDialog();
   const openEditEventDialog = useOpenEditEventDialog();
   const events = useCalendarEvents();
-  const setGhostEvent = useGhostEventStore((s) => s.setGhostEvent);
-  const clearGhostEvent = useGhostEventStore((s) => s.clearGhostEvent);
-  const setDateRange = useScheduleStore((s) => s.setViewRange);
+  const createGhostEvent = useGhostEvent();
   const updateMutation = useUpdateCalendarEventMutation();
-  const openRecurringConfirm = useRecurringConfirmDialogStore((s) => s.open);
-  const currentView = useScheduleStore((s) => s.currentView);
-  const setTitle = useScheduleStore((s) => s.setCalendarTitle);
-
-  useEffect(() => {
-    const unsubscribe = useCalendarEventDialogStore.subscribe(
-      (state) => state.opened,
-      (opened, previouslyOpened) => {
-        if (previouslyOpened && !opened) {
-          clearGhostEvent();
-        }
-      },
-    );
-    return () => unsubscribe();
-  }, [clearGhostEvent]);
+  const { open: openRecurringConfirm } = useManageRecurringEventDialog();
+  const { currentView } = useScheduleView();
+  const { setViewRange, setCalendarTitle } = useManageScheduleView();
 
   const handleSelect = (arg: DateSelectArg) => {
-    clearGhostEvent();
-    setGhostEvent({
-      id: GHOST_EVENT_ID,
-      eventId: GHOST_EVENT_ID,
-      title: "",
-      start: arg.start,
-      end: arg.end,
-      rrule: null,
-      durationSeconds: Math.round(
-        (arg.end.getTime() - arg.start.getTime()) / 1000,
-      ),
-      instanceStart: arg.start.toISOString(),
-    });
+    createGhostEvent(arg.start, arg.end);
     openNewEventDialog(arg.start, arg.end);
     calendarRef.current?.getApi().unselect();
   };
 
-  const handleEventDrop = (arg: EventDropArg) => {
+  const handleEventDrop = async (arg: EventDropArg) => {
     const event = events.find((e) => e.id === arg.event.id);
-    if (!event) return;
+    if (!event) {
+      return;
+    }
     const newStart = arg.event.start;
     const newEnd = arg.event.end;
-    if (!newStart || !newEnd) return;
+
+    if (!newStart || !newEnd) {
+      return;
+    }
 
     if (event.rrule) {
-      openRecurringConfirm({
+      const result = await openRecurringConfirm({
         mode: "edit",
         eventId: event.eventId,
         instanceStart: event.instanceStart,
@@ -88,6 +67,7 @@ export function ScheduleCalendar() {
           end: newEnd,
         }),
       });
+      if (result === "canceled") arg.revert();
     } else {
       updateMutation.mutate({
         eventId: event.eventId,
@@ -96,15 +76,22 @@ export function ScheduleCalendar() {
     }
   };
 
-  const handleEventResize = (arg: EventResizeDoneArg) => {
+  const handleEventResize = async (arg: EventResizeDoneArg) => {
     const event = events.find((e) => e.id === arg.event.id);
-    if (!event) return;
+
+    if (!event) {
+      return;
+    }
+
     const newStart = arg.event.start;
     const newEnd = arg.event.end;
-    if (!newStart || !newEnd) return;
+
+    if (!newStart || !newEnd) {
+      return;
+    }
 
     if (event.rrule) {
-      openRecurringConfirm({
+      const result = await openRecurringConfirm({
         mode: "edit",
         eventId: event.eventId,
         instanceStart: event.instanceStart,
@@ -113,6 +100,7 @@ export function ScheduleCalendar() {
           end: newEnd,
         }),
       });
+      if (result === "canceled") arg.revert();
     } else {
       updateMutation.mutate({
         eventId: event.eventId,
@@ -122,8 +110,8 @@ export function ScheduleCalendar() {
   };
 
   const handleDatesSet = (arg: DatesSetArg) => {
-    setTitle(arg.view.title);
-    setDateRange(arg.start, arg.end);
+    setCalendarTitle(arg.view.title);
+    setViewRange(arg.start, arg.end);
   };
 
   const handleEventClick = (arg: EventClickArg): void => {

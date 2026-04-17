@@ -10,7 +10,7 @@ type ScheduleState = {
   setViewRange: (start: Date, end: Date) => void;
 };
 
-export const useScheduleStore = create<ScheduleState>((set) => ({
+export const useScheduleViewStore = create<ScheduleState>((set) => ({
   calendarTitle: "",
   currentView: "timeGridWeek",
   viewStart: new Date(),

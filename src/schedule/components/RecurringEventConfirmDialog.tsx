@@ -1,21 +1,21 @@
 import { Button, Group, Modal, Stack, Text } from "@mantine/core";
 
-import { useRecurringConfirmDialogStore } from "@/schedule/store/recurringConfirmDialogStore";
-import { useCalendarEventDialogStore } from "@/schedule/store/calendarEventDialogStore";
 import {
   useCancelOccurrenceMutation,
   useDeleteCalendarEventMutation,
   useDetachInstanceMutation,
   useSplitSeriesMutation,
 } from "@/schedule/hooks/mutations";
+import { useCalendarEventDialogStore } from "@/schedule/store/calendarEventDialogStore";
+import { useManageRecurringEventDialog } from "../hooks/useManageRecurringEventDialog";
+import { useRecurringEventDialogData } from "../hooks/useRecurringEventDialogData";
+import { toISOStringWithTimezone } from "@/lib/date";
 
 export function RecurringEventConfirmDialog() {
-  const opened = useRecurringConfirmDialogStore((s) => s.opened);
-  const mode = useRecurringConfirmDialogStore((s) => s.mode);
-  const eventId = useRecurringConfirmDialogStore((s) => s.eventId);
-  const instanceStart = useRecurringConfirmDialogStore((s) => s.instanceStart);
-  const pendingUpdate = useRecurringConfirmDialogStore((s) => s.pendingUpdate);
-  const closeConfirm = useRecurringConfirmDialogStore((s) => s.close);
+  const { opened, mode, eventId, instanceStart, pendingUpdate } =
+    useRecurringEventDialogData();
+  const { close: closeConfirm, confirm: confirmDialog } =
+    useManageRecurringEventDialog();
   const closeEventDialog = useCalendarEventDialogStore((s) => s.close);
 
   const cancelOccurrence = useCancelOccurrenceMutation();
@@ -28,39 +28,44 @@ export function RecurringEventConfirmDialog() {
   };
 
   const handleThisOnly = () => {
+    const start = toISOStringWithTimezone(instanceStart!);
+
     if (mode === "delete") {
       cancelOccurrence.mutate({
         eventId,
-        occurrenceStart: instanceStart,
-        instanceId: `${eventId}::${instanceStart}`,
+        occurrenceStart: start,
+        instanceId: `${eventId}::${start}`,
       });
     } else {
       detachInstance.mutate({
         eventId,
-        instanceStart,
+        instanceStart: start,
         dto: pendingUpdate ?? {},
       });
     }
-    closeConfirm();
+    confirmDialog();
     closeEventDialog();
   };
 
   const handleAllOrFuture = () => {
+    const start = toISOStringWithTimezone(instanceStart!);
+
     if (mode === "delete") {
       deleteEvent.mutate(eventId);
     } else {
       splitSeries.mutate({
         eventId,
-        splitStart: instanceStart,
+        splitStart: start,
         dto: pendingUpdate ?? {},
       });
     }
-    closeConfirm();
+    confirmDialog();
     closeEventDialog();
   };
 
   const title =
     mode === "delete" ? "Delete recurring event" : "Edit recurring event";
+
   const description =
     mode === "delete"
       ? "This is a recurring event. What would you like to delete?"

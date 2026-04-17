@@ -7,8 +7,9 @@ import {
 } from "@tabler/icons-react";
 import type { RefObject } from "react";
 
-import { useScheduleStore } from "@/schedule/store/scheduleStore";
+import { useManageScheduleView } from "../hooks/useManageScheduleView";
 import { useOpenNewEventDialog } from "../hooks/useOpenNewEventDialog";
+import { useScheduleView } from "../hooks/useScheduleView";
 
 const VIEW_OPTIONS = [
   { value: "dayGridMonth", label: "Month" },
@@ -21,9 +22,8 @@ type ScheduleToolbarProps = {
 };
 
 export function ScheduleToolbar({ calendarRef }: ScheduleToolbarProps) {
-  const title = useScheduleStore((s) => s.calendarTitle);
-  const currentView = useScheduleStore((s) => s.currentView);
-  const setView = useScheduleStore((s) => s.setView);
+  const { calendarTitle, currentView } = useScheduleView();
+  const { setView } = useManageScheduleView();
   const openNewEventDialog = useOpenNewEventDialog();
   const getApi = () => calendarRef.current?.getApi() ?? null;
 
@@ -56,7 +56,7 @@ export function ScheduleToolbar({ calendarRef }: ScheduleToolbarProps) {
           <IconChevronRight size={16} />
         </ActionIcon>
         <Text fw={500} size="lg">
-          {title}
+          {calendarTitle}
         </Text>
       </Group>
 
