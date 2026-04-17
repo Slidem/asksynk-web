@@ -97,6 +97,23 @@ Check these categories in priority order:
   or i18n keys (if the project uses i18n).
 - **Dead code**: Unused props, unreachable branches, commented-out JSX blocks.
 
+### 5b. Project layout (hooks / APIs)
+
+Canonical reference: `src/tags/` and `src/schedule/`. Flag regressions:
+
+- Monolith `hooks/api.ts`, `hooks/mutations.ts`, or `hooks/queries.ts` — must
+  split into `apis/<endpoint>.ts`, `hooks/mutations/useXxx.ts`,
+  `hooks/queries/useXxx.ts` (one file per fn / hook).
+- `fetch` / `apiFetch` calls inside a hook file — belong in `apis/`.
+- Dialog-related hooks loose at the `hooks/` root — must live under
+  `hooks/dialogs/<dialogName>DialogHooks.ts`, grouped per dialog store.
+- Mutation hook names ending in `Mutation` (e.g. `useCreateXMutation`) — drop
+  the suffix (`useCreateX`).
+- Shared query-key derivation duplicated across queries/mutations — extract to
+  `hooks/queries/useXxxQueryData.ts` (exports key builder + hook).
+- Barrel exports (`index.ts` re-exporting hooks / apis) — forbidden; always
+  import the specific file via `@/<feature>/…` alias.
+
 ### 6. Styling (low priority)
 
 - **Inline styles for things that should be classes**: Complex inline style

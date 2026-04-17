@@ -1,6 +1,6 @@
 import { Container, Paper, Stack } from "@mantine/core";
 
-import { useEnsureCalendar } from "@/schedule/hooks/queries";
+import { useEnsureCalendar } from "@/schedule/hooks/queries/useEnsureCalendar";
 import { SchedulePageHeader } from "./SchedulePageHeader";
 import { CalendarUserRow } from "./CalendarUserRow";
 import { ScheduleCalendar } from "./ScheduleCalendar";

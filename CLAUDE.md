@@ -17,13 +17,25 @@ By leveraging tags as a barrier between incoming communication channels and a us
 
 ### Project Structure
 
-- **Feature-based structure**: `signin`, `signup`, `verify-email`, `tags`
-- **Feature folders include**: `components`, `models`, `hooks`, `store`, `utils` (folders or files)
+- **Feature-based structure**: `signin`, `signup`, `verify-email`, `tags`, `schedule`
+- **Feature folders include**: `components`, `models`, `hooks`, `store`, `utils`, `apis` (folders or files)
 - **Shared components**: `src/components`
 - **Shared lib functions**: `src/lib`
 - **Shared utils**: `src/utils`
 - **DON'T USE BARREL EXPORTS**
 - **Use import aliases** Avoid relative imports, use import aliases as defined in tsconfig
+
+### Hooks / APIs folder layout
+
+Canonical reference: `src/tags/` and `src/schedule/`.
+
+- **`apis/`** One file per endpoint, exports a single fn (`fetchX`, `createX`, `updateX`, `deleteX`). No fetch calls inside hook files.
+- **`hooks/queries/`** One file per query hook. For query keys derived from filters/view state, add a shared `useXxxQueryData.ts` exporting the key builder + a hook that derives the key; reused by queries and mutations.
+- **`hooks/mutations/`** One file per mutation hook; **no `Mutation` suffix** on the hook name. Imports API fn from `apis/`, query key from `queries/useXxxQueryData`.
+- **`hooks/dialogs/`** One file per dialog store (e.g. `createTagDialogHooks.ts`), grouping that store's selector + handler hooks.
+- **Other store-wrapping hooks** Grouped into a concern-named flat file when they compose as one API (e.g. `tags/hooks/filters.ts`), or one hook per file at the `hooks/` root when independent (e.g. `useScheduleView.ts`).
+- **Composite / domain hooks** Live at the `hooks/` root as `useXxx.ts` or `useXxxService.ts` (cross-store, cross-query).
+- **One hook per file**, file name matches exported hook name. No barrel exports; always `@/<feature>/…` aliases.
 
 ### Component Architecture
 

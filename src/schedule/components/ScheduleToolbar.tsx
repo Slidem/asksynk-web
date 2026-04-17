@@ -8,7 +8,7 @@ import {
 import type { RefObject } from "react";
 
 import { useManageScheduleView } from "../hooks/useManageScheduleView";
-import { useOpenNewEventDialog } from "../hooks/useOpenNewEventDialog";
+import { useOpenNewEventDialog } from "@/schedule/hooks/dialogs/calendarEventDialogHooks";
 import { useScheduleView } from "../hooks/useScheduleView";
 
 const VIEW_OPTIONS = [

@@ -64,6 +64,16 @@ type assertions instead of type guards.
 God components (>200 lines mixing concerns), prop drilling past 3 levels,
 hardcoded user-facing strings, dead code.
 
+**Priority 5b — Project layout (hooks / APIs)** — canonical ref `src/tags/`
+and `src/schedule/`. Flag: monolith `hooks/api.ts` / `hooks/mutations.ts` /
+`hooks/queries.ts`; fetch calls inside hook files (belong in `apis/<fn>.ts`);
+dialog hooks loose at the `hooks/` root (must live under
+`hooks/dialogs/<name>DialogHooks.ts` per dialog store); mutation hooks named
+`useXxxMutation` (drop the suffix); duplicated query-key derivation across
+query + mutation files (extract to `hooks/queries/useXxxQueryData.ts`);
+barrel exports (`index.ts` re-exports) — always import specific files via
+`@/<feature>/…`.
+
 **Priority 6 — Styling** (only flag clear problems):
 Complex inline styles that belong in Tailwind classes, magic pixel numbers,
 z-index without a scale.

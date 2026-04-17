@@ -12,17 +12,19 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import { Paper } from "@mantine/core";
 import { useRef } from "react";
 
-import { useUpdateCalendarEventMutation } from "@/schedule/hooks/mutations";
+import { useUpdateCalendarEvent } from "@/schedule/hooks/mutations/useUpdateCalendarEvent";
 import { useCalendarEvents } from "@/schedule/hooks/useCalendarEvents";
-import { useOpenEditEventDialog } from "@/schedule/hooks/useOpenEditEventDialog";
-import { useOpenNewEventDialog } from "@/schedule/hooks/useOpenNewEventDialog";
+import {
+  useOpenEditEventDialog,
+  useOpenNewEventDialog,
+} from "@/schedule/hooks/dialogs/calendarEventDialogHooks";
 import {
   GHOST_EVENT_ID,
   type CalendarEvent,
 } from "@/schedule/models/calendarEvent";
 import { formToUpdateInput } from "@/schedule/utils/calendarEventMapper";
 import { useGhostEvent } from "../hooks/useGhostEvent";
-import { useManageRecurringEventDialog } from "../hooks/useManageRecurringEventDialog";
+import { useManageRecurringEventDialog } from "@/schedule/hooks/dialogs/recurringEventDialogHooks";
 import { useManageScheduleView } from "../hooks/useManageScheduleView";
 import { useScheduleView } from "../hooks/useScheduleView";
 import classes from "./ScheduleCalendar.module.css";
@@ -34,7 +36,7 @@ export function ScheduleCalendar() {
   const openEditEventDialog = useOpenEditEventDialog();
   const events = useCalendarEvents();
   const createGhostEvent = useGhostEvent();
-  const updateMutation = useUpdateCalendarEventMutation();
+  const updateMutation = useUpdateCalendarEvent();
   const { open: openRecurringConfirm } = useManageRecurringEventDialog();
   const { currentView } = useScheduleView();
   const { setViewRange, setCalendarTitle } = useManageScheduleView();

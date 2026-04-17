@@ -1,6 +1,7 @@
 import { useShallow } from "zustand/shallow";
-import type { CalendarEvent } from "../models/calendarEvent";
-import { useCalendarEventDialogStore } from "../store/calendarEventDialogStore";
+
+import type { CalendarEvent } from "@/schedule/models/calendarEvent";
+import { useCalendarEventDialogStore } from "@/schedule/store/calendarEventDialogStore";
 
 type CalendarEventDialogState = ReturnType<
   typeof useCalendarEventDialogStore.getState
@@ -32,4 +33,24 @@ export function useEventDialogData(
       sliceFn ? sliceFn(state) : selectCalendarEventDialogData(state),
     ),
   );
+}
+
+export const useCloseEventDialog = () => {
+  return useCalendarEventDialogStore((s) => s.close);
+};
+
+export function useOpenEditEventDialog() {
+  const open = useCalendarEventDialogStore((s) => s.open);
+
+  return (event: CalendarEvent) => {
+    open({ mode: "edit", event });
+  };
+}
+
+export function useOpenNewEventDialog() {
+  const open = useCalendarEventDialogStore((s) => s.open);
+
+  return (start: Date, end: Date) => {
+    open({ mode: "create", start, end });
+  };
 }

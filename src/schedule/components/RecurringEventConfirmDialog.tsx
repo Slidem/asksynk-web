@@ -1,14 +1,14 @@
 import { Button, Group, Modal, Stack, Text } from "@mantine/core";
 
-import {
-  useCancelOccurrenceMutation,
-  useDeleteCalendarEventMutation,
-  useDetachInstanceMutation,
-  useSplitSeriesMutation,
-} from "@/schedule/hooks/mutations";
+import { useCancelOccurrence } from "@/schedule/hooks/mutations/useCancelOccurrence";
+import { useDeleteCalendarEvent } from "@/schedule/hooks/mutations/useDeleteCalendarEvent";
+import { useDetachInstance } from "@/schedule/hooks/mutations/useDetachInstance";
+import { useSplitSeries } from "@/schedule/hooks/mutations/useSplitSeries";
 import { useCalendarEventDialogStore } from "@/schedule/store/calendarEventDialogStore";
-import { useManageRecurringEventDialog } from "../hooks/useManageRecurringEventDialog";
-import { useRecurringEventDialogData } from "../hooks/useRecurringEventDialogData";
+import {
+  useManageRecurringEventDialog,
+  useRecurringEventDialogData,
+} from "@/schedule/hooks/dialogs/recurringEventDialogHooks";
 import { toISOStringWithTimezone } from "@/lib/date";
 
 export function RecurringEventConfirmDialog() {
@@ -18,10 +18,10 @@ export function RecurringEventConfirmDialog() {
     useManageRecurringEventDialog();
   const closeEventDialog = useCalendarEventDialogStore((s) => s.close);
 
-  const cancelOccurrence = useCancelOccurrenceMutation();
-  const deleteEvent = useDeleteCalendarEventMutation();
-  const detachInstance = useDetachInstanceMutation();
-  const splitSeries = useSplitSeriesMutation();
+  const cancelOccurrence = useCancelOccurrence();
+  const deleteEvent = useDeleteCalendarEvent();
+  const detachInstance = useDetachInstance();
+  const splitSeries = useSplitSeries();
 
   const handleClose = () => {
     closeConfirm();

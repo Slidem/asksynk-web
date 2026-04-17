@@ -21,3 +21,10 @@ export function mapDefined<T, R>(
 export function nonEmptyArray<T>(arr: T[] | undefined): T[] | undefined {
   return arr && arr.length > 0 ? arr : undefined;
 }
+
+/** Returns value if defined, otherwise the fallback. Distinguishes null from undefined (unlike `??`). */
+export function ifPresent<T>(value: T | undefined) {
+  return {
+    or: <D>(fallback: D): T | D => (value !== undefined ? value : fallback),
+  };
+}

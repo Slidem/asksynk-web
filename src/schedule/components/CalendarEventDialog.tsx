@@ -14,12 +14,10 @@ import { useEffect, useState } from "react";
 import { shallow } from "zustand/shallow";
 
 import { createUuidV7 } from "@/lib/id";
-import {
-  useCreateCalendarEventMutation,
-  useDeleteCalendarEventMutation,
-  useUpdateCalendarEventMutation,
-} from "@/schedule/hooks/mutations";
-import { useCalendarEventDetail } from "@/schedule/hooks/queries";
+import { useCreateCalendarEvent } from "@/schedule/hooks/mutations/useCreateCalendarEvent";
+import { useDeleteCalendarEvent } from "@/schedule/hooks/mutations/useDeleteCalendarEvent";
+import { useUpdateCalendarEvent } from "@/schedule/hooks/mutations/useUpdateCalendarEvent";
+import { useCalendarEventDetail } from "@/schedule/hooks/queries/useCalendarEventDetail";
 import {
   DEFAULT_FORM_VALUES,
   RECURRENCE_OPTIONS,
@@ -32,17 +30,19 @@ import {
   rruleToRecurrence,
 } from "@/schedule/utils/calendarEventMapper";
 import { TagSelector } from "../../tags/components/TagSelector";
-import { useCloseEventDialog } from "../hooks/useCloseEventDialog";
-import { useEventDialogData } from "../hooks/useEventDialogData";
-import { useManageRecurringEventDialog } from "../hooks/useManageRecurringEventDialog";
+import {
+  useCloseEventDialog,
+  useEventDialogData,
+} from "@/schedule/hooks/dialogs/calendarEventDialogHooks";
+import { useManageRecurringEventDialog } from "@/schedule/hooks/dialogs/recurringEventDialogHooks";
 
 export function CalendarEventDialog() {
   const { opened, mode, openedEvent } = useEventDialogData();
   const closeDialog = useCloseEventDialog();
   const { open: openRecurringConfirm } = useManageRecurringEventDialog();
-  const createMutation = useCreateCalendarEventMutation();
-  const updateMutation = useUpdateCalendarEventMutation();
-  const deleteMutation = useDeleteCalendarEventMutation();
+  const createMutation = useCreateCalendarEvent();
+  const updateMutation = useUpdateCalendarEvent();
+  const deleteMutation = useDeleteCalendarEvent();
 
   // Fetch full event details for edit mode to get isRecurring
   const editEventId =
