@@ -14,13 +14,16 @@ import { Route as SignupRouteImport } from "./routes/signup"
 import { Route as SigninRouteImport } from "./routes/signin"
 import { Route as AuthenticatedRouteImport } from "./routes/_authenticated"
 import { Route as IndexRouteImport } from "./routes/index"
+import { Route as PublicSlugRouteImport } from "./routes/public.$slug"
 import { Route as AuthenticatedTimerRouteImport } from "./routes/_authenticated/timer"
 import { Route as AuthenticatedTagsRouteImport } from "./routes/_authenticated/tags"
 import { Route as AuthenticatedScheduleRouteImport } from "./routes/_authenticated/schedule"
+import { Route as AuthenticatedPublicViewsRouteImport } from "./routes/_authenticated/public-views"
 import { Route as AuthenticatedNetworkRouteImport } from "./routes/_authenticated/network"
 import { Route as AuthenticatedMessagesRouteImport } from "./routes/_authenticated/messages"
 import { Route as AuthenticatedIntegrationsRouteImport } from "./routes/_authenticated/integrations"
 import { Route as AuthenticatedDashboardRouteImport } from "./routes/_authenticated/dashboard"
+import { Route as AuthenticatedInvitesInviteIdRouteImport } from "./routes/_authenticated/invites.$inviteId"
 
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
   id: "/verify-email",
@@ -46,6 +49,11 @@ const IndexRoute = IndexRouteImport.update({
   path: "/",
   getParentRoute: () => rootRouteImport,
 } as any)
+const PublicSlugRoute = PublicSlugRouteImport.update({
+  id: "/public/$slug",
+  path: "/public/$slug",
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedTimerRoute = AuthenticatedTimerRouteImport.update({
   id: "/timer",
   path: "/timer",
@@ -61,6 +69,12 @@ const AuthenticatedScheduleRoute = AuthenticatedScheduleRouteImport.update({
   path: "/schedule",
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedPublicViewsRoute =
+  AuthenticatedPublicViewsRouteImport.update({
+    id: "/public-views",
+    path: "/public-views",
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedNetworkRoute = AuthenticatedNetworkRouteImport.update({
   id: "/network",
   path: "/network",
@@ -82,6 +96,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: "/dashboard",
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedInvitesInviteIdRoute =
+  AuthenticatedInvitesInviteIdRouteImport.update({
+    id: "/invites/$inviteId",
+    path: "/invites/$inviteId",
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
@@ -92,9 +112,12 @@ export interface FileRoutesByFullPath {
   "/integrations": typeof AuthenticatedIntegrationsRoute
   "/messages": typeof AuthenticatedMessagesRoute
   "/network": typeof AuthenticatedNetworkRoute
+  "/public-views": typeof AuthenticatedPublicViewsRoute
   "/schedule": typeof AuthenticatedScheduleRoute
   "/tags": typeof AuthenticatedTagsRoute
   "/timer": typeof AuthenticatedTimerRoute
+  "/public/$slug": typeof PublicSlugRoute
+  "/invites/$inviteId": typeof AuthenticatedInvitesInviteIdRoute
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
@@ -105,9 +128,12 @@ export interface FileRoutesByTo {
   "/integrations": typeof AuthenticatedIntegrationsRoute
   "/messages": typeof AuthenticatedMessagesRoute
   "/network": typeof AuthenticatedNetworkRoute
+  "/public-views": typeof AuthenticatedPublicViewsRoute
   "/schedule": typeof AuthenticatedScheduleRoute
   "/tags": typeof AuthenticatedTagsRoute
   "/timer": typeof AuthenticatedTimerRoute
+  "/public/$slug": typeof PublicSlugRoute
+  "/invites/$inviteId": typeof AuthenticatedInvitesInviteIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -120,9 +146,12 @@ export interface FileRoutesById {
   "/_authenticated/integrations": typeof AuthenticatedIntegrationsRoute
   "/_authenticated/messages": typeof AuthenticatedMessagesRoute
   "/_authenticated/network": typeof AuthenticatedNetworkRoute
+  "/_authenticated/public-views": typeof AuthenticatedPublicViewsRoute
   "/_authenticated/schedule": typeof AuthenticatedScheduleRoute
   "/_authenticated/tags": typeof AuthenticatedTagsRoute
   "/_authenticated/timer": typeof AuthenticatedTimerRoute
+  "/public/$slug": typeof PublicSlugRoute
+  "/_authenticated/invites/$inviteId": typeof AuthenticatedInvitesInviteIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -135,9 +164,12 @@ export interface FileRouteTypes {
     | "/integrations"
     | "/messages"
     | "/network"
+    | "/public-views"
     | "/schedule"
     | "/tags"
     | "/timer"
+    | "/public/$slug"
+    | "/invites/$inviteId"
   fileRoutesByTo: FileRoutesByTo
   to:
     | "/"
@@ -148,9 +180,12 @@ export interface FileRouteTypes {
     | "/integrations"
     | "/messages"
     | "/network"
+    | "/public-views"
     | "/schedule"
     | "/tags"
     | "/timer"
+    | "/public/$slug"
+    | "/invites/$inviteId"
   id:
     | "__root__"
     | "/"
@@ -162,9 +197,12 @@ export interface FileRouteTypes {
     | "/_authenticated/integrations"
     | "/_authenticated/messages"
     | "/_authenticated/network"
+    | "/_authenticated/public-views"
     | "/_authenticated/schedule"
     | "/_authenticated/tags"
     | "/_authenticated/timer"
+    | "/public/$slug"
+    | "/_authenticated/invites/$inviteId"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -173,6 +211,7 @@ export interface RootRouteChildren {
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
+  PublicSlugRoute: typeof PublicSlugRoute
 }
 
 declare module "@tanstack/react-router" {
@@ -212,6 +251,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    "/public/$slug": {
+      id: "/public/$slug"
+      path: "/public/$slug"
+      fullPath: "/public/$slug"
+      preLoaderRoute: typeof PublicSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     "/_authenticated/timer": {
       id: "/_authenticated/timer"
       path: "/timer"
@@ -231,6 +277,13 @@ declare module "@tanstack/react-router" {
       path: "/schedule"
       fullPath: "/schedule"
       preLoaderRoute: typeof AuthenticatedScheduleRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    "/_authenticated/public-views": {
+      id: "/_authenticated/public-views"
+      path: "/public-views"
+      fullPath: "/public-views"
+      preLoaderRoute: typeof AuthenticatedPublicViewsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     "/_authenticated/network": {
@@ -261,6 +314,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    "/_authenticated/invites/$inviteId": {
+      id: "/_authenticated/invites/$inviteId"
+      path: "/invites/$inviteId"
+      fullPath: "/invites/$inviteId"
+      preLoaderRoute: typeof AuthenticatedInvitesInviteIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
@@ -269,9 +329,11 @@ interface AuthenticatedRouteChildren {
   AuthenticatedIntegrationsRoute: typeof AuthenticatedIntegrationsRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
   AuthenticatedNetworkRoute: typeof AuthenticatedNetworkRoute
+  AuthenticatedPublicViewsRoute: typeof AuthenticatedPublicViewsRoute
   AuthenticatedScheduleRoute: typeof AuthenticatedScheduleRoute
   AuthenticatedTagsRoute: typeof AuthenticatedTagsRoute
   AuthenticatedTimerRoute: typeof AuthenticatedTimerRoute
+  AuthenticatedInvitesInviteIdRoute: typeof AuthenticatedInvitesInviteIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -279,9 +341,11 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedIntegrationsRoute: AuthenticatedIntegrationsRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
   AuthenticatedNetworkRoute: AuthenticatedNetworkRoute,
+  AuthenticatedPublicViewsRoute: AuthenticatedPublicViewsRoute,
   AuthenticatedScheduleRoute: AuthenticatedScheduleRoute,
   AuthenticatedTagsRoute: AuthenticatedTagsRoute,
   AuthenticatedTimerRoute: AuthenticatedTimerRoute,
+  AuthenticatedInvitesInviteIdRoute: AuthenticatedInvitesInviteIdRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -294,6 +358,7 @@ const rootRouteChildren: RootRouteChildren = {
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
   VerifyEmailRoute: VerifyEmailRoute,
+  PublicSlugRoute: PublicSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

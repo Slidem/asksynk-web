@@ -1,14 +1,7 @@
-import { Stack, Title } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
+
+import { NetworkPage } from "@/network/components/NetworkPage";
 
 export const Route = createFileRoute("/_authenticated/network")({
   component: NetworkPage,
 });
-
-function NetworkPage() {
-  return (
-    <Stack gap="md">
-      <Title order={2}>Network</Title>
-    </Stack>
-  );
-}

@@ -14,6 +14,7 @@ import {
   IconMessage,
   IconNetwork,
   IconPlugConnected,
+  IconShare,
   IconTags,
 } from "@tabler/icons-react";
 import { Link, useLocation } from "@tanstack/react-router";
@@ -53,6 +54,7 @@ const navItems = [
   { icon: IconPlugConnected, label: "Integrations", to: "/integrations" },
   { icon: IconMessage, label: "Messages", to: "/messages" },
   { icon: IconNetwork, label: "Network", to: "/network" },
+  { icon: IconShare, label: "Public Views", to: "/public-views" },
 ];
 
 function UserProfile() {

@@ -1,6 +1,9 @@
 import "@mantine/core/styles.css";
+import "@mantine/dates/styles.css";
+import "@mantine/notifications/styles.css";
 
 import { MantineProvider } from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
 import { Outlet, createRootRoute } from "@tanstack/react-router";
 
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
@@ -25,6 +28,7 @@ function RootLayout() {
       theme={theme}
       colorSchemeManager={colorSchemeManager}
     >
+      <Notifications position="bottom-right" />
       <Outlet />
       {import.meta.env.DEV ? <TanStackRouterDevtools /> : null}
     </MantineProvider>
