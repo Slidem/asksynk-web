@@ -1,12 +1,4 @@
-import {
-  Avatar,
-  Center,
-  Menu,
-  Stack,
-  Text,
-  Tooltip,
-  UnstyledButton,
-} from "@mantine/core";
+import { Center, Menu, Stack, Text, Tooltip, UnstyledButton } from "@mantine/core";
 import {
   IconCalendar,
   IconClock,
@@ -21,6 +13,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { authClient, useSession } from "@/auth";
 
 import { ColorSchemeToggle } from "@/components/ColorSchemeToggle";
+import { UserBadge } from "@/components/UserBadge";
 import classes from "./Navbar.module.css";
 
 interface NavbarLinkProps {
@@ -62,27 +55,16 @@ function UserProfile() {
 
   if (!session) return null;
 
-  const displayName = session.user?.name || session.user?.email || "User";
-  const initials = displayName
-    .split(" ")
-    .map((name: string) => name[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-
   return (
     <Menu shadow="md" width={200} position="right-end">
       <Menu.Target>
         <UnstyledButton className={classes.profileButton}>
-          <Tooltip
-            label={displayName}
-            position="right"
-            transitionProps={{ duration: 0 }}
-          >
-            <Avatar size="md" radius="xl" color="blue">
-              {initials}
-            </Avatar>
-          </Tooltip>
+          <UserBadge
+            name={session.user?.name}
+            email={session.user?.email}
+            variant="avatar"
+            size="md"
+          />
         </UnstyledButton>
       </Menu.Target>
 

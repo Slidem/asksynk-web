@@ -1,13 +1,7 @@
-import {
-  Avatar,
-  Badge,
-  Group,
-  Menu,
-  Text,
-  UnstyledButton,
-} from "@mantine/core";
+import { Badge, Group, Menu, Text, UnstyledButton } from "@mantine/core";
 import { authClient, useSession } from "@/auth";
 
+import { UserBadge } from "@/components/UserBadge";
 import { useNavigate } from "@tanstack/react-router";
 
 export function AuthStatusBadge() {
@@ -22,25 +16,18 @@ export function AuthStatusBadge() {
     );
   }
 
-  const displayName = session.user?.name || session.user?.email || "User";
-  const initials = displayName
-    .split(" ")
-    .map((name: string) => name[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-
   return (
     <Menu shadow="md" width={200}>
       <Menu.Target>
         <UnstyledButton>
           <Group gap="xs">
-            <Avatar size="sm" radius="xl" color="green">
-              {initials}
-            </Avatar>
-            <Text size="sm" fw={500}>
-              {displayName}
-            </Text>
+            <UserBadge
+              name={session.user?.name}
+              email={session.user?.email}
+              variant="name"
+              size="sm"
+              color="green"
+            />
             <Badge variant="light" color="green" size="xs">
               Authenticated
             </Badge>

@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 
 import type { InviteDto } from "@/network/models/invite";
 import { InviteStatusBadge } from "@/network/components/InviteStatusBadge";
+import { UserBadge } from "@/components/UserBadge";
 import { useAcceptInvite } from "@/network/hooks/mutations/useAcceptInvite";
 import { useRejectInvite } from "@/network/hooks/mutations/useRejectInvite";
 
@@ -18,7 +19,7 @@ export function ReceivedInviteRow({ invite }: Props) {
   return (
     <Group justify="space-between" wrap="nowrap" px="md" py="sm">
       <Stack gap={2}>
-        <Text fw={500}>Invite from {invite.inviteeEmail}</Text>
+        <UserBadge email={invite.inviteeEmail} variant="full" />
         <Text size="xs" c="dimmed">
           Received {dayjs(invite.createdAt).format("MMM D, YYYY")}
         </Text>
