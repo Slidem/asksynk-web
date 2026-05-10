@@ -3,6 +3,7 @@ import { Container, Stack } from "@mantine/core";
 import { InviteCreateDialog } from "@/network/components/InviteCreateDialog";
 import { NetworkPageHeader } from "@/network/components/NetworkPageHeader";
 import { NetworkTabs } from "@/network/components/NetworkTabs";
+import { UserActionsDialog } from "@/network/components/UserActionsDialog";
 
 export function NetworkPage() {
   return (
@@ -13,6 +14,7 @@ export function NetworkPage() {
       </Stack>
 
       <InviteCreateDialog />
+      <UserActionsDialog />
     </Container>
   );
 }

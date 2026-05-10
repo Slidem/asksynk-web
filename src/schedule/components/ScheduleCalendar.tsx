@@ -18,6 +18,7 @@ import {
   useOpenEditEventDialog,
   useOpenNewEventDialog,
 } from "@/schedule/hooks/dialogs/calendarEventDialogHooks";
+import { useIsViewingOwnCalendar } from "@/schedule/hooks/useIsViewingOwnCalendar";
 import {
   GHOST_EVENT_ID,
   type CalendarEvent,
@@ -40,6 +41,7 @@ export function ScheduleCalendar() {
   const { open: openRecurringConfirm } = useManageRecurringEventDialog();
   const { currentView } = useScheduleView();
   const { setViewRange, setCalendarTitle } = useManageScheduleView();
+  const isOwn = useIsViewingOwnCalendar();
 
   const handleSelect = (arg: DateSelectArg) => {
     createGhostEvent(arg.start, arg.end);
@@ -145,8 +147,8 @@ export function ScheduleCalendar() {
           initialView={currentView}
           headerToolbar={false}
           events={events}
-          editable
-          selectable
+          editable={isOwn}
+          selectable={isOwn}
           selectMirror
           dayMaxEvents
           slotLabelFormat={{ hour: "numeric", meridiem: "short" }}
@@ -154,10 +156,10 @@ export function ScheduleCalendar() {
           eventClassNames={(arg) =>
             arg.event.id === GHOST_EVENT_ID ? ["fc-event-mirror"] : []
           }
-          select={handleSelect}
-          eventDrop={handleEventDrop}
-          eventClick={handleEventClick}
-          eventResize={handleEventResize}
+          select={isOwn ? handleSelect : undefined}
+          eventDrop={isOwn ? handleEventDrop : undefined}
+          eventClick={isOwn ? handleEventClick : undefined}
+          eventResize={isOwn ? handleEventResize : undefined}
           datesSet={handleDatesSet}
           height="100%"
         />

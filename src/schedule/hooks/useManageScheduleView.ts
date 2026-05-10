@@ -7,6 +7,7 @@ export const useManageScheduleView = () => {
       setView: s.setView,
       setCalendarTitle: s.setCalendarTitle,
       setViewRange: s.setViewRange,
+      setSelectedUserId: s.setSelectedUserId,
     })),
   );
 };
