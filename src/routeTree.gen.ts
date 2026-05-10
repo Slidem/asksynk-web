@@ -23,6 +23,8 @@ import { Route as AuthenticatedNetworkRouteImport } from "./routes/_authenticate
 import { Route as AuthenticatedMessagesRouteImport } from "./routes/_authenticated/messages"
 import { Route as AuthenticatedIntegrationsRouteImport } from "./routes/_authenticated/integrations"
 import { Route as AuthenticatedDashboardRouteImport } from "./routes/_authenticated/dashboard"
+import { Route as AuthenticatedMessagesIndexRouteImport } from "./routes/_authenticated/messages/index"
+import { Route as AuthenticatedMessagesThreadIdRouteImport } from "./routes/_authenticated/messages/$threadId"
 import { Route as AuthenticatedInvitesInviteIdRouteImport } from "./routes/_authenticated/invites.$inviteId"
 
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
@@ -96,6 +98,18 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: "/dashboard",
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedMessagesIndexRoute =
+  AuthenticatedMessagesIndexRouteImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => AuthenticatedMessagesRoute,
+  } as any)
+const AuthenticatedMessagesThreadIdRoute =
+  AuthenticatedMessagesThreadIdRouteImport.update({
+    id: "/$threadId",
+    path: "/$threadId",
+    getParentRoute: () => AuthenticatedMessagesRoute,
+  } as any)
 const AuthenticatedInvitesInviteIdRoute =
   AuthenticatedInvitesInviteIdRouteImport.update({
     id: "/invites/$inviteId",
@@ -110,7 +124,7 @@ export interface FileRoutesByFullPath {
   "/verify-email": typeof VerifyEmailRoute
   "/dashboard": typeof AuthenticatedDashboardRoute
   "/integrations": typeof AuthenticatedIntegrationsRoute
-  "/messages": typeof AuthenticatedMessagesRoute
+  "/messages": typeof AuthenticatedMessagesRouteWithChildren
   "/network": typeof AuthenticatedNetworkRoute
   "/public-views": typeof AuthenticatedPublicViewsRoute
   "/schedule": typeof AuthenticatedScheduleRoute
@@ -118,6 +132,8 @@ export interface FileRoutesByFullPath {
   "/timer": typeof AuthenticatedTimerRoute
   "/public/$slug": typeof PublicSlugRoute
   "/invites/$inviteId": typeof AuthenticatedInvitesInviteIdRoute
+  "/messages/$threadId": typeof AuthenticatedMessagesThreadIdRoute
+  "/messages/": typeof AuthenticatedMessagesIndexRoute
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
@@ -126,7 +142,6 @@ export interface FileRoutesByTo {
   "/verify-email": typeof VerifyEmailRoute
   "/dashboard": typeof AuthenticatedDashboardRoute
   "/integrations": typeof AuthenticatedIntegrationsRoute
-  "/messages": typeof AuthenticatedMessagesRoute
   "/network": typeof AuthenticatedNetworkRoute
   "/public-views": typeof AuthenticatedPublicViewsRoute
   "/schedule": typeof AuthenticatedScheduleRoute
@@ -134,6 +149,8 @@ export interface FileRoutesByTo {
   "/timer": typeof AuthenticatedTimerRoute
   "/public/$slug": typeof PublicSlugRoute
   "/invites/$inviteId": typeof AuthenticatedInvitesInviteIdRoute
+  "/messages/$threadId": typeof AuthenticatedMessagesThreadIdRoute
+  "/messages": typeof AuthenticatedMessagesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -144,7 +161,7 @@ export interface FileRoutesById {
   "/verify-email": typeof VerifyEmailRoute
   "/_authenticated/dashboard": typeof AuthenticatedDashboardRoute
   "/_authenticated/integrations": typeof AuthenticatedIntegrationsRoute
-  "/_authenticated/messages": typeof AuthenticatedMessagesRoute
+  "/_authenticated/messages": typeof AuthenticatedMessagesRouteWithChildren
   "/_authenticated/network": typeof AuthenticatedNetworkRoute
   "/_authenticated/public-views": typeof AuthenticatedPublicViewsRoute
   "/_authenticated/schedule": typeof AuthenticatedScheduleRoute
@@ -152,6 +169,8 @@ export interface FileRoutesById {
   "/_authenticated/timer": typeof AuthenticatedTimerRoute
   "/public/$slug": typeof PublicSlugRoute
   "/_authenticated/invites/$inviteId": typeof AuthenticatedInvitesInviteIdRoute
+  "/_authenticated/messages/$threadId": typeof AuthenticatedMessagesThreadIdRoute
+  "/_authenticated/messages/": typeof AuthenticatedMessagesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -170,6 +189,8 @@ export interface FileRouteTypes {
     | "/timer"
     | "/public/$slug"
     | "/invites/$inviteId"
+    | "/messages/$threadId"
+    | "/messages/"
   fileRoutesByTo: FileRoutesByTo
   to:
     | "/"
@@ -178,7 +199,6 @@ export interface FileRouteTypes {
     | "/verify-email"
     | "/dashboard"
     | "/integrations"
-    | "/messages"
     | "/network"
     | "/public-views"
     | "/schedule"
@@ -186,6 +206,8 @@ export interface FileRouteTypes {
     | "/timer"
     | "/public/$slug"
     | "/invites/$inviteId"
+    | "/messages/$threadId"
+    | "/messages"
   id:
     | "__root__"
     | "/"
@@ -203,6 +225,8 @@ export interface FileRouteTypes {
     | "/_authenticated/timer"
     | "/public/$slug"
     | "/_authenticated/invites/$inviteId"
+    | "/_authenticated/messages/$threadId"
+    | "/_authenticated/messages/"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -314,6 +338,20 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    "/_authenticated/messages/": {
+      id: "/_authenticated/messages/"
+      path: "/"
+      fullPath: "/messages/"
+      preLoaderRoute: typeof AuthenticatedMessagesIndexRouteImport
+      parentRoute: typeof AuthenticatedMessagesRoute
+    }
+    "/_authenticated/messages/$threadId": {
+      id: "/_authenticated/messages/$threadId"
+      path: "/$threadId"
+      fullPath: "/messages/$threadId"
+      preLoaderRoute: typeof AuthenticatedMessagesThreadIdRouteImport
+      parentRoute: typeof AuthenticatedMessagesRoute
+    }
     "/_authenticated/invites/$inviteId": {
       id: "/_authenticated/invites/$inviteId"
       path: "/invites/$inviteId"
@@ -324,10 +362,25 @@ declare module "@tanstack/react-router" {
   }
 }
 
+interface AuthenticatedMessagesRouteChildren {
+  AuthenticatedMessagesThreadIdRoute: typeof AuthenticatedMessagesThreadIdRoute
+  AuthenticatedMessagesIndexRoute: typeof AuthenticatedMessagesIndexRoute
+}
+
+const AuthenticatedMessagesRouteChildren: AuthenticatedMessagesRouteChildren = {
+  AuthenticatedMessagesThreadIdRoute: AuthenticatedMessagesThreadIdRoute,
+  AuthenticatedMessagesIndexRoute: AuthenticatedMessagesIndexRoute,
+}
+
+const AuthenticatedMessagesRouteWithChildren =
+  AuthenticatedMessagesRoute._addFileChildren(
+    AuthenticatedMessagesRouteChildren,
+  )
+
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedIntegrationsRoute: typeof AuthenticatedIntegrationsRoute
-  AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
+  AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRouteWithChildren
   AuthenticatedNetworkRoute: typeof AuthenticatedNetworkRoute
   AuthenticatedPublicViewsRoute: typeof AuthenticatedPublicViewsRoute
   AuthenticatedScheduleRoute: typeof AuthenticatedScheduleRoute
@@ -339,7 +392,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedIntegrationsRoute: AuthenticatedIntegrationsRoute,
-  AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
+  AuthenticatedMessagesRoute: AuthenticatedMessagesRouteWithChildren,
   AuthenticatedNetworkRoute: AuthenticatedNetworkRoute,
   AuthenticatedPublicViewsRoute: AuthenticatedPublicViewsRoute,
   AuthenticatedScheduleRoute: AuthenticatedScheduleRoute,
