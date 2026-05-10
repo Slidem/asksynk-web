@@ -1,0 +1,43 @@
+.row {
+  padding: 2px 12px;
+  border-radius: 4px;
+  transition: background-color 80ms ease;
+
+  &:hover {
+    background-color: var(--mantine-color-default-hover);
+  }
+
+  &:hover .hoverTime {
+    opacity: 1;
+  }
+}
+
+.rowFollowup {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.hoverTime {
+  opacity: 0;
+  transition: opacity 80ms ease;
+  font-variant-numeric: tabular-nums;
+}
+
+.body {
+  font-size: 13px;
+  line-height: 1.45;
+  word-break: break-word;
+
+  & p,
+  & ul,
+  & ol,
+  & pre,
+  & blockquote {
+    margin: 0;
+  }
+
+  & ul,
+  & ol {
+    padding-left: 20px;
+  }
+}

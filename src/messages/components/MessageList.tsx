@@ -11,9 +11,26 @@ interface Props {
   other: ThreadOtherParticipant;
 }
 
+const GROUP_GAP_MS = 5 * 60 * 1000;
+
+interface SenderInfo {
+  name: string | null;
+  email: string | null;
+  image: string | null;
+}
+
+interface DisplayMessage {
+  message: Message;
+  sender: SenderInfo;
+  showHeader: boolean;
+}
+
 export function MessageList({ threadId, other }: Props) {
   const { data: session } = useSession();
   const currentUserId = session?.user?.id;
+  const currentUserName = session?.user?.name ?? null;
+  const currentUserEmail = session?.user?.email ?? null;
+  const currentUserImage = session?.user?.image ?? null;
 
   const {
     data,
@@ -27,21 +44,60 @@ export function MessageList({ threadId, other }: Props) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const lastMessageIdRef = useRef<string | null>(null);
 
-  const messagesAsc = useMemo<Message[]>(() => {
-    if (!data) return [];
-    const all = data.pages.flat();
-    return [...all].reverse();
-  }, [data]);
+  const otherSender = useMemo<SenderInfo>(() => {
+    if (other.kind === "user") {
+      return {
+        name: other.name ?? null,
+        email: other.email ?? null,
+        image: other.image ?? null,
+      };
+    }
+    return { name: other.displayName, email: null, image: null };
+  }, [other]);
+
+  const displayMessages = useMemo<DisplayMessage[]>(() => {
+    if (!data) {
+      return [];
+    }
+    const asc = [...data.pages.flat()].reverse();
+    return asc.map((message, i) => {
+      const isOwn =
+        message.senderKind === "user" && message.senderId === currentUserId;
+      const sender: SenderInfo = isOwn
+        ? {
+            name: currentUserName,
+            email: currentUserEmail,
+            image: currentUserImage,
+          }
+        : otherSender;
+      const prev = asc[i - 1];
+      const showHeader =
+        !prev ||
+        prev.senderKind !== message.senderKind ||
+        prev.senderId !== message.senderId ||
+        new Date(message.createdAt).getTime() -
+          new Date(prev.createdAt).getTime() >
+          GROUP_GAP_MS;
+      return { message, sender, showHeader };
+    });
+  }, [
+    data,
+    currentUserId,
+    currentUserName,
+    currentUserEmail,
+    currentUserImage,
+    otherSender,
+  ]);
 
   useEffect(() => {
-    const last = messagesAsc[messagesAsc.length - 1];
+    const last = displayMessages[displayMessages.length - 1];
     if (!last) {
       return;
     }
-    if (last.id === lastMessageIdRef.current) {
+    if (last.message.id === lastMessageIdRef.current) {
       return;
     }
-    lastMessageIdRef.current = last.id;
+    lastMessageIdRef.current = last.message.id;
     const el = viewportRef.current;
     if (!el) {
       return;
@@ -49,7 +105,7 @@ export function MessageList({ threadId, other }: Props) {
     requestAnimationFrame(() => {
       el.scrollTop = el.scrollHeight;
     });
-  }, [messagesAsc]);
+  }, [displayMessages]);
 
   const handleScrollPositionChange = ({ y }: { x: number; y: number }) => {
     if (y > 60) {
@@ -77,7 +133,7 @@ export function MessageList({ threadId, other }: Props) {
     );
   }
 
-  if (messagesAsc.length === 0) {
+  if (displayMessages.length === 0) {
     return (
       <Center flex={1}>
         <Text c="dimmed">No messages yet. Say hi.</Text>
@@ -90,24 +146,20 @@ export function MessageList({ threadId, other }: Props) {
       flex={1}
       viewportRef={viewportRef}
       onScrollPositionChange={handleScrollPositionChange}
-      px="md"
       py="sm"
     >
-      <Stack gap="sm">
+      <Stack gap={0}>
         {isFetchingNextPage && (
           <Center py="xs">
             <Loader size="xs" />
           </Center>
         )}
-        {messagesAsc.map((message) => (
+        {displayMessages.map(({ message, sender, showHeader }) => (
           <MessageBubble
             key={message.id}
             message={message}
-            other={other}
-            isOwn={
-              message.senderKind === "user" &&
-              message.senderId === currentUserId
-            }
+            sender={sender}
+            showHeader={showHeader}
           />
         ))}
       </Stack>
