@@ -1,5 +1,18 @@
-import { ActionIcon, Box, Group, Menu, Stack, Text, Tooltip } from "@mantine/core";
-import { IconDotsVertical, IconTag } from "@tabler/icons-react";
+import {
+  ActionIcon,
+  Anchor,
+  Box,
+  Group,
+  Menu,
+  Stack,
+  Text,
+  Tooltip,
+} from "@mantine/core";
+import {
+  IconDotsVertical,
+  IconMessageCircle,
+  IconTag,
+} from "@tabler/icons-react";
 import { useState } from "react";
 import { UserBadge } from "@/components/UserBadge";
 import type { Message } from "@/messages/models/message";
@@ -23,6 +36,9 @@ interface Props {
   showHeader: boolean;
   /** null for guest threads; disables tag actions/lookups. */
   recipientUserId: string | null;
+  isReply?: boolean;
+  onReply?: () => void;
+  onShowReplies?: () => void;
 }
 
 const AVATAR_SIZE = 36;
@@ -32,6 +48,9 @@ export function MessageBubble({
   sender,
   showHeader,
   recipientUserId,
+  isReply = false,
+  onReply,
+  onShowReplies,
 }: Props) {
   const { data: session } = useSession();
   const { tagMessage } = useTagMessage(message.threadId);
@@ -41,7 +60,10 @@ export function MessageBubble({
   const displayName = sender.name || sender.email || "User";
   const isOwn = session?.user?.id === message.senderId;
   const isTagged = (message.tagIds?.length ?? 0) > 0;
-  const canTag = isOwn && recipientUserId != null;
+  const canTag = !isReply && isOwn && recipientUserId != null;
+  const showReplyControls = !isReply;
+  const replyCount = message.replyCount;
+  const canShowMenu = canTag || (showReplyControls && !!onReply);
 
   return (
     <Group
@@ -108,35 +130,63 @@ export function MessageBubble({
             />
           )}
         </Box>
+        {showReplyControls && replyCount > 0 && onShowReplies && (
+          <Anchor
+            component="button"
+            type="button"
+            size="xs"
+            fw={600}
+            onClick={onShowReplies}
+            style={{ alignSelf: "flex-start" }}
+          >
+            {replyCount} {replyCount === 1 ? "reply" : "replies"}
+          </Anchor>
+        )}
       </Stack>
-      {canTag && (
+      {canShowMenu && (
         <Box className={classes.kebab} style={{ flexShrink: 0 }}>
           <Menu position="bottom-end" withinPortal>
             <Menu.Target>
-              <ActionIcon variant="subtle" size="sm" aria-label="Message actions">
+              <ActionIcon
+                variant="subtle"
+                size="sm"
+                aria-label="Message actions"
+              >
                 <IconDotsVertical size={14} />
               </ActionIcon>
             </Menu.Target>
             <Menu.Dropdown>
-              <Menu.Item
-                leftSection={<IconTag size={14} />}
-                onClick={() => setPickerOpen(true)}
-              >
-                {isTagged ? "Edit tags" : "Tag message"}
-              </Menu.Item>
+              {showReplyControls && onReply && (
+                <Menu.Item
+                  leftSection={<IconMessageCircle size={14} />}
+                  onClick={onReply}
+                >
+                  Reply
+                </Menu.Item>
+              )}
+              {canTag && (
+                <Menu.Item
+                  leftSection={<IconTag size={14} />}
+                  onClick={() => setPickerOpen(true)}
+                >
+                  {isTagged ? "Edit tags" : "Tag message"}
+                </Menu.Item>
+              )}
             </Menu.Dropdown>
           </Menu>
         </Box>
       )}
-      <TagPickerDialog
-        opened={pickerOpen}
-        initialTagIds={message.tagIds ?? []}
-        targetUserId={recipientUserId ?? undefined}
-        title={isTagged ? "Edit tags" : "Tag message"}
-        confirmLabel="Save"
-        onConfirm={(tagIds) => tagMessage(message.id, tagIds)}
-        onClose={() => setPickerOpen(false)}
-      />
+      {canTag && (
+        <TagPickerDialog
+          opened={pickerOpen}
+          initialTagIds={message.tagIds ?? []}
+          targetUserId={recipientUserId ?? undefined}
+          title={isTagged ? "Edit tags" : "Tag message"}
+          confirmLabel="Save"
+          onConfirm={(tagIds) => tagMessage(message.id, tagIds)}
+          onClose={() => setPickerOpen(false)}
+        />
+      )}
     </Group>
   );
 }

@@ -2,6 +2,7 @@ import { Center, Loader, Stack, Text } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { MessageComposer } from "@/messages/components/MessageComposer";
 import { MessageList } from "@/messages/components/MessageList";
+import { ReplyPanel } from "@/messages/components/ReplyPanel";
 import { ThreadHeader } from "@/messages/components/ThreadHeader";
 import { useThreadsQuery } from "@/messages/hooks/queries/useThreadsQuery";
 import { useThreadSubscription } from "@/messages/hooks/useThreadSubscription";
@@ -48,6 +49,12 @@ export function ThreadView({ threadId }: Props) {
         threadId={threadId}
         frozen={thread.frozen}
         recipientUserId={recipientUserId}
+      />
+      <ReplyPanel
+        threadId={threadId}
+        other={thread.other}
+        recipientUserId={recipientUserId}
+        frozen={thread.frozen}
       />
     </Stack>
   );
