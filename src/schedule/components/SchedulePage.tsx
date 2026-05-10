@@ -1,6 +1,7 @@
 import { Container, Paper, Stack } from "@mantine/core";
 
 import { useEnsureCalendar } from "@/schedule/hooks/queries/useEnsureCalendar";
+import { useSyncSelectedUserFromUrl } from "@/schedule/hooks/useSyncSelectedUserFromUrl";
 import { SchedulePageHeader } from "./SchedulePageHeader";
 import { CalendarUserRow } from "./CalendarUserRow";
 import { ScheduleCalendar } from "./ScheduleCalendar";
@@ -9,6 +10,7 @@ import { RecurringEventConfirmDialog } from "./RecurringEventConfirmDialog";
 
 export function SchedulePage() {
   useEnsureCalendar();
+  useSyncSelectedUserFromUrl();
 
   return (
     <Container

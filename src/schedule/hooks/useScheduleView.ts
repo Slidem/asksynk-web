@@ -8,6 +8,7 @@ export const useScheduleView = () => {
       currentView: s.currentView,
       viewStart: s.viewStart,
       viewEnd: s.viewEnd,
+      selectedUserId: s.selectedUserId,
     })),
   );
 };
