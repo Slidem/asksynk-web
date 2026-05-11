@@ -98,7 +98,7 @@ export function MessageBubble({
           {isTagged && (
             <TagChipsRow
               tagIds={message.tagIds}
-              userId={recipientUserId ?? undefined}
+              userId={isOwn ? (recipientUserId ?? undefined) : undefined}
             />
           )}
           {message.body && (

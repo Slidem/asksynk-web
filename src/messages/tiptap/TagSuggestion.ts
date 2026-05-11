@@ -3,42 +3,49 @@ import { PluginKey } from "@tiptap/pm/state";
 import Suggestion, { type SuggestionOptions } from "@tiptap/suggestion";
 import { ReactRenderer } from "@tiptap/react";
 import tippy, { type Instance as TippyInstance } from "tippy.js";
-import { SlashCommandsList } from "@/messages/tiptap/SlashCommandsList";
-import type { SlashCommandItem } from "@/messages/tiptap/SlashCommandItem";
+import type { TagDto } from "@/tags/models/tag";
+import { TagSuggestionList } from "@/messages/tiptap/TagSuggestionList";
+import { addTagToMarker } from "@/messages/tiptap/addTagToMarker";
 
-const pluginKey = new PluginKey("slashCommands");
+const MAX_RESULTS = 8;
+const pluginKey = new PluginKey("tagSuggestion");
 
-export interface SlashCommandsOptions {
-  getItems: () => SlashCommandItem[];
+export interface TagSuggestionOptions {
+  getTags: () => TagDto[];
+  getExcludedTagIds: () => string[];
   onOpenChange?: (open: boolean) => void;
 }
 
-const fuzzy = (item: SlashCommandItem, query: string) => {
+const matchQuery = (tag: TagDto, query: string) => {
   if (!query) return true;
-  const q = query.toLowerCase();
-  if (item.title.toLowerCase().includes(q)) return true;
-  return (item.keywords ?? []).some((k) => k.toLowerCase().includes(q));
+  return tag.name.toLowerCase().includes(query.toLowerCase());
 };
 
-export const SlashCommands = Extension.create<SlashCommandsOptions>({
-  name: "slashCommands",
+export const TagSuggestion = Extension.create<TagSuggestionOptions>({
+  name: "tagSuggestion",
 
   addOptions() {
-    return { getItems: () => [] };
+    return {
+      getTags: () => [],
+      getExcludedTagIds: () => [],
+    };
   },
 
   addProseMirrorPlugins() {
     const onOpenChange = this.options.onOpenChange;
-    const items = ({ query }: { query: string }) =>
-      this.options.getItems().filter((i) => fuzzy(i, query));
 
-    const command: SuggestionOptions["command"] = ({
-      editor,
-      range,
-      props,
-    }) => {
-      const item = props as SlashCommandItem;
-      item.run({ editor, range });
+    const items = ({ query }: { query: string }) => {
+      const excluded = new Set(this.options.getExcludedTagIds());
+      return this.options
+        .getTags()
+        .filter((t) => !excluded.has(t.id) && matchQuery(t, query))
+        .slice(0, MAX_RESULTS);
+    };
+
+    const command: SuggestionOptions["command"] = ({ editor, range, props }) => {
+      const tag = props as TagDto;
+      editor.chain().focus().deleteRange(range).run();
+      addTagToMarker(editor, tag.id);
     };
 
     const render: SuggestionOptions["render"] = () => {
@@ -47,7 +54,7 @@ export const SlashCommands = Extension.create<SlashCommandsOptions>({
 
       return {
         onStart: (props) => {
-          component = new ReactRenderer(SlashCommandsList, {
+          component = new ReactRenderer(TagSuggestionList, {
             props,
             editor: props.editor,
           });
@@ -94,7 +101,7 @@ export const SlashCommands = Extension.create<SlashCommandsOptions>({
       Suggestion({
         editor: this.editor,
         pluginKey,
-        char: "/",
+        char: "#",
         startOfLine: false,
         allowSpaces: false,
         items,

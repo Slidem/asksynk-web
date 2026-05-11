@@ -69,6 +69,7 @@ export function TagPickerList({
             handleCreate();
           }
         }}
+        data-autofocus
         autoFocus
       />
       <ScrollArea.Autosize mah={maxHeight}>

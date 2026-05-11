@@ -1,9 +1,10 @@
 import { Link, RichTextEditor } from "@mantine/tiptap";
 import { useEditor } from "@tiptap/react";
+import type { Editor } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import { ActionIcon, Group, Stack, Text } from "@mantine/core";
 import { IconSend } from "@tabler/icons-react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSendMessage } from "@/messages/hooks/useSendMessage";
 import {
   TaggedThreadMarker,
@@ -13,8 +14,12 @@ import {
 } from "@/messages/tiptap/TaggedThreadMarker";
 import { SlashCommands } from "@/messages/tiptap/SlashCommands";
 import { buildSlashCommandItems } from "@/messages/tiptap/slashCommandItems";
+import { TagSuggestion } from "@/messages/tiptap/TagSuggestion";
+import { findTaggedMarker } from "@/messages/tiptap/addTagToMarker";
 import { extractTaggedMessage } from "@/messages/tiptap/extractTaggedMessage";
 import { TagPickerDialog } from "@/messages/components/TagPickerDialog";
+import { useUserTagsService } from "@/tags/hooks/useUserTagsService";
+import type { TagDto } from "@/tags/models/tag";
 
 interface Props {
   threadId: string;
@@ -28,15 +33,12 @@ interface PickerState {
   initialTagIds: string[];
   /** marker node position when editing existing marker; null when creating */
   editPos: number | null;
-  /** range to delete (the typed "/...") when creating from slash */
-  deleteRange: { from: number; to: number } | null;
 }
 
 const CLOSED: PickerState = {
   open: false,
   initialTagIds: [],
   editPos: null,
-  deleteRange: null,
 };
 
 export function MessageComposer({
@@ -47,6 +49,15 @@ export function MessageComposer({
   const { sendMessage, isSending } = useSendMessage(threadId);
   const [picker, setPicker] = useState<PickerState>(CLOSED);
   const canTag = recipientUserId != null;
+
+  const { tags } = useUserTagsService(recipientUserId ?? undefined);
+  const tagsRef = useRef<TagDto[]>([]);
+  const editorRef = useRef<Editor | null>(null);
+  const menuOpenRef = useRef(false);
+
+  useEffect(() => {
+    tagsRef.current = tags;
+  }, [tags]);
 
   const editor = useEditor({
     extensions: [
@@ -61,20 +72,32 @@ export function MessageComposer({
                   open: true,
                   initialTagIds: tagIds,
                   editPos: pos,
-                  deleteRange: null,
                 }),
             }),
             SlashCommands.configure({
               getItems: () =>
                 buildSlashCommandItems({
-                  onStartTaggedThread: ({ deleteRange }) =>
+                  onStartTaggedThread: () =>
                     setPicker({
                       open: true,
                       initialTagIds: [],
                       editPos: null,
-                      deleteRange,
                     }),
                 }),
+              onOpenChange: (open) => {
+                menuOpenRef.current = open;
+              },
+            }),
+            TagSuggestion.configure({
+              getTags: () => tagsRef.current,
+              getExcludedTagIds: () => {
+                const e = editorRef.current;
+                if (!e) return [];
+                return findTaggedMarker(e)?.tagIds ?? [];
+              },
+              onOpenChange: (open) => {
+                menuOpenRef.current = open;
+              },
             }),
           ]
         : []),
@@ -84,6 +107,7 @@ export function MessageComposer({
       attributes: { "aria-label": "Message body" },
       handleKeyDown: (_view, event) => {
         if (event.key === "Enter" && !event.shiftKey) {
+          if (menuOpenRef.current) return false;
           event.preventDefault();
           handleSend();
           return true;
@@ -92,6 +116,10 @@ export function MessageComposer({
       },
     },
   });
+
+  useEffect(() => {
+    editorRef.current = editor;
+  }, [editor]);
 
   const handleSend = useCallback(() => {
     if (!editor || frozen) return;
@@ -115,14 +143,9 @@ export function MessageComposer({
       }
 
       if (tagIds.length === 0) return;
-
-      const { from, to } = picker.deleteRange ?? { from: 0, to: 0 };
-      if (to > from) {
-        editor.chain().focus().deleteRange({ from, to }).run();
-      }
       insertTaggedMarker(editor, tagIds);
     },
-    [editor, picker.deleteRange, picker.editPos],
+    [editor, picker.editPos],
   );
 
   if (frozen) {
@@ -160,7 +183,7 @@ export function MessageComposer({
       <Group justify="space-between" align="center">
         <Text size="xs" c="dimmed">
           Enter to send · Shift+Enter for newline
-          {canTag ? " · / for commands" : ""}
+          {canTag ? " · / for commands · # for tags" : ""}
         </Text>
         <ActionIcon
           aria-label="Send message"

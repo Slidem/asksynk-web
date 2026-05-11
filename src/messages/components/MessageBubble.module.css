@@ -43,13 +43,18 @@
 }
 
 .tagged {
-  padding: 6px 8px;
+  padding: 8px 12px;
+  margin-top: 2px;
   border-radius: 6px;
-  background: var(--mantine-color-default-hover);
+  background: var(--mantine-color-blue-light);
   border-left: 3px solid var(--mantine-color-blue-filled);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+}
+
+.row:hover .tagged {
+  background: var(--mantine-color-blue-light-hover);
 }
 
 .kebab {

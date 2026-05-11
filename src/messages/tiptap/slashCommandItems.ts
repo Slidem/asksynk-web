@@ -1,11 +1,8 @@
-import { IconHash } from "@tabler/icons-react";
+import { IconClock, IconHash } from "@tabler/icons-react";
 import type { SlashCommandItem } from "@/messages/tiptap/SlashCommandItem";
 
 export interface SlashCommandHandlers {
-  onStartTaggedThread: (args: {
-    pos: number;
-    deleteRange: { from: number; to: number };
-  }) => void;
+  onStartTaggedThread: () => void;
 }
 
 export function buildSlashCommandItems(
@@ -19,12 +16,17 @@ export function buildSlashCommandItems(
       icon: IconHash,
       keywords: ["tag", "tagged", "thread", "question"],
       run: ({ editor, range }) => {
-        handlers.onStartTaggedThread({
-          pos: range.from,
-          deleteRange: { from: range.from, to: range.to },
-        });
-        editor.chain().focus().run();
+        editor.chain().deleteRange(range).blur().run();
+        handlers.onStartTaggedThread();
       },
+    },
+    {
+      id: "suggest-timeblock",
+      title: "Suggest timeblock",
+      subtitle: "Propose a timeblock (coming soon)",
+      icon: IconClock,
+      keywords: ["timeblock", "suggest", "schedule"],
+      run: () => {},
     },
   ];
 }
