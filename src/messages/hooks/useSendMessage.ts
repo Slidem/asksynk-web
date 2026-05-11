@@ -14,9 +14,10 @@ export function useSendMessage(threadId: string) {
   const [isSending, setIsSending] = useState(false);
 
   const sendMessage = useCallback(
-    (body: string) => {
-      const trimmed = body.trim();
-      if (!trimmed) {
+    (body: string, tagIds: string[]) => {
+      const hasBody = body.trim().length > 0;
+      const hasTags = tagIds.length > 0;
+      if (!hasBody && !hasTags) {
         return;
       }
 
@@ -43,6 +44,7 @@ export function useSendMessage(threadId: string) {
         senderKind: "user",
         senderId: userId,
         body,
+        tagIds,
         createdAt: new Date().toISOString(),
       };
 
@@ -50,7 +52,7 @@ export function useSendMessage(threadId: string) {
       addTemporaryMessageToCache();
       setIsSending(true);
 
-      socket.emit("message.send", { threadId, body }, (ack) => {
+      socket.emit("message.send", { threadId, body, tagIds }, (ack) => {
         setIsSending(false);
         if (ack.ok && ack.messageId) {
           replaceTempIdWithRealId(ack.messageId);

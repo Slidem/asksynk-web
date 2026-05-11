@@ -41,3 +41,22 @@
     padding-left: 20px;
   }
 }
+
+.tagged {
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: var(--mantine-color-default-hover);
+  border-left: 3px solid var(--mantine-color-blue-filled);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.kebab {
+  opacity: 0;
+  transition: opacity 80ms ease;
+}
+
+.row:hover .kebab {
+  opacity: 1;
+}

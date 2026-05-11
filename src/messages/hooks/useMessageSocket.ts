@@ -69,10 +69,32 @@ export function useMessageSocket() {
       );
     };
 
+    const handleMessageUpdated = (payload: {
+      threadId: string;
+      message: Message;
+    }) => {
+      const { threadId, message } = payload;
+
+      queryClient.setQueryData<InfiniteData<Message[]>>(
+        threadMessagesQueryKey(threadId),
+        (current) => {
+          if (!current) return current;
+          return {
+            ...current,
+            pages: current.pages.map((page) =>
+              page.map((m) => (m.id === message.id ? message : m)),
+            ),
+          };
+        },
+      );
+    };
+
     socket.on("message.created", handleMessageCreated);
+    socket.on("message.updated", handleMessageUpdated);
 
     return () => {
       socket.off("message.created", handleMessageCreated);
+      socket.off("message.updated", handleMessageUpdated);
       disconnectMessageSocket();
     };
   }, [queryClient]);

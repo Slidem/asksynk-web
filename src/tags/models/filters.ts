@@ -22,4 +22,6 @@ export interface TagsFilters {
   search?: string;
   limit?: number;
   offset?: number;
+  /** Fetch this user's tags instead of caller's. Auth-gated by network connection. */
+  userId?: string;
 }

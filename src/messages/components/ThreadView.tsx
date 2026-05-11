@@ -32,11 +32,23 @@ export function ThreadView({ threadId }: Props) {
     );
   }
 
+  const recipientUserId =
+    thread.other.kind === "user" ? thread.other.userId : null;
+
   return (
     <Stack gap={0} h="100%">
       <ThreadHeader other={thread.other} showBack={!isDesktop} />
-      <MessageList threadId={threadId} other={thread.other} />
-      <MessageComposer threadId={threadId} frozen={thread.frozen} />
+      <MessageList
+        threadId={threadId}
+        other={thread.other}
+        recipientUserId={recipientUserId}
+      />
+      <MessageComposer
+        key={threadId}
+        threadId={threadId}
+        frozen={thread.frozen}
+        recipientUserId={recipientUserId}
+      />
     </Stack>
   );
 }

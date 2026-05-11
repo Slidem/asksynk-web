@@ -41,6 +41,10 @@ function getTagsUrl(filters: TagsFilters) {
     params.set("offset", String(filters.offset));
   }
 
+  if (filters.userId) {
+    params.set("userId", filters.userId);
+  }
+
   const suffix = params.toString();
 
   return buildApiUrl(`/tags${suffix ? `?${suffix}` : ""}`);

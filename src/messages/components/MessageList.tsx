@@ -9,6 +9,7 @@ import { useEffect, useMemo, useRef } from "react";
 interface Props {
   threadId: string;
   other: ThreadOtherParticipant;
+  recipientUserId: string | null;
 }
 
 const GROUP_GAP_MS = 5 * 60 * 1000;
@@ -25,7 +26,7 @@ interface DisplayMessage {
   showHeader: boolean;
 }
 
-export function MessageList({ threadId, other }: Props) {
+export function MessageList({ threadId, other, recipientUserId }: Props) {
   const { data: session } = useSession();
   const currentUserId = session?.user?.id;
   const currentUserName = session?.user?.name ?? null;
@@ -160,6 +161,7 @@ export function MessageList({ threadId, other }: Props) {
             message={message}
             sender={sender}
             showHeader={showHeader}
+            recipientUserId={recipientUserId}
           />
         ))}
       </Stack>

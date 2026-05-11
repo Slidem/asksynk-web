@@ -1,9 +1,15 @@
-import { Box, Group, Stack, Text, Tooltip } from "@mantine/core";
+import { ActionIcon, Box, Group, Menu, Stack, Text, Tooltip } from "@mantine/core";
+import { IconDotsVertical, IconTag } from "@tabler/icons-react";
+import { useState } from "react";
 import { UserBadge } from "@/components/UserBadge";
 import type { Message } from "@/messages/models/message";
 import DOMPurify from "dompurify";
 import { isoStringToFullDate, isoStringToTime } from "@/lib/date";
 import classes from "@/messages/components/MessageBubble.module.css";
+import { TagChipsRow } from "@/messages/components/TagChipsRow";
+import { TagPickerDialog } from "@/messages/components/TagPickerDialog";
+import { useTagMessage } from "@/messages/hooks/useTagMessage";
+import { useSession } from "@/auth";
 
 interface SenderInfo {
   name: string | null;
@@ -15,13 +21,27 @@ interface Props {
   message: Message;
   sender: SenderInfo;
   showHeader: boolean;
+  /** null for guest threads; disables tag actions/lookups. */
+  recipientUserId: string | null;
 }
 
 const AVATAR_SIZE = 36;
 
-export function MessageBubble({ message, sender, showHeader }: Props) {
+export function MessageBubble({
+  message,
+  sender,
+  showHeader,
+  recipientUserId,
+}: Props) {
+  const { data: session } = useSession();
+  const { tagMessage } = useTagMessage(message.threadId);
+  const [pickerOpen, setPickerOpen] = useState(false);
+
   const sanitized = DOMPurify.sanitize(message.body);
   const displayName = sender.name || sender.email || "User";
+  const isOwn = session?.user?.id === message.senderId;
+  const isTagged = (message.tagIds?.length ?? 0) > 0;
+  const canTag = isOwn && recipientUserId != null;
 
   return (
     <Group
@@ -74,11 +94,49 @@ export function MessageBubble({ message, sender, showHeader }: Props) {
             </Tooltip>
           </Group>
         )}
-        <Box
-          className={classes.body}
-          dangerouslySetInnerHTML={{ __html: sanitized }}
-        />
+        <Box className={isTagged ? classes.tagged : undefined}>
+          {isTagged && (
+            <TagChipsRow
+              tagIds={message.tagIds}
+              userId={recipientUserId ?? undefined}
+            />
+          )}
+          {message.body && (
+            <Box
+              className={classes.body}
+              dangerouslySetInnerHTML={{ __html: sanitized }}
+            />
+          )}
+        </Box>
       </Stack>
+      {canTag && (
+        <Box className={classes.kebab} style={{ flexShrink: 0 }}>
+          <Menu position="bottom-end" withinPortal>
+            <Menu.Target>
+              <ActionIcon variant="subtle" size="sm" aria-label="Message actions">
+                <IconDotsVertical size={14} />
+              </ActionIcon>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Item
+                leftSection={<IconTag size={14} />}
+                onClick={() => setPickerOpen(true)}
+              >
+                {isTagged ? "Edit tags" : "Tag message"}
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
+        </Box>
+      )}
+      <TagPickerDialog
+        opened={pickerOpen}
+        initialTagIds={message.tagIds ?? []}
+        targetUserId={recipientUserId ?? undefined}
+        title={isTagged ? "Edit tags" : "Tag message"}
+        confirmLabel="Save"
+        onConfirm={(tagIds) => tagMessage(message.id, tagIds)}
+        onClose={() => setPickerOpen(false)}
+      />
     </Group>
   );
 }

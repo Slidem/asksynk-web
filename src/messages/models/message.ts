@@ -6,5 +6,6 @@ export interface Message {
   senderKind: SenderKind;
   senderId: string;
   body: string;
+  tagIds: string[];
   createdAt: string;
 }

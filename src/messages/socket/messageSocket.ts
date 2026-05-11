@@ -13,8 +13,14 @@ export interface SubscribeAck {
   error?: string;
 }
 
+export interface TagMessageAck {
+  ok: boolean;
+  error?: string;
+}
+
 interface ServerToClient {
   "message.created": (payload: { threadId: string; message: Message }) => void;
+  "message.updated": (payload: { threadId: string; message: Message }) => void;
 }
 
 interface ClientToServer {
@@ -27,8 +33,12 @@ interface ClientToServer {
     ack: (response: SubscribeAck) => void,
   ) => void;
   "message.send": (
-    payload: { threadId: string; body: string },
+    payload: { threadId: string; body: string; tagIds: string[] },
     ack: (response: SendMessageAck) => void,
+  ) => void;
+  "message.tag": (
+    payload: { messageId: string; tagIds: string[] },
+    ack: (response: TagMessageAck) => void,
   ) => void;
 }
 
