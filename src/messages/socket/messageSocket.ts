@@ -33,7 +33,12 @@ interface ClientToServer {
     ack: (response: SubscribeAck) => void,
   ) => void;
   "message.send": (
-    payload: { threadId: string; body: string; tagIds: string[] },
+    payload: {
+      threadId: string;
+      body: string;
+      tagIds: string[];
+      parentMessageId?: string;
+    },
     ack: (response: SendMessageAck) => void,
   ) => void;
   "message.tag": (

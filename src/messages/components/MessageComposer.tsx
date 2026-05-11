@@ -26,6 +26,7 @@ interface Props {
   frozen?: boolean;
   /** null for guest threads; disables tag actions. */
   recipientUserId: string | null;
+  parentMessageId?: string;
 }
 
 interface PickerState {
@@ -45,10 +46,11 @@ export function MessageComposer({
   threadId,
   frozen = false,
   recipientUserId,
+  parentMessageId,
 }: Props) {
   const { sendMessage, isSending } = useSendMessage(threadId);
   const [picker, setPicker] = useState<PickerState>(CLOSED);
-  const canTag = recipientUserId != null;
+  const canTag = !parentMessageId && recipientUserId != null;
 
   const { tags } = useUserTagsService(recipientUserId ?? undefined);
   const tagsRef = useRef<TagDto[]>([]);
@@ -125,9 +127,9 @@ export function MessageComposer({
     if (!editor || frozen) return;
     const { body, tagIds, isEmptyBody } = extractTaggedMessage(editor);
     if (isEmptyBody && tagIds.length === 0) return;
-    sendMessage(body, tagIds);
+    sendMessage(body, tagIds, { parentMessageId });
     editor.commands.clearContent();
-  }, [editor, frozen, sendMessage]);
+  }, [editor, frozen, sendMessage, parentMessageId]);
 
   const handleConfirm = useCallback(
     (tagIds: string[]) => {

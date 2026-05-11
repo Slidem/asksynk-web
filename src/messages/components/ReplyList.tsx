@@ -1,14 +1,14 @@
 import { Center, Loader, ScrollArea, Stack, Text } from "@mantine/core";
 import { useSession } from "@/auth";
 import { MessageBubble } from "@/messages/components/MessageBubble";
-import { useReplyPanelHandlers } from "@/messages/hooks/dialogs/replyPanelHooks";
-import { useThreadMessagesQuery } from "@/messages/hooks/queries/useThreadMessagesQuery";
+import { useMessageRepliesQuery } from "@/messages/hooks/queries/useMessageRepliesQuery";
 import type { Message } from "@/messages/models/message";
 import type { ThreadOtherParticipant } from "@/messages/models/thread";
 import { useEffect, useMemo, useRef } from "react";
 
 interface Props {
   threadId: string;
+  messageId: string;
   other: ThreadOtherParticipant;
   recipientUserId: string | null;
 }
@@ -27,9 +27,13 @@ interface DisplayMessage {
   showHeader: boolean;
 }
 
-export function MessageList({ threadId, other, recipientUserId }: Props) {
+export function ReplyList({
+  threadId,
+  messageId,
+  other,
+  recipientUserId,
+}: Props) {
   const { data: session } = useSession();
-  const { open: openReplyPanel } = useReplyPanelHandlers();
   const currentUserId = session?.user?.id;
   const currentUserName = session?.user?.name ?? null;
   const currentUserEmail = session?.user?.email ?? null;
@@ -42,7 +46,7 @@ export function MessageList({ threadId, other, recipientUserId }: Props) {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useThreadMessagesQuery(threadId);
+  } = useMessageRepliesQuery(threadId, messageId);
 
   const viewportRef = useRef<HTMLDivElement>(null);
   const lastMessageIdRef = useRef<string | null>(null);
@@ -131,7 +135,7 @@ export function MessageList({ threadId, other, recipientUserId }: Props) {
   if (isError) {
     return (
       <Center flex={1}>
-        <Text c="red">Failed to load messages.</Text>
+        <Text c="red">Failed to load replies.</Text>
       </Center>
     );
   }
@@ -139,7 +143,7 @@ export function MessageList({ threadId, other, recipientUserId }: Props) {
   if (displayMessages.length === 0) {
     return (
       <Center flex={1}>
-        <Text c="dimmed">No messages yet. Say hi.</Text>
+        <Text c="dimmed">No replies yet.</Text>
       </Center>
     );
   }
@@ -164,8 +168,7 @@ export function MessageList({ threadId, other, recipientUserId }: Props) {
             sender={sender}
             showHeader={showHeader}
             recipientUserId={recipientUserId}
-            onReply={() => openReplyPanel(message.id)}
-            onShowReplies={() => openReplyPanel(message.id)}
+            isReply
           />
         ))}
       </Stack>

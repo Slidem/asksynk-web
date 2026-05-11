@@ -1,12 +1,18 @@
 import { useSession } from "@/auth";
 import { createTempId } from "@/lib/id";
+import { messageRepliesQueryKey } from "@/messages/hooks/queries/useMessageRepliesQueryData";
 import { threadMessagesQueryKey } from "@/messages/hooks/queries/useThreadMessagesQueryData";
 import type { Message } from "@/messages/models/message";
 import { getMessageSocket } from "@/messages/socket/messageSocket";
+import { bumpReplyCount } from "@/messages/utils/bumpReplyCount";
 import { notifications } from "@mantine/notifications";
 import type { InfiniteData } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
+
+interface SendMessageOptions {
+  parentMessageId?: string;
+}
 
 export function useSendMessage(threadId: string) {
   const queryClient = useQueryClient();
@@ -14,7 +20,8 @@ export function useSendMessage(threadId: string) {
   const [isSending, setIsSending] = useState(false);
 
   const sendMessage = useCallback(
-    (body: string, tagIds: string[]) => {
+    (body: string, tagIds: string[], options: SendMessageOptions = {}) => {
+      const { parentMessageId } = options;
       const hasBody = body.trim().length > 0;
       const hasTags = tagIds.length > 0;
       if (!hasBody && !hasTags) {
@@ -41,31 +48,46 @@ export function useSendMessage(threadId: string) {
       const optimistic: Message = {
         id: tempId,
         threadId,
+        parentMessageId: parentMessageId ?? null,
         senderKind: "user",
         senderId: userId,
         body,
         tagIds,
         createdAt: new Date().toISOString(),
+        replyCount: 0,
       };
 
-      const queryKey = threadMessagesQueryKey(threadId);
+      const queryKey = parentMessageId
+        ? messageRepliesQueryKey(threadId, parentMessageId)
+        : threadMessagesQueryKey(threadId);
+
       addTemporaryMessageToCache();
+      if (parentMessageId) {
+        bumpReplyCount(queryClient, threadId, parentMessageId, 1);
+      }
       setIsSending(true);
 
-      socket.emit("message.send", { threadId, body, tagIds }, (ack) => {
-        setIsSending(false);
-        if (ack.ok && ack.messageId) {
-          replaceTempIdWithRealId(ack.messageId);
-          return;
-        }
+      socket.emit(
+        "message.send",
+        { threadId, body, tagIds, parentMessageId },
+        (ack) => {
+          setIsSending(false);
+          if (ack.ok && ack.messageId) {
+            replaceTempIdWithRealId(ack.messageId);
+            return;
+          }
 
-        removeTemporaryMessage(tempId);
-        notifications.show({
-          color: "red",
-          title: "Could not send",
-          message: ack.error ?? "Please try again",
-        });
-      });
+          removeTemporaryMessage(tempId);
+          if (parentMessageId) {
+            bumpReplyCount(queryClient, threadId, parentMessageId, -1);
+          }
+          notifications.show({
+            color: "red",
+            title: "Could not send",
+            message: ack.error ?? "Please try again",
+          });
+        },
+      );
 
       function addTemporaryMessageToCache() {
         queryClient.setQueryData<InfiniteData<Message[]>>(
