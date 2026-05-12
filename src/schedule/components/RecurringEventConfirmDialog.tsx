@@ -66,10 +66,7 @@ export function RecurringEventConfirmDialog() {
   const title =
     mode === "delete" ? "Delete recurring event" : "Edit recurring event";
 
-  const description =
-    mode === "delete"
-      ? "This is a recurring event. What would you like to delete?"
-      : "This is a recurring event. What would you like to change?";
+  const description = `This is a recurring event. What would you like to ${mode === "delete" ? "delete" : "change"}?`;
 
   return (
     <Modal
