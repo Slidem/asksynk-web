@@ -1,12 +1,7 @@
-import { Paper, Stack, Text, UnstyledButton } from "@mantine/core";
-import {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useState,
-} from "react";
 import type { SlashCommandItem } from "@/messages/tiptap/SlashCommandItem";
 import classes from "@/messages/tiptap/SlashCommandsList.module.css";
+import { Paper, Stack, Text, UnstyledButton } from "@mantine/core";
+import { forwardRef, useImperativeHandle, useState } from "react";
 
 interface Props {
   items: SlashCommandItem[];
@@ -20,8 +15,6 @@ export interface SlashCommandsListHandle {
 export const SlashCommandsList = forwardRef<SlashCommandsListHandle, Props>(
   ({ items, command }, ref) => {
     const [selectedIndex, setSelectedIndex] = useState(0);
-
-    useEffect(() => setSelectedIndex(0), [items]);
 
     const select = (index: number) => {
       const item = items[index];

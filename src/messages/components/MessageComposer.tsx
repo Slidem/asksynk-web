@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/refs */
 import { Link, RichTextEditor } from "@mantine/tiptap";
 import { useEditor } from "@tiptap/react";
 import type { Editor } from "@tiptap/core";

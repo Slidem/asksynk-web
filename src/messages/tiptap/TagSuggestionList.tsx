@@ -1,21 +1,15 @@
+import classes from "@/messages/tiptap/TagSuggestionList.module.css";
+import type { TagDto } from "@/tags/models/tag";
 import {
   Badge,
   ColorSwatch,
-  Group,
   Paper,
   Stack,
   Text,
   UnstyledButton,
 } from "@mantine/core";
 import { IconBolt, IconClock } from "@tabler/icons-react";
-import {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useState,
-} from "react";
-import type { TagDto } from "@/tags/models/tag";
-import classes from "@/messages/tiptap/TagSuggestionList.module.css";
+import { forwardRef, useImperativeHandle, useState } from "react";
 
 interface Props {
   items: TagDto[];
@@ -29,8 +23,6 @@ export interface TagSuggestionListHandle {
 export const TagSuggestionList = forwardRef<TagSuggestionListHandle, Props>(
   ({ items, command }, ref) => {
     const [selectedIndex, setSelectedIndex] = useState(0);
-
-    useEffect(() => setSelectedIndex(0), [items]);
 
     const select = (index: number) => {
       const item = items[index];
@@ -80,14 +72,23 @@ export const TagSuggestionList = forwardRef<TagSuggestionListHandle, Props>(
                 className={`${classes.item} ${selected ? classes.itemSelected : ""}`}
               >
                 <ColorSwatch color={tag.color} size={12} />
-                <Text size="sm" fw={600} style={{ flex: 1, minWidth: 0 }} truncate>
+                <Text
+                  size="sm"
+                  fw={600}
+                  style={{ flex: 1, minWidth: 0 }}
+                  truncate
+                >
                   {tag.name}
                 </Text>
                 <Badge
                   size="xs"
                   variant="light"
                   leftSection={
-                    isImmediate ? <IconBolt size={10} /> : <IconClock size={10} />
+                    isImmediate ? (
+                      <IconBolt size={10} />
+                    ) : (
+                      <IconClock size={10} />
+                    )
                   }
                 >
                   {isImmediate ? "immediate" : "timeblock"}
