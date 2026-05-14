@@ -11,7 +11,7 @@ import {
 } from "../hooks/dialogs/editTagDialogHooks";
 
 import { TagForm } from "@/tags/components/TagForm";
-import { TagUpcomingEventsPopover } from "@/tags/components/TagUpcomingEventsPopover";
+import { TagUpcomingEventsSection } from "@/tags/components/TagUpcomingEventsSection";
 import {
   DEFAULT_TAG_FORM_VALUES,
   type TagFormValues,
@@ -63,9 +63,7 @@ export function TagEditDialog() {
       <Stack gap="md">
         {selectedTag && <TagEditDialogHeader selectedTag={selectedTag} />}
         {selectedTag && (
-          <Group justify="flex-end">
-            <TagUpcomingEventsPopover tagId={selectedTag.id} />
-          </Group>
+          <TagUpcomingEventsSection tagId={selectedTag.id} />
         )}
         <Divider />
         <TagForm
