@@ -8,19 +8,20 @@ import {
   Switch,
   Text,
   TextInput,
-  Textarea,
 } from "@mantine/core";
 import { IconBell, IconBolt, IconClock, IconVolume } from "@tabler/icons-react";
 
+import { TagDescriptionEditor } from "@/tags/components/TagDescriptionEditor";
 import type { TagFormValues } from "@/tags/models/tagForm";
 import type { UseFormReturnType } from "@mantine/form";
 import { useState } from "react";
 
 interface TagFormProps {
   form: UseFormReturnType<TagFormValues>;
+  initialDescription?: string;
 }
 
-export function TagForm({ form }: TagFormProps) {
+export function TagForm({ form, initialDescription = "" }: TagFormProps) {
   const [answerMode, setAnswerMode] = useState(form.getValues().answerMode);
   form.watch("answerMode", ({ value }) => setAnswerMode(value));
 
@@ -32,13 +33,12 @@ export function TagForm({ form }: TagFormProps) {
         key={form.key("name")}
         {...form.getInputProps("name")}
       />
-      <Textarea
-        label="Description"
-        placeholder="What does this tag represent?"
-        minRows={3}
-        key={form.key("description")}
-        {...form.getInputProps("description")}
-      />
+      <Stack gap={4}>
+        <Text size="sm" fw={500}>
+          Description
+        </Text>
+        <TagDescriptionEditor form={form} initialContent={initialDescription} />
+      </Stack>
       <Group grow>
         <ColorInput
           label="Color"

@@ -11,6 +11,7 @@ import {
 } from "@mantine/core";
 import { IconBolt, IconClock, IconPlus, IconSearch } from "@tabler/icons-react";
 import { useCallback, useMemo } from "react";
+import { htmlToPreview } from "@/lib/htmlToPreview";
 import { useUserTagsService } from "@/tags/hooks/useUserTagsService";
 
 interface TagPickerListProps {
@@ -95,7 +96,7 @@ export function TagPickerList({
                   </Text>
                   {tag.description && (
                     <Text size="xs" c="dimmed" truncate>
-                      {tag.description}
+                      {htmlToPreview(tag.description)}
                     </Text>
                   )}
                 </div>

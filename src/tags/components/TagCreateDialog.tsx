@@ -9,6 +9,7 @@ import { TagForm } from "@/tags/components/TagForm";
 import type { TagFormValues } from "@/tags/models/tagForm";
 import { createUuidV7 } from "@/lib/id";
 import { tagFormValuesToInput } from "@/tags/utils/tagFormMapper";
+import { validateTagName } from "@/tags/utils/tagNameValidation";
 import { useCreateTag } from "../hooks/mutations/useCreateTag";
 import { useForm } from "@mantine/form";
 
@@ -20,6 +21,8 @@ export function TagCreateDialog() {
   const form = useForm<TagFormValues>({
     mode: "uncontrolled",
     initialValues: DEFAULT_TAG_FORM_VALUES,
+    validate: { name: validateTagName },
+    validateInputOnBlur: true,
   });
 
   const handleClose = () => {
@@ -28,12 +31,10 @@ export function TagCreateDialog() {
   };
 
   const handleCreate = () => {
+    const { hasErrors } = form.validate();
+    if (hasErrors) return;
+
     const values = form.getValues();
-
-    if (!values.name.trim()) {
-      return;
-    }
-
     createTag({
       id: createUuidV7(),
       ...tagFormValuesToInput(values),

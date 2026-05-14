@@ -12,6 +12,7 @@ import {
 import { IconPlus, IconSearch } from "@tabler/icons-react";
 
 import { useCallback, useMemo } from "react";
+import { htmlToPreview } from "@/lib/htmlToPreview";
 import { useTimeblockTagsService } from "../hooks/useTimeblockTagsService";
 
 interface TagSelectorProps {
@@ -98,8 +99,8 @@ export function TagSelector({ selectedTagIds, onChange }: TagSelectorProps) {
                           {tag.name}
                         </Text>
                         {tag.description && (
-                          <Text size="xs" c="dimmed">
-                            {tag.description}
+                          <Text size="xs" c="dimmed" lineClamp={1}>
+                            {htmlToPreview(tag.description)}
                           </Text>
                         )}
                       </div>

@@ -1,5 +1,6 @@
-import { Badge, Group, Paper, Stack, Text, ThemeIcon } from "@mantine/core";
+import { Badge, Box, Group, Paper, Stack, Text, ThemeIcon } from "@mantine/core";
 
+import DOMPurify from "dompurify";
 import { IconTag } from "@tabler/icons-react";
 import type { TagDto } from "../models/tag";
 import { formatResponseTime } from "@/tags/utils/responseTime";
@@ -25,9 +26,13 @@ export const TagEditDialogHeader = ({
             {selectedTag.name}
           </Text>
           {selectedTag.description && (
-            <Text size="sm" c="dimmed">
-              {selectedTag.description}
-            </Text>
+            <Box
+              c="dimmed"
+              fz="sm"
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(selectedTag.description),
+              }}
+            />
           )}
           <Group gap="xs" mt={8}>
             <Badge variant="light">

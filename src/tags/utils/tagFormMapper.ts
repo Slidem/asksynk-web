@@ -7,6 +7,11 @@ import {
 import type { TagDto } from "@/tags/models/tag";
 import type { TagFormValues } from "@/tags/models/tagForm";
 
+function cleanHtml(html: string): string | undefined {
+  const stripped = html.replace(/<p>\s*<\/p>/g, "").trim();
+  return cleanString(stripped);
+}
+
 export function tagDtoToFormValues(tag: TagDto): TagFormValues {
   const rtMillis =
     tag.answerMode.type === "immediately"
@@ -30,7 +35,7 @@ export function tagDtoToFormValues(tag: TagDto): TagFormValues {
 export function tagFormValuesToInput(values: TagFormValues) {
   return {
     name: values.name.trim(),
-    description: cleanString(values.description),
+    description: cleanHtml(values.description),
     color: values.color,
     answerMode:
       values.answerMode === "immediately"

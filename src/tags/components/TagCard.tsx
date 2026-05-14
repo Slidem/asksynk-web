@@ -25,6 +25,7 @@ import {
 
 import type { TagDto } from "@/tags/models/tag";
 import { formatResponseTime } from "@/tags/utils/responseTime";
+import { htmlToPreview } from "@/lib/htmlToPreview";
 import { useDeleteTagMutation } from "../hooks/mutations/useDeleteTag";
 import { useEditTagDialogHandlers } from "../hooks/dialogs/editTagDialogHooks";
 
@@ -95,7 +96,7 @@ export function TagCard({ tag }: TagCardProps) {
 
         {tag.description && (
           <Text size="sm" c="dimmed" lineClamp={2}>
-            {tag.description}
+            {htmlToPreview(tag.description, 160)}
           </Text>
         )}
 

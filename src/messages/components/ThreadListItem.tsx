@@ -1,7 +1,7 @@
 import { Box, Group, Stack, Text, UnstyledButton } from "@mantine/core";
 import { Link, useParams } from "@tanstack/react-router";
 import { UserBadge } from "@/components/UserBadge";
-import { htmlToPreview } from "@/messages/utils/htmlToPreview";
+import { htmlToPreview } from "@/lib/htmlToPreview";
 import type { ThreadListItem as ThreadListItemModel } from "@/messages/models/thread";
 import { formatIsoStringToRelativeDate } from "@/lib/date";
 
