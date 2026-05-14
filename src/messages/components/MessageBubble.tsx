@@ -88,12 +88,7 @@ export function MessageBubble({
             position="left"
             withArrow
           >
-            <Text
-              size="xs"
-              c="dimmed"
-              ta="right"
-              className={classes.hoverTime}
-            >
+            <Text size="xs" c="dimmed" ta="right" className={classes.hoverTime}>
               {isoStringToTime(message.createdAt)}
             </Text>
           </Tooltip>
