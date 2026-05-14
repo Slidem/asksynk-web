@@ -1,6 +1,6 @@
 import type { TagDto } from "@/tags/models/tag";
 import { useEditTagDialogStore } from "@/tags/store/editTagDialogStore";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useShallow } from "zustand/shallow";
 
 export const useEditTagDialogHandlers = () => {
@@ -20,13 +20,14 @@ export const useOpenedEditTag = () => {
 export const useOnSelectedEditedTagChange = (
   callback: (tag: TagDto | null) => void,
 ) => {
+  const callBackRef = useRef(callback);
   useEffect(() => {
     const unsubscribe = useEditTagDialogStore.subscribe(
       (state) => state.selectedTag,
       (selectedTag) => {
-        callback(selectedTag);
+        callBackRef.current(selectedTag);
       },
     );
     return unsubscribe;
-  }, [callback]);
+  }, []);
 };
