@@ -1,20 +1,21 @@
 import { Button, Modal, Stack } from "@mantine/core";
 import {
-  IconCalendar,
   IconClipboardList,
+  IconClockHour4,
   IconClockPlus,
-  IconMessage,
 } from "@tabler/icons-react";
-import { useNavigate } from "@tanstack/react-router";
 
 import { UserBadge } from "@/components/UserBadge";
-import { useUserActionsDialog } from "@/network/hooks/dialogs/useUserActionsDialog";
-import { useUserActionsDialogHandlers } from "@/network/hooks/dialogs/useUserActionsDialogHandlers";
+import {
+  useUserActionsDialog,
+  useUserActionsDialogHandlers,
+} from "@/network/hooks/dialogs/userActionsDialogHooks";
+import { useUserAvailabilityDialogHandlers } from "@/network/hooks/dialogs/userAvailabilityDialogHooks";
 
 export function UserActionsDialog() {
-  const navigate = useNavigate();
   const { opened, user } = useUserActionsDialog();
   const { close } = useUserActionsDialogHandlers();
+  const { open: openAvailability } = useUserAvailabilityDialogHandlers();
 
   const displayName =
     user?.name ||
@@ -22,9 +23,9 @@ export function UserActionsDialog() {
     user?.email ||
     "";
 
-  const handleViewCalendar = () => {
+  const handleShowAvailability = () => {
     if (!user) return;
-    navigate({ to: "/schedule", search: { userId: user.userId } });
+    openAvailability(user);
     close();
   };
 
@@ -49,19 +50,10 @@ export function UserActionsDialog() {
           variant="default"
           fullWidth
           justify="flex-start"
-          leftSection={<IconCalendar size={18} />}
-          onClick={handleViewCalendar}
+          leftSection={<IconClockHour4 size={18} />}
+          onClick={handleShowAvailability}
         >
-          View calendar
-        </Button>
-        <Button
-          variant="default"
-          fullWidth
-          justify="flex-start"
-          leftSection={<IconMessage size={18} />}
-          disabled
-        >
-          Ask a question
+          Show availability
         </Button>
         <Button
           variant="default"

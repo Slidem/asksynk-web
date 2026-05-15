@@ -1,0 +1,8 @@
+.content {
+  & :global(.tiptap) {
+    font-size: var(--mantine-font-size-sm);
+  }
+  & :global(.tiptap p) {
+    font-size: var(--mantine-font-size-sm);
+  }
+}

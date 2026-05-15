@@ -1,13 +1,13 @@
-import { Box } from "@mantine/core";
-import { useMediaQuery } from "@mantine/hooks";
-import { Outlet, useParams } from "@tanstack/react-router";
+import { useIsDesktop } from "@/lib/mediaQueries";
 import { NewThreadDialog } from "@/messages/components/NewThreadDialog";
 import { ThreadList } from "@/messages/components/ThreadList";
 import { useMessageSocket } from "@/messages/hooks/useMessageSocket";
+import { Box } from "@mantine/core";
+import { Outlet, useParams } from "@tanstack/react-router";
 
 export function MessagesPage() {
   useMessageSocket();
-  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const isDesktop = useIsDesktop();
   const params = useParams({ strict: false });
   const hasThread = !!params.threadId;
 

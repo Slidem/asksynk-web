@@ -4,6 +4,7 @@ import { InviteCreateDialog } from "@/network/components/InviteCreateDialog";
 import { NetworkPageHeader } from "@/network/components/NetworkPageHeader";
 import { NetworkTabs } from "@/network/components/NetworkTabs";
 import { UserActionsDialog } from "@/network/components/UserActionsDialog";
+import { UserAvailabilityDialog } from "@/network/components/UserAvailabilityDialog";
 
 export function NetworkPage() {
   return (
@@ -15,6 +16,7 @@ export function NetworkPage() {
 
       <InviteCreateDialog />
       <UserActionsDialog />
+      <UserAvailabilityDialog />
     </Container>
   );
 }

@@ -1,8 +1,9 @@
-import { Badge, Group, Paper, Stack, Text } from "@mantine/core";
+import { Badge, Button, Group, Paper, Stack, Text } from "@mantine/core";
 import {
   IconClock,
   IconLink,
   IconMapPin,
+  IconMessage,
   IconRepeat,
 } from "@tabler/icons-react";
 
@@ -11,6 +12,8 @@ import { formatEventTime } from "@/schedule/utils/formatEventTime";
 
 interface Props {
   event: CalendarEvent;
+  onAsk?: () => void;
+  isAsking?: boolean;
 }
 
 const FREQ_LABELS: Record<string, string> = {
@@ -25,7 +28,7 @@ function rruleToCadence(rrule: string): string {
   return (match && FREQ_LABELS[match[1]]) ?? "Recurring";
 }
 
-export function UpcomingEventCard({ event }: Props) {
+export function UpcomingEventCard({ event, onAsk, isAsking }: Props) {
   const color = event.color ?? "var(--mantine-color-gray-4)";
   const hasMeta = !!(event.location || event.link || event.rrule);
 
@@ -85,6 +88,19 @@ export function UpcomingEventCard({ event }: Props) {
                 {rruleToCadence(event.rrule)}
               </Badge>
             )}
+          </Group>
+        )}
+        {onAsk && (
+          <Group justify="flex-end" gap="xs" mt={4}>
+            <Button
+              size="xs"
+              variant="light"
+              leftSection={<IconMessage size={14} />}
+              onClick={onAsk}
+              loading={isAsking}
+            >
+              Start a thread
+            </Button>
           </Group>
         )}
       </Stack>

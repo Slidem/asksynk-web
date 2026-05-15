@@ -1,7 +1,6 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import { fetchCalendarEvents } from "@/schedule/apis/fetchCalendarEvents";
-import { fetchNetworkUserCalendarEvents } from "@/schedule/apis/fetchNetworkUserCalendarEvents";
 import { dtoToCalendarEvent } from "@/schedule/utils/calendarEventMapper";
 import { useCalendarEventsQueryData } from "./useCalendarEventsQueryData";
 
@@ -13,14 +12,7 @@ export function useCalendarEventsQuery() {
   return useQuery({
     queryKey,
     queryFn: () =>
-      selectedUserId
-        ? fetchNetworkUserCalendarEvents(
-            selectedUserId,
-            viewStart,
-            viewEnd,
-            timezone,
-          )
-        : fetchCalendarEvents(viewStart, viewEnd, timezone),
+      fetchCalendarEvents(viewStart, viewEnd, timezone, selectedUserId),
     placeholderData: keepPreviousData,
     select: (data) => data.map(dtoToCalendarEvent),
     enabled: !!viewStart && !!viewEnd,

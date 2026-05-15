@@ -5,12 +5,7 @@ import { calendarEventsQueryKey } from "@/schedule/hooks/queries/useCalendarEven
 import { dtoToCalendarEvent } from "@/schedule/utils/calendarEventMapper";
 import { useOneWeekCalendarPeriod } from "./useOneWeekCalendarPeriod";
 
-const UPCOMING_LIMIT = 5;
-
-export function useUpcomingTagCalendarEvents(
-  tagId: string,
-  userId?: string | null,
-) {
+export function useUpcomingUserCalendarEvents(userId?: string | null) {
   const { start, end } = useOneWeekCalendarPeriod();
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -20,9 +15,6 @@ export function useUpcomingTagCalendarEvents(
     select: (data) =>
       data
         .map(dtoToCalendarEvent)
-        .filter((e) => e.tagIds?.includes(tagId))
-        .sort((a, b) => a.start.getTime() - b.start.getTime())
-        .slice(0, UPCOMING_LIMIT),
-    enabled: !!tagId,
+        .sort((a, b) => a.start.getTime() - b.start.getTime()),
   });
 }

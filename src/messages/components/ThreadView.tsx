@@ -1,18 +1,19 @@
-import { Center, Loader, Stack, Text } from "@mantine/core";
-import { useMediaQuery } from "@mantine/hooks";
+import { useIsDesktop } from "@/lib/mediaQueries";
 import { MessageComposer } from "@/messages/components/MessageComposer";
 import { MessageList } from "@/messages/components/MessageList";
 import { ReplyPanel } from "@/messages/components/ReplyPanel";
 import { ThreadHeader } from "@/messages/components/ThreadHeader";
 import { useThreadsQuery } from "@/messages/hooks/queries/useThreadsQuery";
 import { useThreadSubscription } from "@/messages/hooks/useThreadSubscription";
+import { Center, Loader, Stack, Text } from "@mantine/core";
 
 interface Props {
   threadId: string;
+  initialTagIds?: string[];
 }
 
-export function ThreadView({ threadId }: Props) {
-  const isDesktop = useMediaQuery("(min-width: 768px)");
+export function ThreadView({ threadId, initialTagIds }: Props) {
+  const isDesktop = useIsDesktop();
   const { data: threads, isFetching } = useThreadsQuery();
   useThreadSubscription(threadId);
 
@@ -49,6 +50,7 @@ export function ThreadView({ threadId }: Props) {
         threadId={threadId}
         frozen={thread.frozen}
         recipientUserId={recipientUserId}
+        initialTagIds={initialTagIds}
       />
       <ReplyPanel
         threadId={threadId}

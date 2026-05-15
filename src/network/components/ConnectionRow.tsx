@@ -5,7 +5,7 @@ import type { MouseEvent } from "react";
 
 import type { NetworkConnectionDto } from "@/network/models/networkConnection";
 import { UserBadge } from "@/components/UserBadge";
-import { useUserActionsDialogHandlers } from "@/network/hooks/dialogs/useUserActionsDialogHandlers";
+import { useUserActionsDialogHandlers } from "@/network/hooks/dialogs/userActionsDialogHooks";
 import { useRemoveNetworkConnection } from "@/network/hooks/mutations/useRemoveNetworkConnection";
 
 interface Props {

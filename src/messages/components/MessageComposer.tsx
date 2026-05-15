@@ -11,6 +11,7 @@ import {
   TaggedThreadMarker,
   insertTaggedMarker,
   removeTaggedMarker,
+  taggedMarkerInitialContent,
   updateTaggedMarker,
 } from "@/messages/tiptap/TaggedThreadMarker";
 import { SlashCommands } from "@/messages/tiptap/SlashCommands";
@@ -28,6 +29,7 @@ interface Props {
   /** null for guest threads; disables tag actions. */
   recipientUserId: string | null;
   parentMessageId?: string;
+  initialTagIds?: string[];
 }
 
 interface PickerState {
@@ -48,10 +50,12 @@ export function MessageComposer({
   frozen = false,
   recipientUserId,
   parentMessageId,
+  initialTagIds,
 }: Props) {
   const { sendMessage, isSending } = useSendMessage(threadId);
   const [picker, setPicker] = useState<PickerState>(CLOSED);
   const canTag = !parentMessageId && recipientUserId != null;
+  const seedTagIds = canTag ? initialTagIds : undefined;
 
   const { tags } = useUserTagsService(recipientUserId ?? undefined);
   const tagsRef = useRef<TagDto[]>([]);
@@ -105,7 +109,10 @@ export function MessageComposer({
           ]
         : []),
     ],
-    content: "",
+    content:
+      seedTagIds && seedTagIds.length > 0
+        ? taggedMarkerInitialContent(seedTagIds)
+        : "",
     editorProps: {
       attributes: { "aria-label": "Message body" },
       handleKeyDown: (_view, event) => {

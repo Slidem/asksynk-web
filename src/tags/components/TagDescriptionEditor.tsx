@@ -3,6 +3,7 @@ import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useEffect } from "react";
 
+import classes from "@/tags/components/TagDescriptionEditor.module.css";
 import type { TagFormValues } from "@/tags/models/tagForm";
 import type { UseFormReturnType } from "@mantine/form";
 
@@ -26,7 +27,8 @@ export function TagDescriptionEditor({ form, initialContent = "" }: Props) {
   }, [editor, initialContent]);
 
   return (
-    <RichTextEditor editor={editor}>
+    <RichTextEditor editor={editor} classNames={{ content: classes.content }}>
+      <RichTextEditor.Content />
       <RichTextEditor.Toolbar>
         <RichTextEditor.ControlsGroup>
           <RichTextEditor.Bold />
@@ -40,7 +42,6 @@ export function TagDescriptionEditor({ form, initialContent = "" }: Props) {
           <RichTextEditor.OrderedList />
         </RichTextEditor.ControlsGroup>
       </RichTextEditor.Toolbar>
-      <RichTextEditor.Content />
     </RichTextEditor>
   );
 }

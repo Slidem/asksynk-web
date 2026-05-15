@@ -1,5 +1,4 @@
 import {
-  Badge,
   Checkbox,
   ColorSwatch,
   Group,
@@ -9,9 +8,10 @@ import {
   TextInput,
   UnstyledButton,
 } from "@mantine/core";
-import { IconBolt, IconClock, IconPlus, IconSearch } from "@tabler/icons-react";
+import { IconPlus, IconSearch } from "@tabler/icons-react";
 import { useCallback, useMemo } from "react";
 import { htmlToPreview } from "@/lib/htmlToPreview";
+import { TagAvailabilityHint } from "@/tags/components/TagAvailabilityHint";
 import { useUserTagsService } from "@/tags/hooks/useUserTagsService";
 
 interface TagPickerListProps {
@@ -100,21 +100,7 @@ export function TagPickerList({
                     </Text>
                   )}
                 </div>
-                <Badge
-                  size="xs"
-                  variant="light"
-                  leftSection={
-                    tag.answerMode.type === "immediately" ? (
-                      <IconBolt size={10} />
-                    ) : (
-                      <IconClock size={10} />
-                    )
-                  }
-                >
-                  {tag.answerMode.type === "immediately"
-                    ? "immediate"
-                    : "timeblock"}
-                </Badge>
+                <TagAvailabilityHint tag={tag} userId={targetUserId} />
               </Group>
             </UnstyledButton>
           ))}

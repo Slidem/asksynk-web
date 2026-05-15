@@ -1,4 +1,4 @@
-import { Node, mergeAttributes, type Editor } from "@tiptap/core";
+import { Node, mergeAttributes, type Editor, type JSONContent } from "@tiptap/core";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 import { TaggedThreadMarkerView } from "@/messages/tiptap/TaggedThreadMarkerView";
 
@@ -60,6 +60,16 @@ export function insertTaggedMarker(editor: Editor, tagIds: string[]) {
     .focus()
     .insertContentAt(0, { type: NAME, attrs: { tagIds } })
     .run();
+}
+
+export function taggedMarkerInitialContent(tagIds: string[]): JSONContent {
+  return {
+    type: "doc",
+    content: [
+      { type: NAME, attrs: { tagIds } },
+      { type: "paragraph" },
+    ],
+  };
 }
 
 export function updateTaggedMarker(

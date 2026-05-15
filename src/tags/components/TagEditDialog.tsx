@@ -1,8 +1,8 @@
+import { Accordion, Button, Group, Modal, Stack } from "@mantine/core";
 import {
   tagDtoToFormValues,
   tagFormValuesToInput,
 } from "@/tags/utils/tagFormMapper";
-import { Button, Divider, Group, Modal, Stack } from "@mantine/core";
 import {
   useEditTagDialogHandlers,
   useIsEditTagDialogOpened,
@@ -10,7 +10,9 @@ import {
   useOpenedEditTag,
 } from "../hooks/dialogs/editTagDialogHooks";
 
-import { TagForm } from "@/tags/components/TagForm";
+import { TagNameDescriptionSection } from "@/tags/components/TagNameDescriptionSection";
+import { TagNotificationsSection } from "@/tags/components/TagNotificationsSection";
+import { TagPropertiesSection } from "@/tags/components/TagPropertiesSection";
 import { TagUpcomingEventsSection } from "@/tags/components/TagUpcomingEventsSection";
 import {
   DEFAULT_TAG_FORM_VALUES,
@@ -19,7 +21,6 @@ import {
 import { validateTagName } from "@/tags/utils/tagNameValidation";
 import { useForm } from "@mantine/form";
 import { useUpdateTagMutation } from "../hooks/mutations/useUpdateTag";
-import { TagEditDialogHeader } from "./TagEditDialogHeader";
 
 export function TagEditDialog() {
   const isOpened = useIsEditTagDialogOpened();
@@ -54,22 +55,26 @@ export function TagEditDialog() {
   };
 
   return (
-    <Modal
-      opened={isOpened}
-      onClose={closeDialog}
-      title="Tag details"
-      size="lg"
-    >
+    <Modal opened={isOpened} onClose={closeDialog} title="Tag details" size="lg">
       <Stack gap="md">
-        {selectedTag && <TagEditDialogHeader selectedTag={selectedTag} />}
         {selectedTag && (
-          <TagUpcomingEventsSection tagId={selectedTag.id} />
+          <Accordion
+            multiple
+            defaultValue={["name-desc", "properties"]}
+            variant="separated"
+          >
+            <TagNameDescriptionSection
+              form={form}
+              initialDescription={selectedTag.description ?? ""}
+              readonly
+            />
+            <TagPropertiesSection form={form} />
+            <TagNotificationsSection form={form} />
+            {selectedTag.answerMode.type === "timeblock" && (
+              <TagUpcomingEventsSection tagId={selectedTag.id} />
+            )}
+          </Accordion>
         )}
-        <Divider />
-        <TagForm
-          form={form}
-          initialDescription={selectedTag?.description ?? ""}
-        />
         <Group justify="flex-end">
           <Button variant="default" onClick={closeDialog}>
             Cancel
