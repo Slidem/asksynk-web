@@ -3,7 +3,7 @@ import { ActionIcon, Button, Group, Select, Text } from "@mantine/core";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import type { ReactNode, RefObject } from "react";
 
-const VIEW_OPTIONS = [
+const DEFAULT_VIEW_OPTIONS = [
   { value: "dayGridMonth", label: "Month" },
   { value: "timeGridWeek", label: "Week" },
   { value: "timeGridDay", label: "Day" },
@@ -15,6 +15,7 @@ interface Props {
   currentView: string;
   onViewChange: (view: string) => void;
   rightSection?: ReactNode;
+  viewOptions?: { value: string; label: string }[];
 }
 
 export function CalendarToolbar({
@@ -23,6 +24,7 @@ export function CalendarToolbar({
   currentView,
   onViewChange,
   rightSection,
+  viewOptions,
 }: Props) {
   const getApi = () => calendarRef.current?.getApi() ?? null;
 
@@ -65,7 +67,7 @@ export function CalendarToolbar({
 
       <Group gap="sm">
         <Select
-          data={VIEW_OPTIONS}
+          data={viewOptions ?? DEFAULT_VIEW_OPTIONS}
           value={currentView}
           onChange={handleViewChange}
           size="xs"

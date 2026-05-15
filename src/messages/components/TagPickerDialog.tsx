@@ -1,4 +1,5 @@
 import { Button, Group, Modal, Stack } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import { TagPickerList } from "@/tags/components/TagPickerList";
 
@@ -23,13 +24,21 @@ export function TagPickerDialog({
   onClose,
 }: Props) {
   const [tagIds, setTagIds] = useState<string[]>(initialTagIds);
+  const isMobile = useMediaQuery("(max-width: 48em)");
 
   useEffect(() => {
     if (opened) setTagIds(initialTagIds);
   }, [opened, initialTagIds]);
 
   return (
-    <Modal opened={opened} onClose={onClose} title={title} size="md" centered>
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      title={title}
+      size="lg"
+      fullScreen={isMobile}
+      centered
+    >
       <Stack gap="md">
         <TagPickerList
           selectedTagIds={tagIds}

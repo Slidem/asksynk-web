@@ -104,8 +104,9 @@ export function CalendarEventDialog() {
   }, [form]);
 
   const handleClose = () => {
-    setShowRecurrence(false);
     form.reset();
+    setCurrentTagIds([]);
+    setShowRecurrence(false);
     closeDialog();
   };
 

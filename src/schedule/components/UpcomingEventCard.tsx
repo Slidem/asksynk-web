@@ -9,9 +9,13 @@ import {
 
 import type { CalendarEvent } from "@/schedule/models/calendarEvent";
 import { formatEventTime } from "@/schedule/utils/formatEventTime";
+import type { TagDto } from "@/tags/models/tag";
+
+const TAG_LIMIT = 3;
 
 interface Props {
   event: CalendarEvent;
+  tags?: TagDto[];
   onAsk?: () => void;
   isAsking?: boolean;
 }
@@ -28,7 +32,7 @@ function rruleToCadence(rrule: string): string {
   return (match && FREQ_LABELS[match[1]]) ?? "Recurring";
 }
 
-export function UpcomingEventCard({ event, onAsk, isAsking }: Props) {
+export function UpcomingEventCard({ event, tags, onAsk, isAsking }: Props) {
   const color = event.color ?? "var(--mantine-color-gray-4)";
   const hasMeta = !!(event.location || event.link || event.rrule);
 
@@ -91,13 +95,43 @@ export function UpcomingEventCard({ event, onAsk, isAsking }: Props) {
           </Group>
         )}
         {onAsk && (
-          <Group justify="flex-end" gap="xs" mt={4}>
+          <Group justify="space-between" gap="xs" mt={4} wrap="nowrap">
+            <Group
+              gap={4}
+              wrap="nowrap"
+              style={{ minWidth: 0, overflow: "hidden", flex: 1 }}
+            >
+              {tags?.slice(0, TAG_LIMIT).map((tag) => (
+                <Badge
+                  key={tag.id}
+                  size="xs"
+                  variant="dot"
+                  color={tag.color}
+                  styles={{
+                    label: { overflow: "hidden", textOverflow: "ellipsis" },
+                  }}
+                >
+                  {tag.name}
+                </Badge>
+              ))}
+              {(tags?.length ?? 0) > TAG_LIMIT && (
+                <Badge
+                  size="xs"
+                  variant="light"
+                  color="gray"
+                  style={{ flexShrink: 0 }}
+                >
+                  +{(tags?.length ?? 0) - TAG_LIMIT} more
+                </Badge>
+              )}
+            </Group>
             <Button
               size="xs"
               variant="light"
               leftSection={<IconMessage size={14} />}
               onClick={onAsk}
               loading={isAsking}
+              style={{ flexShrink: 0 }}
             >
               Start a thread
             </Button>

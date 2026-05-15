@@ -149,6 +149,7 @@ export function MessageList({ threadId, other, recipientUserId }: Props) {
       flex={1}
       viewportRef={viewportRef}
       onScrollPositionChange={handleScrollPositionChange}
+      scrollbars="y"
       py="sm"
     >
       <Stack gap={0}>

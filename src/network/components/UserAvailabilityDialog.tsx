@@ -5,7 +5,7 @@ import {
   IconInfoCircle,
   IconTag,
 } from "@tabler/icons-react";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { UserBadge } from "@/components/UserBadge";
 import {
@@ -19,6 +19,7 @@ import { UpcomingEventCard } from "@/schedule/components/UpcomingEventCard";
 import type { CalendarEvent } from "@/schedule/models/calendarEvent";
 import { useUpcomingUserCalendarEvents } from "@/schedule/hooks/queries/useUpcomingUserCalendarEvents";
 import { useUserTagsService } from "@/tags/hooks/useUserTagsService";
+import type { TagDto } from "@/tags/models/tag";
 
 export function UserAvailabilityDialog() {
   const { opened, user } = useUserAvailabilityDialog();
@@ -90,6 +91,19 @@ export function UserAvailabilityDialog() {
 
 function TagsAvailabilityPanel({ userId }: { userId: string }) {
   const { tags } = useUserTagsService(userId);
+  const { data: upcomingEvents } = useUpcomingUserCalendarEvents(userId);
+
+  const sorted = useMemo(() => {
+    const upcoming = upcomingEvents ?? [];
+    const score = (tag: TagDto): number => {
+      if (tag.answerMode.type === "immediately") {
+        return tag.answerMode.responseTimeMillis;
+      }
+      const hasUpcoming = upcoming.some((e) => e.tagIds?.includes(tag.id));
+      return hasUpcoming ? Number.MAX_SAFE_INTEGER : Infinity;
+    };
+    return [...tags].sort((a, b) => score(a) - score(b));
+  }, [tags, upcomingEvents]);
 
   return (
     <Stack gap="sm">
@@ -99,11 +113,11 @@ function TagsAvailabilityPanel({ userId }: { userId: string }) {
           when addressing a question based on each tag.
         </Text>
       </Alert>
-      {tags.length === 0 ? (
+      {sorted.length === 0 ? (
         <EmptyState message="No tags" />
       ) : (
         <Stack gap="xs">
-          {tags.map((tag) => (
+          {sorted.map((tag) => (
             <UserTagAvailabilityCard key={tag.id} tag={tag} userId={userId} />
           ))}
         </Stack>
@@ -114,6 +128,7 @@ function TagsAvailabilityPanel({ userId }: { userId: string }) {
 
 function TimeblocksPanel({ userId }: { userId: string }) {
   const { data, isLoading } = useUpcomingUserCalendarEvents(userId);
+  const { tags } = useUserTagsService(userId);
   const { close } = useUserAvailabilityDialogHandlers();
   const { start, isStarting } = useStartTaggedThread();
 
@@ -132,16 +147,23 @@ function TimeblocksPanel({ userId }: { userId: string }) {
   if (!data || data.length === 0) {
     return <EmptyState message="No events in the next 7 days" />;
   }
+
   return (
     <Stack gap="xs">
-      {data.map((event) => (
-        <UpcomingEventCard
-          key={event.id}
-          event={event}
-          onAsk={() => handleAsk(event)}
-          isAsking={isStarting}
-        />
-      ))}
+      {data.map((event) => {
+        const eventTags = (event.tagIds ?? [])
+          .map((id) => tags.find((t) => t.id === id))
+          .filter((t) => t !== undefined);
+        return (
+          <UpcomingEventCard
+            key={event.id}
+            event={event}
+            tags={eventTags}
+            onAsk={() => handleAsk(event)}
+            isAsking={isStarting}
+          />
+        );
+      })}
     </Stack>
   );
 }

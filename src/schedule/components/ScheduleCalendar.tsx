@@ -12,6 +12,8 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import { Paper } from "@mantine/core";
 import { useRef } from "react";
 
+import { CalendarEventReadonlyDialog } from "@/network/components/CalendarEventReadonlyDialog";
+import { useCalendarEventReadonlyDialogHandlers } from "@/network/hooks/dialogs/calendarEventReadonlyDialogHooks";
 import { useUpdateCalendarEvent } from "@/schedule/hooks/mutations/useUpdateCalendarEvent";
 import { useCalendarEvents } from "@/schedule/hooks/useCalendarEvents";
 import {
@@ -23,6 +25,7 @@ import {
   GHOST_EVENT_ID,
   type CalendarEvent,
 } from "@/schedule/models/calendarEvent";
+import { useScheduleViewStore } from "@/schedule/store/scheduleViewStore";
 import { formToUpdateInput } from "@/schedule/utils/calendarEventMapper";
 import { useGhostEvent } from "../hooks/useGhostEvent";
 import { useManageRecurringEventDialog } from "@/schedule/hooks/dialogs/recurringEventDialogHooks";
@@ -35,6 +38,8 @@ export function ScheduleCalendar() {
   const calendarRef = useRef<FullCalendar>(null);
   const openNewEventDialog = useOpenNewEventDialog();
   const openEditEventDialog = useOpenEditEventDialog();
+  const { open: openReadonlyEventDialog } =
+    useCalendarEventReadonlyDialogHandlers();
   const events = useCalendarEvents();
   const createGhostEvent = useGhostEvent();
   const updateMutation = useUpdateCalendarEvent();
@@ -42,6 +47,7 @@ export function ScheduleCalendar() {
   const { currentView } = useScheduleView();
   const { setViewRange, setCalendarTitle } = useManageScheduleView();
   const isOwn = useIsViewingOwnCalendar();
+  const selectedUserId = useScheduleViewStore((s) => s.selectedUserId);
 
   const handleSelect = (arg: DateSelectArg) => {
     createGhostEvent(arg.start, arg.end);
@@ -122,8 +128,11 @@ export function ScheduleCalendar() {
     const event: CalendarEvent | undefined = events.find(
       (e) => e.id === arg.event.id,
     );
-    if (event) {
+    if (!event) return;
+    if (isOwn) {
       openEditEventDialog(event);
+    } else {
+      openReadonlyEventDialog(event);
     }
   };
 
@@ -158,12 +167,15 @@ export function ScheduleCalendar() {
           }
           select={isOwn ? handleSelect : undefined}
           eventDrop={isOwn ? handleEventDrop : undefined}
-          eventClick={isOwn ? handleEventClick : undefined}
+          eventClick={handleEventClick}
           eventResize={isOwn ? handleEventResize : undefined}
           datesSet={handleDatesSet}
           height="100%"
         />
       </div>
+      {!isOwn && selectedUserId && (
+        <CalendarEventReadonlyDialog userId={selectedUserId} />
+      )}
     </Paper>
   );
 }

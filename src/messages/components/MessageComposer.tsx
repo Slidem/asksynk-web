@@ -102,6 +102,7 @@ export function MessageComposer({
                 if (!e) return [];
                 return findTaggedMarker(e)?.tagIds ?? [];
               },
+              getUserId: () => recipientUserId,
               onOpenChange: (open) => {
                 menuOpenRef.current = open;
               },

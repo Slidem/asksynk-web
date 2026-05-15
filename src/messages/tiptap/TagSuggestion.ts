@@ -13,6 +13,7 @@ const pluginKey = new PluginKey("tagSuggestion");
 export interface TagSuggestionOptions {
   getTags: () => TagDto[];
   getExcludedTagIds: () => string[];
+  getUserId?: () => string | null;
   onOpenChange?: (open: boolean) => void;
 }
 
@@ -33,6 +34,7 @@ export const TagSuggestion = Extension.create<TagSuggestionOptions>({
 
   addProseMirrorPlugins() {
     const onOpenChange = this.options.onOpenChange;
+    const getUserId = this.options.getUserId;
 
     const items = ({ query }: { query: string }) => {
       const excluded = new Set(this.options.getExcludedTagIds());
@@ -55,7 +57,7 @@ export const TagSuggestion = Extension.create<TagSuggestionOptions>({
       return {
         onStart: (props) => {
           component = new ReactRenderer(TagSuggestionList, {
-            props,
+            props: { ...props, userId: getUserId?.() ?? null },
             editor: props.editor,
           });
           if (!props.clientRect) return;
@@ -71,7 +73,7 @@ export const TagSuggestion = Extension.create<TagSuggestionOptions>({
           onOpenChange?.(true);
         },
         onUpdate: (props) => {
-          component?.updateProps(props);
+          component?.updateProps({ ...props, userId: getUserId?.() ?? null });
           if (!props.clientRect || !popup) return;
           popup.setProps({
             getReferenceClientRect: () => props.clientRect?.() ?? new DOMRect(),

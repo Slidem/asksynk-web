@@ -1,9 +1,11 @@
 import timeGridPlugin from "@fullcalendar/timegrid";
 import FullCalendar from "@fullcalendar/react";
-import { Button, Group, SegmentedControl } from "@mantine/core";
 import { useRef, useState } from "react";
-import type { DatesSetArg } from "@fullcalendar/core";
+import type { DatesSetArg, EventClickArg } from "@fullcalendar/core";
 
+import { CalendarToolbar } from "@/components/calendar/CalendarToolbar";
+import { CalendarEventReadonlyDialog } from "@/network/components/CalendarEventReadonlyDialog";
+import { useCalendarEventReadonlyDialogHandlers } from "@/network/hooks/dialogs/calendarEventReadonlyDialogHooks";
 import { useUserCalendarEvents } from "@/schedule/hooks/queries/useUserCalendarEvents";
 import calendarClasses from "@/schedule/components/ScheduleCalendar.module.css";
 
@@ -20,11 +22,19 @@ export function UserAvailabilityCalendar({ userId }: Props) {
   const calendarRef = useRef<FullCalendar>(null);
   const [range, setRange] = useState<{ start: Date; end: Date } | null>(null);
   const [view, setView] = useState("timeGridWeek");
+  const [calendarTitle, setCalendarTitle] = useState("");
 
   const { data: events } = useUserCalendarEvents(userId, range);
+  const { open: openEventDialog } = useCalendarEventReadonlyDialogHandlers();
 
   const handleDatesSet = (arg: DatesSetArg) => {
     setRange({ start: arg.start, end: arg.end });
+    setCalendarTitle(arg.view.title);
+  };
+
+  const handleEventClick = (arg: EventClickArg) => {
+    const event = events?.find((e) => e.id === arg.event.id);
+    if (event) openEventDialog(event);
   };
 
   const handleViewChange = (value: string) => {
@@ -37,21 +47,13 @@ export function UserAvailabilityCalendar({ userId }: Props) {
       className={calendarClasses.wrapper}
       style={{ display: "flex", flexDirection: "column", height: 520 }}
     >
-      <Group justify="space-between" mb="sm">
-        <Button
-          variant="default"
-          size="compact-sm"
-          onClick={() => calendarRef.current?.getApi().today()}
-        >
-          Today
-        </Button>
-        <SegmentedControl
-          size="xs"
-          data={VIEW_OPTIONS}
-          value={view}
-          onChange={handleViewChange}
-        />
-      </Group>
+      <CalendarToolbar
+        calendarRef={calendarRef}
+        calendarTitle={calendarTitle}
+        currentView={view}
+        onViewChange={handleViewChange}
+        viewOptions={VIEW_OPTIONS}
+      />
       <div style={{ flex: 1, minHeight: 0 }}>
         <FullCalendar
           ref={calendarRef}
@@ -65,9 +67,11 @@ export function UserAvailabilityCalendar({ userId }: Props) {
           slotLabelFormat={{ hour: "numeric", meridiem: "short" }}
           nowIndicator
           datesSet={handleDatesSet}
+          eventClick={handleEventClick}
           height="100%"
         />
       </div>
+      <CalendarEventReadonlyDialog userId={userId} />
     </div>
   );
 }

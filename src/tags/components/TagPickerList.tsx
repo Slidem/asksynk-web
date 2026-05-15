@@ -91,7 +91,7 @@ export function TagPickerList({
                 />
                 <ColorSwatch color={tag.color} size={14} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <Text size="sm" fw={600}>
+                  <Text size="sm" fw={600} truncate>
                     {tag.name}
                   </Text>
                   {tag.description && (

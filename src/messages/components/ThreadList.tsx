@@ -55,7 +55,7 @@ export function ThreadList() {
           <IconPlus size={20} />
         </ActionIcon>
       </Group>
-      <ScrollArea flex={1}>
+      <ScrollArea flex={1} scrollbars="y">
         <Stack gap={2} p="xs">
           {threads.map((thread) => (
             <ThreadListItem key={thread.threadId} thread={thread} />

@@ -1,19 +1,20 @@
 import classes from "@/messages/tiptap/TagSuggestionList.module.css";
+import { TagAvailabilityHint } from "@/tags/components/TagAvailabilityHint";
 import type { TagDto } from "@/tags/models/tag";
 import {
-  Badge,
   ColorSwatch,
   Paper,
   Stack,
   Text,
+  Tooltip,
   UnstyledButton,
 } from "@mantine/core";
-import { IconBolt, IconClock } from "@tabler/icons-react";
 import { forwardRef, useImperativeHandle, useState } from "react";
 
 interface Props {
   items: TagDto[];
   command: (tag: TagDto) => void;
+  userId?: string | null;
 }
 
 export interface TagSuggestionListHandle {
@@ -21,7 +22,7 @@ export interface TagSuggestionListHandle {
 }
 
 export const TagSuggestionList = forwardRef<TagSuggestionListHandle, Props>(
-  ({ items, command }, ref) => {
+  ({ items, command, userId }, ref) => {
     const [selectedIndex, setSelectedIndex] = useState(0);
 
     const select = (index: number) => {
@@ -63,7 +64,6 @@ export const TagSuggestionList = forwardRef<TagSuggestionListHandle, Props>(
         <Stack gap={2} p={4}>
           {items.map((tag, idx) => {
             const selected = idx === selectedIndex;
-            const isImmediate = tag.answerMode.type === "immediately";
             return (
               <UnstyledButton
                 key={tag.id}
@@ -80,19 +80,14 @@ export const TagSuggestionList = forwardRef<TagSuggestionListHandle, Props>(
                 >
                   {tag.name}
                 </Text>
-                <Badge
-                  size="xs"
-                  variant="light"
-                  leftSection={
-                    isImmediate ? (
-                      <IconBolt size={10} />
-                    ) : (
-                      <IconClock size={10} />
-                    )
-                  }
-                >
-                  {isImmediate ? "immediate" : "timeblock"}
-                </Badge>
+                <Tooltip label="Approximate answer time" withArrow>
+                  <span style={{ display: "inline-flex" }}>
+                    <TagAvailabilityHint
+                      tag={tag}
+                      userId={userId ?? undefined}
+                    />
+                  </span>
+                </Tooltip>
               </UnstyledButton>
             );
           })}

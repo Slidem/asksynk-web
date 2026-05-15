@@ -1,5 +1,6 @@
 import { Center, Drawer, Loader, Stack, Text } from "@mantine/core";
 import { useSession } from "@/auth";
+import { UserBadge } from "@/components/UserBadge";
 import { MessageBubble } from "@/messages/components/MessageBubble";
 import { MessageComposer } from "@/messages/components/MessageComposer";
 import { ReplyList } from "@/messages/components/ReplyList";
@@ -96,22 +97,27 @@ export function ReplyPanel({
       onClose={close}
       position="right"
       size="md"
-      title="Thread"
-      padding="0"
+      title={
+        <UserBadge
+          variant="name"
+          size="sm"
+          name={otherSender.name}
+          email={otherSender.email}
+          image={otherSender.image}
+        />
+      }
       styles={{
+        header: {
+          padding: "var(--mantine-spacing-md)",
+          borderBottom: "1px solid var(--mantine-color-default-border)",
+        },
         body: { padding: 0, height: "calc(100% - 60px)" },
         content: { display: "flex", flexDirection: "column" },
       }}
     >
       {openMessageId && parent && parentSender ? (
         <Stack gap={0} h="100%">
-          <Stack
-            gap={0}
-            py="xs"
-            style={{
-              borderBottom: "1px solid var(--mantine-color-default-border)",
-            }}
-          >
+          <Stack gap={0} py="xs">
             <MessageBubble
               message={parent}
               sender={parentSender}
