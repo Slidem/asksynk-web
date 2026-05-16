@@ -8,6 +8,7 @@ export const useManageScheduleView = () => {
       setCalendarTitle: s.setCalendarTitle,
       setViewRange: s.setViewRange,
       setSelectedUserId: s.setSelectedUserId,
+      setCalendarTagIds: s.setCalendarTagIds,
     })),
   );
 };

@@ -9,6 +9,7 @@ export const useScheduleView = () => {
       viewStart: s.viewStart,
       viewEnd: s.viewEnd,
       selectedUserId: s.selectedUserId,
+      calendarTagIds: s.calendarTagIds,
     })),
   );
 };

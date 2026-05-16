@@ -102,7 +102,7 @@ export function PublicViewPage({ slug }: Props) {
 
   return (
     <PublicViewLayout view={view}>
-      <PublicScheduleCalendar slug={slug} />
+      <PublicScheduleCalendar slug={slug} ownerUserId={view.ownerUserId} />
     </PublicViewLayout>
   );
 }

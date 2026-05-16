@@ -21,3 +21,9 @@ export const usePublicScheduleViewHandlers = () => {
     })),
   );
 };
+
+export const usePublicCalendarTagFilter = () =>
+  usePublicScheduleViewStore((s) => s.calendarTagIds);
+
+export const useSetPublicCalendarTagIds = () =>
+  usePublicScheduleViewStore((s) => s.setCalendarTagIds);

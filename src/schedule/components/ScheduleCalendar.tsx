@@ -33,6 +33,7 @@ import { useManageScheduleView } from "../hooks/useManageScheduleView";
 import { useScheduleView } from "../hooks/useScheduleView";
 import classes from "./ScheduleCalendar.module.css";
 import { ScheduleToolbar } from "./ScheduleToolbar";
+import { ScheduleTagFilter } from "./ScheduleTagFilter";
 
 export function ScheduleCalendar() {
   const calendarRef = useRef<FullCalendar>(null);
@@ -149,6 +150,7 @@ export function ScheduleCalendar() {
       }}
     >
       <ScheduleToolbar calendarRef={calendarRef} />
+      <ScheduleTagFilter />
       <div style={{ flex: 1, minHeight: 0 }}>
         <FullCalendar
           ref={calendarRef}
