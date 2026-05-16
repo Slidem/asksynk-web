@@ -5,7 +5,8 @@ import {
 } from "../hooks/dialogs/createTagDialogHooks";
 
 import { DEFAULT_TAG_FORM_VALUES } from "@/tags/models/tagForm";
-import { TagNameDescriptionSection } from "@/tags/components/TagNameDescriptionSection";
+import { TagNameSection } from "@/tags/components/TagNameSection";
+import { TagDescriptionSection } from "@/tags/components/TagDescriptionSection";
 import { TagNotificationsSection } from "@/tags/components/TagNotificationsSection";
 import { TagPropertiesSection } from "@/tags/components/TagPropertiesSection";
 import type { TagFormValues } from "@/tags/models/tagForm";
@@ -53,10 +54,11 @@ export function TagCreateDialog() {
     >
       <Accordion
         multiple
-        defaultValue={["name-desc", "properties"]}
+        defaultValue={["name", "description", "properties"]}
         variant="separated"
       >
-        <TagNameDescriptionSection form={form} />
+        <TagNameSection form={form} />
+        <TagDescriptionSection form={form} />
         <TagPropertiesSection form={form} />
         <TagNotificationsSection form={form} />
       </Accordion>

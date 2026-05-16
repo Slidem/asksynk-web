@@ -10,7 +10,8 @@ import {
   useOpenedEditTag,
 } from "../hooks/dialogs/editTagDialogHooks";
 
-import { TagNameDescriptionSection } from "@/tags/components/TagNameDescriptionSection";
+import { TagNameSection } from "@/tags/components/TagNameSection";
+import { TagDescriptionSection } from "@/tags/components/TagDescriptionSection";
 import { TagNotificationsSection } from "@/tags/components/TagNotificationsSection";
 import { TagPropertiesSection } from "@/tags/components/TagPropertiesSection";
 import { TagUpcomingEventsSection } from "@/tags/components/TagUpcomingEventsSection";
@@ -60,10 +61,11 @@ export function TagEditDialog() {
         {selectedTag && (
           <Accordion
             multiple
-            defaultValue={["name-desc", "properties"]}
+            defaultValue={["name", "description", "properties"]}
             variant="separated"
           >
-            <TagNameDescriptionSection
+            <TagNameSection form={form} readonly />
+            <TagDescriptionSection
               form={form}
               initialDescription={selectedTag.description ?? ""}
               readonly

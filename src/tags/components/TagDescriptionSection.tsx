@@ -3,17 +3,10 @@ import {
   ActionIcon,
   Box,
   Group,
-  Stack,
   Text,
-  TextInput,
   Tooltip,
 } from "@mantine/core";
-import {
-  IconArrowBackUp,
-  IconNote,
-  IconPencil,
-  IconTag,
-} from "@tabler/icons-react";
+import { IconArrowBackUp, IconNote, IconPencil } from "@tabler/icons-react";
 
 import DOMPurify from "dompurify";
 import { TagDescriptionEditor } from "@/tags/components/TagDescriptionEditor";
@@ -27,24 +20,21 @@ interface Props {
   readonly?: boolean;
 }
 
-const ACCORDION_VALUE = "name-desc";
-
-export function TagNameDescriptionSection({
+export function TagDescriptionSection({
   form,
   initialDescription = "",
   readonly = false,
 }: Props) {
   const [isEditing, setIsEditing] = useState(!readonly);
   const showReadonly = readonly && !isEditing;
-  const { name: currentName, description: currentDescription } =
-    form.getValues();
+  const { description: currentDescription } = form.getValues();
 
   return (
-    <Accordion.Item value={ACCORDION_VALUE}>
+    <Accordion.Item value="description">
       <Accordion.Control icon={<IconNote size={16} />}>
         <Group justify="space-between" wrap="nowrap" pr="xs">
           <Text fw={500} size="sm">
-            Name & description
+            Description
           </Text>
           {readonly &&
             (isEditing ? (
@@ -66,7 +56,7 @@ export function TagNameDescriptionSection({
                 <ActionIcon
                   variant="subtle"
                   size="sm"
-                  aria-label="Edit name and description"
+                  aria-label="Edit description"
                   onClick={(e) => {
                     e.stopPropagation();
                     setIsEditing(true);
@@ -80,47 +70,21 @@ export function TagNameDescriptionSection({
       </Accordion.Control>
       <Accordion.Panel>
         {showReadonly ? (
-          <Stack gap="xs">
-            <Text fw={600} size="sm">
-              {currentName || (
-                <Text component="span" c="dimmed" fs="italic">
-                  Untitled
-                </Text>
-              )}
-            </Text>
-            {currentDescription ? (
-              <Box
-                c="dimmed"
-                fz="sm"
-                dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(currentDescription),
-                }}
-              />
-            ) : (
-              <Text size="sm" c="dimmed" fs="italic">
-                No description
-              </Text>
-            )}
-          </Stack>
-        ) : (
-          <Stack gap="sm">
-            <TextInput
-              label="Name"
-              placeholder="Focus time"
-              leftSection={<IconTag size={16} />}
-              key={form.key("name")}
-              {...form.getInputProps("name")}
+          currentDescription ? (
+            <Box
+              c="dimmed"
+              fz="sm"
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(currentDescription),
+              }}
             />
-            <Stack gap={4}>
-              <Text size="sm" fw={500}>
-                Description
-              </Text>
-              <TagDescriptionEditor
-                form={form}
-                initialContent={initialDescription}
-              />
-            </Stack>
-          </Stack>
+          ) : (
+            <Text size="sm" c="dimmed" fs="italic">
+              No description
+            </Text>
+          )
+        ) : (
+          <TagDescriptionEditor form={form} initialContent={initialDescription} />
         )}
       </Accordion.Panel>
     </Accordion.Item>
