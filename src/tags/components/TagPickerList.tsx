@@ -73,7 +73,7 @@ export function TagPickerList({
         data-autofocus
         autoFocus
       />
-      <ScrollArea.Autosize mah={maxHeight}>
+      <ScrollArea.Autosize mah={maxHeight} scrollbars="y">
         <Stack gap={2}>
           {tags.map((tag) => (
             <UnstyledButton
