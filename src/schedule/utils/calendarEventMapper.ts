@@ -1,10 +1,5 @@
 import { toISOStringWithTimezone } from "@/lib/date";
-import {
-  cleanString,
-  fromNullable,
-  mapDefined,
-  nonEmptyArray,
-} from "@/lib/optional";
+import { cleanString, fromNullable, mapDefined } from "@/lib/optional";
 import type { CalendarEvent } from "@/schedule/models/calendarEvent";
 import type {
   CalendarEventInstanceDto,
@@ -57,7 +52,7 @@ export function formToCreateInput(
       ? recurrenceToRrule(form.recurrence)
       : undefined,
     color: form.color || undefined,
-    tagIds: nonEmptyArray(form.tagIds),
+    tagIds: mapDefined(form.tagIds, (v) => v),
   };
 }
 
@@ -72,7 +67,7 @@ export function formToUpdateInput(
     location: mapDefined(form.location, cleanString),
     link: mapDefined(form.link, cleanString),
     color: mapDefined(form.color, (v) => v || undefined),
-    tagIds: nonEmptyArray(form.tagIds),
+    tagIds: mapDefined(form.tagIds, (v) => v),
     rrule: mapDefined(form.recurrence, (v) =>
       v ? recurrenceToRrule(v) : undefined,
     ),
