@@ -1,16 +1,18 @@
-import { Center, Loader, ScrollArea, Stack, Text } from "@mantine/core";
+import { Box, Center, Loader, ScrollArea, Stack, Text } from "@mantine/core";
 import { useSession } from "@/auth";
 import { MessageBubble } from "@/messages/components/MessageBubble";
+import classes from "@/messages/components/MessageList.module.css";
 import { useReplyPanelHandlers } from "@/messages/hooks/dialogs/replyPanelHooks";
 import { useThreadMessagesQuery } from "@/messages/hooks/queries/useThreadMessagesQuery";
 import type { Message } from "@/messages/models/message";
 import type { ThreadOtherParticipant } from "@/messages/models/thread";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 interface Props {
   threadId: string;
   other: ThreadOtherParticipant;
   recipientUserId: string | null;
+  focusMessageId?: string;
 }
 
 const GROUP_GAP_MS = 5 * 60 * 1000;
@@ -27,7 +29,12 @@ interface DisplayMessage {
   showHeader: boolean;
 }
 
-export function MessageList({ threadId, other, recipientUserId }: Props) {
+export function MessageList({
+  threadId,
+  other,
+  recipientUserId,
+  focusMessageId,
+}: Props) {
   const { data: session } = useSession();
   const { open: openReplyPanel } = useReplyPanelHandlers();
   const currentUserId = session?.user?.id;
@@ -46,6 +53,9 @@ export function MessageList({ threadId, other, recipientUserId }: Props) {
 
   const viewportRef = useRef<HTMLDivElement>(null);
   const lastMessageIdRef = useRef<string | null>(null);
+  const messageRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const focusedHandledRef = useRef<string | null>(null);
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
   const otherSender = useMemo<SenderInfo>(() => {
     if (other.kind === "user") {
@@ -100,7 +110,11 @@ export function MessageList({ threadId, other, recipientUserId }: Props) {
     if (last.message.id === lastMessageIdRef.current) {
       return;
     }
+    const isFirstLoad = lastMessageIdRef.current === null;
     lastMessageIdRef.current = last.message.id;
+    if (isFirstLoad && focusMessageId) {
+      return;
+    }
     const el = viewportRef.current;
     if (!el) {
       return;
@@ -108,7 +122,28 @@ export function MessageList({ threadId, other, recipientUserId }: Props) {
     requestAnimationFrame(() => {
       el.scrollTop = el.scrollHeight;
     });
-  }, [displayMessages]);
+  }, [displayMessages, focusMessageId]);
+
+  useEffect(() => {
+    if (!focusMessageId) {
+      focusedHandledRef.current = null;
+      return;
+    }
+    if (focusedHandledRef.current === focusMessageId) {
+      return;
+    }
+    const el = messageRefs.current.get(focusMessageId);
+    if (!el) {
+      return;
+    }
+    focusedHandledRef.current = focusMessageId;
+    requestAnimationFrame(() => {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    setHighlightedId(focusMessageId);
+    const timer = window.setTimeout(() => setHighlightedId(null), 1500);
+    return () => window.clearTimeout(timer);
+  }, [focusMessageId, displayMessages]);
 
   const handleScrollPositionChange = ({ y }: { x: number; y: number }) => {
     if (y > 60) {
@@ -159,15 +194,25 @@ export function MessageList({ threadId, other, recipientUserId }: Props) {
           </Center>
         )}
         {displayMessages.map(({ message, sender, showHeader }) => (
-          <MessageBubble
+          <Box
             key={message.id}
-            message={message}
-            sender={sender}
-            showHeader={showHeader}
-            recipientUserId={recipientUserId}
-            onReply={() => openReplyPanel(message.id)}
-            onShowReplies={() => openReplyPanel(message.id)}
-          />
+            ref={(el: HTMLDivElement | null) => {
+              if (el) messageRefs.current.set(message.id, el);
+              else messageRefs.current.delete(message.id);
+            }}
+            className={
+              highlightedId === message.id ? classes.highlight : undefined
+            }
+          >
+            <MessageBubble
+              message={message}
+              sender={sender}
+              showHeader={showHeader}
+              recipientUserId={recipientUserId}
+              onReply={() => openReplyPanel(message.id)}
+              onShowReplies={() => openReplyPanel(message.id)}
+            />
+          </Box>
         ))}
       </Stack>
     </ScrollArea>

@@ -10,9 +10,14 @@ import { Center, Loader, Stack, Text } from "@mantine/core";
 interface Props {
   threadId: string;
   initialTagIds?: string[];
+  focusMessageId?: string;
 }
 
-export function ThreadView({ threadId, initialTagIds }: Props) {
+export function ThreadView({
+  threadId,
+  initialTagIds,
+  focusMessageId,
+}: Props) {
   const isDesktop = useIsDesktop();
   const { data: threads, isFetching } = useThreadsQuery();
   useThreadSubscription(threadId);
@@ -44,6 +49,7 @@ export function ThreadView({ threadId, initialTagIds }: Props) {
         threadId={threadId}
         other={thread.other}
         recipientUserId={recipientUserId}
+        focusMessageId={focusMessageId}
       />
       <MessageComposer
         key={threadId}

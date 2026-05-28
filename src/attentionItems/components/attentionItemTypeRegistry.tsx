@@ -7,6 +7,7 @@ import type {
   AttentionItemType,
   TaggedMessageMetadata,
 } from "@/attentionItems/models/attentionItem";
+import { htmlToPreview } from "@/lib/htmlToPreview";
 
 import { TaggedMessageBody } from "./bodies/TaggedMessageBody";
 import { UnknownTypeBody } from "./bodies/UnknownTypeBody";
@@ -33,7 +34,7 @@ const TYPE_LABELS: Record<AttentionItemType, string> = {
 const TAGGED_MESSAGE_CONFIG: AttentionItemTypeConfig<TaggedMessageMetadata> = {
   Icon: IconMessage,
   Body: TaggedMessageBody,
-  getDisplayTitle: (m) => firstLineOrTruncate(m.content, 80),
+  getDisplayTitle: (m) => htmlToPreview(m.content, 80) || "Empty message",
 };
 
 const UNKNOWN_CONFIG: AttentionItemTypeConfig = {
@@ -52,10 +53,4 @@ export function getAttentionItemConfig(
   type: AttentionItemType,
 ): AttentionItemTypeConfig<any> {
   return REGISTRY[type] ?? UNKNOWN_CONFIG;
-}
-
-function firstLineOrTruncate(text: string, max: number): string {
-  const first = (text.split("\n")[0] ?? "").trim();
-  if (!first) return "Empty message";
-  return first.length > max ? `${first.slice(0, max)}…` : first;
 }

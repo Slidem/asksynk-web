@@ -1,0 +1,24 @@
+.body {
+  font-size: 13px;
+  line-height: 1.45;
+  word-break: break-word;
+  color: var(--mantine-color-dimmed);
+
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+  & p,
+  & ul,
+  & ol,
+  & pre,
+  & blockquote {
+    margin: 0;
+  }
+
+  & ul,
+  & ol {
+    padding-left: 20px;
+  }
+}

@@ -3,6 +3,7 @@ import { ThreadView } from "@/messages/components/ThreadView";
 
 interface ThreadSearch {
   initialTagIds?: string[];
+  focusMessageId?: string;
 }
 
 export const Route = createFileRoute("/_authenticated/messages/$threadId")({
@@ -13,13 +14,26 @@ export const Route = createFileRoute("/_authenticated/messages/$threadId")({
       : typeof raw === "string"
         ? [raw]
         : [];
-    return ids.length > 0 ? { initialTagIds: ids } : {};
+    const focus =
+      typeof search.focusMessageId === "string"
+        ? search.focusMessageId
+        : undefined;
+    const result: ThreadSearch = {};
+    if (ids.length > 0) result.initialTagIds = ids;
+    if (focus) result.focusMessageId = focus;
+    return result;
   },
   component: ThreadRoute,
 });
 
 function ThreadRoute() {
   const { threadId } = Route.useParams();
-  const { initialTagIds } = Route.useSearch();
-  return <ThreadView threadId={threadId} initialTagIds={initialTagIds} />;
+  const { initialTagIds, focusMessageId } = Route.useSearch();
+  return (
+    <ThreadView
+      threadId={threadId}
+      initialTagIds={initialTagIds}
+      focusMessageId={focusMessageId}
+    />
+  );
 }
