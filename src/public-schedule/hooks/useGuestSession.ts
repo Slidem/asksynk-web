@@ -4,6 +4,10 @@ import {
 } from "@/public-schedule/store/guestSessionStore";
 import { useShallow } from "zustand/shallow";
 
+export const useIsGuestSession = () => {
+  return useGuestSessionStore((s) => !!s.session);
+};
+
 export const useGuestSession = (): GuestSession | null => {
   return useGuestSessionStore((s) => s.session);
 };

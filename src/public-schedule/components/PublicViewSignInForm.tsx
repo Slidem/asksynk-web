@@ -38,7 +38,6 @@ export function PublicViewSignInForm({ view }: Props) {
         if (trimmed.length > 80) {
           return "Max 80 characters";
         }
-
         return null;
       },
     },

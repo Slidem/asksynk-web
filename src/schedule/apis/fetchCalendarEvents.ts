@@ -13,10 +13,15 @@ export async function fetchCalendarEvents(
     end: toISOStringWithTimezone(end),
     timezone,
   });
-  const path = userId
-    ? `/network/${userId}/calendar-events`
-    : "/calendar-events";
-  const response = await apiFetch(buildApiUrl(`${path}?${params.toString()}`));
+
+  if (userId) {
+    params.append("userId", userId);
+  }
+
+  const response = await apiFetch(
+    buildApiUrl(`/calendar-events?${params.toString()}`),
+  );
+
   if (!response.ok) throw new Error("Failed to fetch calendar events");
   return response.json();
 }

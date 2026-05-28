@@ -5,7 +5,9 @@ import type { TagDto } from "../models/tag";
 export async function fetchFilteredTags(
   filters: TagsFilters,
 ): Promise<TagDto[]> {
-  const response = await apiFetch(getTagsUrl(filters));
+  const response = await apiFetch(getTagsUrl(filters), {
+    allowGuestSession: true,
+  });
 
   if (!response.ok) {
     throw new Error("Failed to load tags");

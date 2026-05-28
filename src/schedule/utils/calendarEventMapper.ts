@@ -61,6 +61,9 @@ export function formToUpdateInput(
 ): UpdateCalendarEventInput {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
+  const startDate = form.start ? new Date(form.start!) : undefined;
+  const endDate = form.end ? new Date(form.end!) : undefined;
+
   return {
     title: mapDefined(form.title, (v) => v.trim()),
     description: mapDefined(form.description, cleanString),
@@ -71,11 +74,11 @@ export function formToUpdateInput(
     rrule: mapDefined(form.recurrence, (v) =>
       v ? recurrenceToRrule(v) : undefined,
     ),
-    ...(form.start &&
-      form.end && {
-        start: toISOStringWithTimezone(form.start),
+    ...(startDate &&
+      endDate && {
+        start: toISOStringWithTimezone(startDate),
         durationSeconds: Math.round(
-          (form.end.getTime() - form.start.getTime()) / 1000,
+          (endDate.getTime() - startDate.getTime()) / 1000,
         ),
         timezone,
       }),

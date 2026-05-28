@@ -10,7 +10,10 @@ import { URGENCY_ORDER } from "@/attentionItems/models/urgency";
 import { computeUrgency } from "@/attentionItems/utils/computeUrgency";
 import { filterAttentionItemsByQuery } from "@/attentionItems/utils/filterAttentionItemsByQuery";
 
-export type AttentionItemsByUrgency = Record<AttentionUrgency, AttentionItemDto[]>;
+export type AttentionItemsByUrgency = Record<
+  AttentionUrgency,
+  AttentionItemDto[]
+>;
 
 export function useAttentionItemsByUrgency() {
   const { data: items, isLoading, isError } = useAttentionItems();
