@@ -15,6 +15,8 @@ export function computeUrgency(
   item: AttentionItemDto,
   ctx: UrgencyContext,
 ): AttentionUrgency {
+  if (item.status === "resolved") return "resolved";
+
   const due = item.dueDate ? new Date(item.dueDate) : null;
 
   const hasImmediateTag = item.tagIds.some(
