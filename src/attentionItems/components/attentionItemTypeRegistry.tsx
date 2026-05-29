@@ -44,6 +44,7 @@ const UNKNOWN_CONFIG: AttentionItemTypeConfig = {
 };
 
 const REGISTRY: Partial<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Record<AttentionItemType, AttentionItemTypeConfig<any>>
 > = {
   tagged_message: TAGGED_MESSAGE_CONFIG,
@@ -51,6 +52,7 @@ const REGISTRY: Partial<
 
 export function getAttentionItemConfig(
   type: AttentionItemType,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): AttentionItemTypeConfig<any> {
   return REGISTRY[type] ?? UNKNOWN_CONFIG;
 }
