@@ -37,7 +37,7 @@ export function AttentionItemCard({ item }: Props) {
 
         {item.note && (
           <Text size="xs" c="dimmed" lineClamp={2}>
-            {item.note}
+            v{item.note}
           </Text>
         )}
 

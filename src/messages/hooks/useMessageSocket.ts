@@ -1,7 +1,4 @@
-import {
-  connectMessageSocket,
-  disconnectMessageSocket,
-} from "@/messages/socket/messageSocket";
+import { connectMessageSocket } from "@/messages/socket/messageSocket";
 import { messageRepliesQueryKey } from "@/messages/hooks/queries/useMessageRepliesQueryData";
 import { threadMessagesQueryKey } from "@/messages/hooks/queries/useThreadMessagesQueryData";
 import { threadsQueryKey } from "@/messages/hooks/queries/useThreadsQueryData";
@@ -138,7 +135,6 @@ export function useMessageSocket() {
     return () => {
       socket.off("message.created", handleMessageCreated);
       socket.off("message.updated", handleMessageUpdated);
-      disconnectMessageSocket();
     };
   }, [queryClient]);
 }

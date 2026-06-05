@@ -1,5 +1,4 @@
-import { Stack, Title } from "@mantine/core";
-
+import { PomodoroTimer } from "@/timer/components/PomodoroTimer";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/timer")({
@@ -7,9 +6,5 @@ export const Route = createFileRoute("/_authenticated/timer")({
 });
 
 function TimerPage() {
-  return (
-    <Stack gap="md">
-      <Title order={2}>Timer</Title>
-    </Stack>
-  );
+  return <PomodoroTimer />;
 }

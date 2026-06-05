@@ -1,6 +1,7 @@
 import { apiBaseUrl } from "@/lib/api";
 import { io, type Socket } from "socket.io-client";
 import type { Message } from "@/messages/models/message";
+import type { TimerCompletedEvent } from "@/timer/models/timer";
 
 export interface SendMessageAck {
   ok: boolean;
@@ -21,6 +22,7 @@ export interface TagMessageAck {
 interface ServerToClient {
   "message.created": (payload: { threadId: string; message: Message }) => void;
   "message.updated": (payload: { threadId: string; message: Message }) => void;
+  "timer.completed": (payload: TimerCompletedEvent) => void;
 }
 
 interface ClientToServer {

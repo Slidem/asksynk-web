@@ -1,0 +1,9 @@
+.floating {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 190;
+  width: 210px;
+  user-select: none;
+  touch-action: none;
+}

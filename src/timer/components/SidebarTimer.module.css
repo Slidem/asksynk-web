@@ -1,0 +1,18 @@
+.button {
+  width: 50px;
+  height: 50px;
+  margin-top: var(--mantine-spacing-md);
+  border-radius: var(--mantine-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-0));
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background-color: light-dark(
+      var(--mantine-color-gray-0),
+      var(--mantine-color-dark-5)
+    );
+  }
+}

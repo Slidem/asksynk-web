@@ -1,0 +1,30 @@
+.track {
+  width: 100%;
+  border-radius: 999px;
+  background-color: var(--mantine-color-default-border);
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  border-radius: 999px;
+  transition:
+    width 250ms linear,
+    background-color 300ms ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pulse {
+    animation: barPulse 1.2s ease-in-out infinite;
+  }
+}
+
+@keyframes barPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}

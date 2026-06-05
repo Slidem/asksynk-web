@@ -14,6 +14,7 @@ import { authClient, useSession } from "@/auth";
 
 import { ColorSchemeToggle } from "@/components/ColorSchemeToggle";
 import { UserBadge } from "@/components/UserBadge";
+import { SidebarTimer } from "@/timer/components/SidebarTimer";
 import classes from "./Navbar.module.css";
 
 interface NavbarLinkProps {
@@ -126,6 +127,8 @@ export function Navbar() {
           {links}
         </Stack>
       </div>
+
+      <SidebarTimer />
     </nav>
   );
 }
