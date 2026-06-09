@@ -11,6 +11,15 @@ import {
   Text,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import {
+  IconBolt,
+  IconBrain,
+  IconClock,
+  IconCoffee,
+  IconMoon,
+  IconRepeat,
+  IconVolume,
+} from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import {
   DEFAULT_TIMER_SETTINGS_FORM_VALUES,
@@ -35,6 +44,12 @@ import {
 
 const minutesValidator = (value: number) =>
   value >= 1 && value <= 1440 ? null : "Between 1 and 1440 minutes";
+
+const PRESET_ICONS: Record<string, typeof IconClock> = {
+  Classic: IconClock,
+  "Deep work": IconBrain,
+  "Short bursts": IconBolt,
+};
 
 type NotificationState = NotificationPermission | "unsupported";
 
@@ -97,26 +112,38 @@ export function TimerSettingsDialog() {
       centered
     >
       <Stack gap="md">
-        <Group gap="xs">
-          <Text size="sm" c="dimmed">
-            Presets:
-          </Text>
-          {TIMER_SETTINGS_PRESETS.map((preset) => (
-            <Button
-              key={preset.label}
-              variant="default"
-              size="xs"
-              radius="xl"
-              onClick={() => form.setValues(preset.values)}
-            >
-              {preset.label}
-            </Button>
-          ))}
-        </Group>
+        <Stack gap={6}>
+          <Group gap={6}>
+            <IconBolt size={14} />
+            <Text size="sm" fw={500}>
+              Quick presets
+            </Text>
+          </Group>
+          <Group gap="xs">
+            {TIMER_SETTINGS_PRESETS.map((preset) => {
+              const Icon = PRESET_ICONS[preset.label];
+              return (
+                <Button
+                  key={preset.label}
+                  variant="default"
+                  size="xs"
+                  radius="xl"
+                  leftSection={Icon ? <Icon size={14} /> : undefined}
+                  onClick={() => form.setValues(preset.values)}
+                >
+                  {preset.label}
+                </Button>
+              );
+            })}
+          </Group>
+        </Stack>
 
-        <SimpleGrid cols={2}>
+        <Divider label="Durations" labelPosition="left" />
+
+        <SimpleGrid cols={2} spacing="md" verticalSpacing="md">
           <NumberInput
             label="Focus (min)"
+            leftSection={<IconBrain size={16} />}
             min={1}
             max={1440}
             clampBehavior="strict"
@@ -125,17 +152,8 @@ export function TimerSettingsDialog() {
             {...form.getInputProps("focusMinutes")}
           />
           <NumberInput
-            label="Long break interval"
-            description="Long break after N focus sessions"
-            min={1}
-            max={50}
-            clampBehavior="strict"
-            allowDecimal={false}
-            key={form.key("longBreakInterval")}
-            {...form.getInputProps("longBreakInterval")}
-          />
-          <NumberInput
             label="Short break (min)"
+            leftSection={<IconCoffee size={16} />}
             min={1}
             max={1440}
             clampBehavior="strict"
@@ -145,12 +163,24 @@ export function TimerSettingsDialog() {
           />
           <NumberInput
             label="Long break (min)"
+            leftSection={<IconMoon size={16} />}
             min={1}
             max={1440}
             clampBehavior="strict"
             allowDecimal={false}
             key={form.key("longBreakMinutes")}
             {...form.getInputProps("longBreakMinutes")}
+          />
+          <NumberInput
+            label="Long break interval"
+            description="Long break after N focus sessions"
+            leftSection={<IconRepeat size={16} />}
+            min={1}
+            max={50}
+            clampBehavior="strict"
+            allowDecimal={false}
+            key={form.key("longBreakInterval")}
+            {...form.getInputProps("longBreakInterval")}
           />
         </SimpleGrid>
 
@@ -170,14 +200,18 @@ export function TimerSettingsDialog() {
           onChange={(event) => setSoundEnabled(event.currentTarget.checked)}
         />
         {soundEnabled && (
-          <Slider
-            min={0}
-            max={1}
-            step={0.05}
-            value={volume}
-            onChange={setVolume}
-            label={(value) => `${Math.round(value * 100)}%`}
-          />
+          <Group gap="sm" wrap="nowrap">
+            <IconVolume size={16} />
+            <Slider
+              flex={1}
+              min={0}
+              max={1}
+              step={0.05}
+              value={volume}
+              onChange={setVolume}
+              label={(value) => `${Math.round(value * 100)}%`}
+            />
+          </Group>
         )}
 
         {notifState !== "unsupported" && (
