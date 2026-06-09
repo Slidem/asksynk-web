@@ -66,7 +66,7 @@ function UserProfile() {
           <UserBadge
             name={session.user?.name}
             email={session.user?.email}
-            image={profile?.avatar?.url ?? session.user?.image}
+            image={profile?.image ?? session.user?.image}
             variant="avatar"
             size="md"
           />

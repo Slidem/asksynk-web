@@ -10,7 +10,7 @@ export function AvatarUploadField() {
   const { updateProfile, isUpdating } = useUpdateProfile();
 
   const busy = isUploading || isUpdating;
-  const previewUrl = profile?.avatar?.url ?? profile?.image ?? undefined;
+  const previewUrl = profile?.image ?? undefined;
 
   async function handlePick(file: File | null) {
     if (!file) return;

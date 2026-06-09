@@ -1,8 +1,3 @@
-export interface ProfileAvatar {
-  id: string;
-  url: string;
-}
-
 export interface ProfileDto {
   id: string;
   name: string | null;
@@ -11,7 +6,6 @@ export interface ProfileDto {
   email: string;
   image: string | null;
   phone: string | null;
-  avatar: ProfileAvatar | null;
 }
 
 export interface ProfileUpdateInput {

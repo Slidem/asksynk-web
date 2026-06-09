@@ -2,6 +2,7 @@ export interface PublicViewMetadataDto {
   slug: string;
   name: string | null;
   ownerUserId: string;
+  ownerImage: string | null;
   expiresAt: string;
 }
 
