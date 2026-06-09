@@ -2,7 +2,7 @@
 id: ST-002
 task: add-user-profile-and-settings
 title: Attachments presigned-upload module
-status: todo
+status: done
 source: backend-api-specs
 depends_on: []
 owns:
@@ -57,7 +57,27 @@ Follow canonical layout (`src/tags/`): one fn per api file, `apiFetch`/`buildApi
   multipart POST to storage url, PATCH `/attachments/:id` → returns `{ id, url }`.
 
 ## Implementation output
-<!-- FILL AFTER WORK. What was built and key files. Required before in-review/done. -->
+
+Reusable presigned-upload module under `src/attachments` (no feature deps).
+
+- `models/attachment.ts` — `AttachmentPlacement`, `AttachmentRegisterInput`,
+  `AttachmentUploadGrant`, `AttachmentDto`; `ALLOWED_CONTENT_TYPES` (+ derived
+  `AllowedContentType`), `MAX_ATTACHMENT_BYTES = 10485760`.
+- `apis/createAttachment.ts` — `POST /attachments` → `AttachmentUploadGrant`.
+- `apis/finalizeAttachment.ts` — `PATCH /attachments/:id` `{ status: "ready" }` → `AttachmentDto`.
+- `apis/getAttachment.ts` — `GET /attachments/:id` → `AttachmentDto` (signed-url refresh; unused by ST-003).
+- `apis/uploadBytes.ts` — raw `fetch` multipart POST to `grant.upload.url`; fields appended
+  first, `file` last; no credentials/auth headers; throws on `!ok`.
+- `hooks/useUploadAttachment.ts` — `useMutation` orchestrating validate → register →
+  uploadBytes → finalize. Input `{ file, placement }`; derives contentType/sizeBytes/fileName
+  from `File`; validates type ∈ allowed and size ≤ max before register (throws early).
+  Returns `AttachmentDto`; exposes `{ upload, isUploading }`; `notifications.show` on error.
+
+Typecheck (`pnpm tsc`) passes.
 
 ## Notes/decisions
-<!-- Anything worth recording for reviewers. -->
+
+- `upload` is `mutateAsync` so ST-003 can `await` the returned `AttachmentDto` and chain the
+  `/profile` PATCH with `avatarAttachmentId`.
+- `uploadBytes` takes `grant.upload` (not the whole grant) — only the upload form is needed.
+- Content-type validation uses `file.type`; cast to `readonly string[]` for `.includes`.

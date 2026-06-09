@@ -2,7 +2,7 @@
 id: ST-004
 task: add-user-profile-and-settings
 title: Wire own avatar + menu link in app shell
-status: todo
+status: done
 source: overview
 depends_on: [ST-003]
 owns:
@@ -21,6 +21,7 @@ already render — every `UserBadge` call site passes `image` from its DTO — s
 ## Plan
 
 Edit only `src/app/components/Navbar/Navbar.tsx`:
+
 - In `UserProfile`, call `useProfile()` (from `@/profile/hooks/queries/useProfile`).
 - Pass `image={profile?.avatar?.url ?? session.user?.image}` into the `UserBadge`.
 - Add a `Menu.Item` "Profile & settings" (e.g. `IconUserCog`/`IconSettings`) as
@@ -44,7 +45,20 @@ Edit only `src/app/components/Navbar/Navbar.tsx`:
   menu shows "Profile & settings" → navigates to `/settings`.
 
 ## Implementation output
-<!-- FILL AFTER WORK. What was built and key files. Required before in-review/done. -->
+
+Edited only `src/app/components/Navbar/Navbar.tsx`:
+
+- `UserProfile` now calls `useProfile()` and passes
+  `image={profile?.avatar?.url ?? session.user?.image}` to `UserBadge` — signed-in avatar shows
+  the uploaded profile picture, falling back to the auth-provider image.
+- Added a `Menu.Item` "Profile & settings" (`IconSettings`, `component={Link} to="/settings"`)
+  above the Sign out divider. Email item + Sign out unchanged.
+
+Typecheck (`pnpm tsc -b`) passes.
 
 ## Notes/decisions
-<!-- Anything worth recording for reviewers. -->
+
+- Avatar updates without reload: `useUpdateProfile` invalidates the shared `["profile"]` key, so
+  the Navbar's `useProfile()` refetches after an upload.
+- Fallback order: profile avatar → auth `session.user.image`. `UserBadge` already supports
+  `image`, so no component change.
