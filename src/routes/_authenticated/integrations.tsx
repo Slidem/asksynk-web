@@ -1,14 +1,10 @@
-import { Stack, Title } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
 
+import { IntegrationsPage } from "@/integrations/components/IntegrationsPage";
+
 export const Route = createFileRoute("/_authenticated/integrations")({
+  validateSearch: (search: Record<string, string | undefined>) => ({
+    connected: search.connected,
+  }),
   component: IntegrationsPage,
 });
-
-function IntegrationsPage() {
-  return (
-    <Stack gap="md">
-      <Title order={2}>Integrations</Title>
-    </Stack>
-  );
-}

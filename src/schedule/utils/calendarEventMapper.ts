@@ -27,6 +27,9 @@ export function dtoToCalendarEvent(
     rrule: dto.rrule,
     durationSeconds: dto.durationSeconds,
     instanceStart: start,
+    calendarId: dto.calendarId,
+    source: dto.source,
+    readOnly: dto.readOnly,
   };
 }
 

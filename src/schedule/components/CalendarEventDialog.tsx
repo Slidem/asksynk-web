@@ -38,6 +38,7 @@ import { useManageRecurringEventDialog } from "@/schedule/hooks/dialogs/recurrin
 
 export function CalendarEventDialog() {
   const { opened, mode, openedEvent } = useEventDialogData();
+  const readOnly = !!openedEvent?.readOnly;
   const closeDialog = useCloseEventDialog();
   const { open: openRecurringConfirm } = useManageRecurringEventDialog();
   const createMutation = useCreateCalendarEvent();
@@ -112,6 +113,17 @@ export function CalendarEventDialog() {
 
   const handleAction = async () => {
     const values = form.getValues();
+
+    if (readOnly && openedEvent) {
+      // Imported events: only tags may be changed.
+      updateMutation.mutate({
+        eventId: openedEvent.eventId,
+        update: { tagIds: values.tagIds },
+      });
+      handleClose();
+      return;
+    }
+
     if (!values.title.trim() || !values.start || !values.end) return;
 
     if (mode === "create") {
@@ -154,8 +166,16 @@ export function CalendarEventDialog() {
     }
   };
 
-  const title = mode === "create" ? "New event" : "Edit event";
-  const actionText = mode === "create" ? "Create" : "Update";
+  const title = readOnly
+    ? "Event (read-only)"
+    : mode === "create"
+      ? "New event"
+      : "Edit event";
+  const actionText = readOnly
+    ? "Save tags"
+    : mode === "create"
+      ? "Create"
+      : "Update";
 
   return (
     <Modal opened={opened} onClose={handleClose} title={title} size="md">
@@ -164,6 +184,7 @@ export function CalendarEventDialog() {
         placeholder="Event title"
         key={form.key("title")}
         {...form.getInputProps("title")}
+        disabled={readOnly}
         mb="sm"
       />
       <Textarea
@@ -171,6 +192,7 @@ export function CalendarEventDialog() {
         placeholder="Add a description..."
         key={form.key("description")}
         {...form.getInputProps("description")}
+        disabled={readOnly}
         mb="sm"
         autosize
         minRows={2}
@@ -182,17 +204,20 @@ export function CalendarEventDialog() {
           placeholder="Add location"
           key={form.key("location")}
           {...form.getInputProps("location")}
+          disabled={readOnly}
         />
         <TextInput
           label="Link"
           placeholder="Add link"
           key={form.key("link")}
           {...form.getInputProps("link")}
+          disabled={readOnly}
         />
         <ColorInput
           label="Color"
           key={form.key("color")}
           {...form.getInputProps("color")}
+          disabled={readOnly}
         />
       </Group>
       <Group grow mb="sm">
@@ -200,11 +225,13 @@ export function CalendarEventDialog() {
           label="Start"
           key={form.key("start")}
           {...form.getInputProps("start")}
+          disabled={readOnly}
         />
         <DateTimePicker
           label="End"
           key={form.key("end")}
           {...form.getInputProps("end")}
+          disabled={readOnly}
         />
       </Group>
 
@@ -212,6 +239,7 @@ export function CalendarEventDialog() {
         <Checkbox
           label="Recurring event"
           checked={showRecurrence}
+          disabled={readOnly}
           onChange={(e) => {
             form.setFieldValue(
               "recurrence",
@@ -228,6 +256,7 @@ export function CalendarEventDialog() {
             key={form.key("recurrence")}
             {...form.getInputProps("recurrence")}
             allowDeselect={false}
+            disabled={readOnly}
             size="xs"
             w={120}
           />
@@ -241,7 +270,7 @@ export function CalendarEventDialog() {
 
       <Group justify="space-between" mt="md">
         <div>
-          {mode === "edit" && (
+          {mode === "edit" && !readOnly && (
             <Button
               variant="subtle"
               color="red"

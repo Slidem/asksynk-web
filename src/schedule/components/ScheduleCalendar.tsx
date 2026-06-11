@@ -58,7 +58,8 @@ export function ScheduleCalendar() {
 
   const handleEventDrop = async (arg: EventDropArg) => {
     const event = events.find((e) => e.id === arg.event.id);
-    if (!event) {
+    if (!event || event.readOnly) {
+      arg.revert();
       return;
     }
     const newStart = arg.event.start;
@@ -90,7 +91,8 @@ export function ScheduleCalendar() {
   const handleEventResize = async (arg: EventResizeDoneArg) => {
     const event = events.find((e) => e.id === arg.event.id);
 
-    if (!event) {
+    if (!event || event.readOnly) {
+      arg.revert();
       return;
     }
 

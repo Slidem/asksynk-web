@@ -8,6 +8,9 @@ export interface CalendarDto {
 export interface CalendarEventInstanceDto {
   eventId: string;
   instanceId: string;
+  calendarId: string;
+  source: string;
+  readOnly: boolean;
   title: string;
   description: string | null;
   location: string | null;

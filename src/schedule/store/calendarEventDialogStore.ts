@@ -49,6 +49,9 @@ export const useCalendarEventDialogStore = create<CalendarEventDialogState>()(
           rrule: props.event.rrule,
           durationSeconds,
           instanceStart: props.event.instanceStart,
+          calendarId: props.event.calendarId,
+          source: props.event.source,
+          readOnly: props.event.readOnly,
         };
       } else {
         const tempId = createTempId();

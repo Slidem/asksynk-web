@@ -1,5 +1,5 @@
-import { Button, Group, Stack, Text, Title } from "@mantine/core";
-import { IconCalendar, IconSettings } from "@tabler/icons-react";
+import { Group, Stack, Text, Title } from "@mantine/core";
+import { IconCalendar } from "@tabler/icons-react";
 
 export function SchedulePageHeader() {
   return (
@@ -15,13 +15,6 @@ export function SchedulePageHeader() {
             calendar with your favorite tools for bi-directional sync.
           </Text>
         </Stack>
-
-        <Button
-          variant="default"
-          leftSection={<IconSettings size={16} />}
-        >
-          Integrations
-        </Button>
       </Group>
     </Stack>
   );
