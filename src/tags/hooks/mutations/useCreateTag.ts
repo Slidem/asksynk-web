@@ -1,4 +1,5 @@
 import { useOptimisticMutation } from "@/lib/useOptimisticMutation";
+import { requestNotificationPermission } from "@/lib/browserNotification";
 import { createTag } from "@/tags/apis/createTag";
 import type { TagDto, TagCreateInput } from "@/tags/models/tag";
 import { useFilteredTagsQueryData } from "../queries/useFilteredTagsQueryData";
@@ -21,6 +22,12 @@ export function useCreateTag() {
       return [...(previous ?? []), nextTag];
     },
     skipInvalidateOnSuccess: true,
+    onSuccess: (_data, input) => {
+      // Save is a user gesture — good moment to ask for desktop alerts.
+      if (input.notificationsSettings.browserNotificationEnabled) {
+        void requestNotificationPermission();
+      }
+    },
   });
 
   return { createTag: mutationObj.mutate, isCreating: mutationObj.isPending };

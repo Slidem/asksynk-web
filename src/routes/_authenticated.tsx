@@ -4,6 +4,7 @@ import { Box } from "@mantine/core";
 import { Navbar } from "@/app/components/Navbar/Navbar";
 import { authClient } from "@/auth";
 import { useAppSocketConnection } from "@/app/hooks/useAppSocketConnection";
+import { AttentionItemsEngine } from "@/attentionItems/components/AttentionItemsEngine";
 import { TimerEngine } from "@/timer/components/TimerEngine";
 import { FloatingTimer } from "@/timer/components/FloatingTimer";
 import { TimerSettingsDialog } from "@/timer/components/TimerSettingsDialog";
@@ -40,6 +41,7 @@ function AuthenticatedLayout() {
         <Outlet />
       </Box>
       <TimerEngine />
+      <AttentionItemsEngine />
       <FloatingTimer />
       <TimerSettingsDialog />
     </Box>

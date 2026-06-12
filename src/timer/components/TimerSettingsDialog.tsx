@@ -40,7 +40,7 @@ import { useTimerSoundSettingsStore } from "@/timer/sounds/useTimerSoundSettings
 import {
   canUseNotifications,
   requestNotificationPermission,
-} from "@/timer/utils/browserNotification";
+} from "@/lib/browserNotification";
 
 const minutesValidator = (value: number) =>
   value >= 1 && value <= 1440 ? null : "Between 1 and 1440 minutes";

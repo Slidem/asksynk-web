@@ -1,4 +1,5 @@
 import { useOptimisticMutation } from "@/lib/useOptimisticMutation";
+import { requestNotificationPermission } from "@/lib/browserNotification";
 import { updateTag } from "@/tags/apis/updateTag";
 import type { TagDto, TagUpdateInput } from "@/tags/models/tag";
 import { merge } from "lodash";
@@ -11,6 +12,12 @@ export function useUpdateTagMutation() {
     mutationFn: updateTag,
     updater: updateOptimisticTag,
     skipInvalidateOnSuccess: true,
+    onSuccess: (_data, input) => {
+      // Save is a user gesture — good moment to ask for desktop alerts.
+      if (input.notificationsSettings?.browserNotificationEnabled) {
+        void requestNotificationPermission();
+      }
+    },
   });
 }
 function updateOptimisticTag(

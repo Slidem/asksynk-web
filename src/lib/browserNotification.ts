@@ -1,4 +1,4 @@
-interface TimerNotificationInput {
+interface BrowserNotificationInput {
   title: string;
   body: string;
 }
@@ -19,7 +19,10 @@ export async function requestNotificationPermission(): Promise<
   }
 }
 
-export function showTimerNotification({ title, body }: TimerNotificationInput) {
+export function showBrowserNotification({
+  title,
+  body,
+}: BrowserNotificationInput) {
   if (!canUseNotifications()) return;
   if (Notification.permission !== "granted") return;
   try {

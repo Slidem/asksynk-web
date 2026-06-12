@@ -11,7 +11,7 @@ import {
   playTimerSound,
   preloadTimerSounds,
 } from "@/timer/sounds/timerSoundPlayer";
-import { showTimerNotification } from "@/timer/utils/browserNotification";
+import { showBrowserNotification } from "@/lib/browserNotification";
 import { useQueryClient } from "@tanstack/react-query";
 import { IconCircleCheck } from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
@@ -105,7 +105,7 @@ export function useTimerEngine() {
         autoClose: 6000,
       });
       if (document.hidden) {
-        showTimerNotification({ title, body: message });
+        showBrowserNotification({ title, body: message });
       }
       queryClient.invalidateQueries({ queryKey: timerQueryKey() });
       queryClient.invalidateQueries({ queryKey: timerSuggestionQueryKey() });

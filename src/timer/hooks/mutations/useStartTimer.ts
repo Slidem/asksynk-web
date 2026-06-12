@@ -2,7 +2,7 @@ import { useOptimisticMutation } from "@/lib/useOptimisticMutation";
 import { patchTimer } from "@/timer/apis/patchTimer";
 import type { SessionType, Timer } from "@/timer/models/timer";
 import { playTimerSound } from "@/timer/sounds/timerSoundPlayer";
-import { requestNotificationPermission } from "@/timer/utils/browserNotification";
+import { requestNotificationPermission } from "@/lib/browserNotification";
 import { useQueryClient } from "@tanstack/react-query";
 import { timerQueryKey } from "../queries/useTimerQueryData";
 import { timerSuggestionQueryKey } from "../queries/useTimerSuggestionQueryData";
