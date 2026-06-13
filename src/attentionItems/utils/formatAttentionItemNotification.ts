@@ -15,6 +15,7 @@ const TITLE_BY_TYPE: Record<AttentionItemType, string> = {
   slack_message: "New Slack message",
   whatsapp_message: "New WhatsApp message",
   suggested_timeblock: "Suggested timeblock",
+  task: "New task",
   suggested_task: "Suggested task",
 };
 
@@ -26,9 +27,18 @@ export function formatAttentionItemNotification(
   item: AttentionItemDto,
 ): AttentionNotificationContent {
   const title = TITLE_BY_TYPE[item.type] ?? "New item needs attention";
-  const raw =
-    item.metadata.type === "tagged_message"
-      ? item.metadata.content
-      : (item.note ?? "");
+  const raw = bodyText(item);
   return { title, body: htmlToPreview(raw, MAX_BODY) };
+}
+
+function bodyText(item: AttentionItemDto): string {
+  switch (item.metadata.type) {
+    case "tagged_message":
+      return item.metadata.content;
+    case "task":
+    case "suggested_task":
+      return item.metadata.title;
+    default:
+      return item.note ?? "";
+  }
 }

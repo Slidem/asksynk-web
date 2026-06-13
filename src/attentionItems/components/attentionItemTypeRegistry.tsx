@@ -1,15 +1,24 @@
 import type { ComponentType } from "react";
-import { IconBell, IconMessage } from "@tabler/icons-react";
+import {
+  IconBell,
+  IconChecklist,
+  IconClipboardCheck,
+  IconMessage,
+} from "@tabler/icons-react";
 
 import type {
   AttentionItemDto,
   AttentionItemMetadata,
   AttentionItemType,
+  SuggestedTaskMetadata,
   TaggedMessageMetadata,
+  TaskMetadata,
 } from "@/attentionItems/models/attentionItem";
 import { htmlToPreview } from "@/lib/htmlToPreview";
 
+import { SuggestedTaskBody } from "./bodies/SuggestedTaskBody";
 import { TaggedMessageBody } from "./bodies/TaggedMessageBody";
+import { TaskBody } from "./bodies/TaskBody";
 import { UnknownTypeBody } from "./bodies/UnknownTypeBody";
 
 type IconComponent = ComponentType<{ size?: number | string }>;
@@ -28,6 +37,7 @@ const TYPE_LABELS: Record<AttentionItemType, string> = {
   slack_message: "Slack message",
   whatsapp_message: "WhatsApp message",
   suggested_timeblock: "Suggested timeblock",
+  task: "Task",
   suggested_task: "Suggested task",
 };
 
@@ -35,6 +45,18 @@ const TAGGED_MESSAGE_CONFIG: AttentionItemTypeConfig<TaggedMessageMetadata> = {
   Icon: IconMessage,
   Body: TaggedMessageBody,
   getDisplayTitle: (m) => htmlToPreview(m.content, 80) || "Empty message",
+};
+
+const TASK_CONFIG: AttentionItemTypeConfig<TaskMetadata> = {
+  Icon: IconChecklist,
+  Body: TaskBody,
+  getDisplayTitle: (m) => m.title || "Task",
+};
+
+const SUGGESTED_TASK_CONFIG: AttentionItemTypeConfig<SuggestedTaskMetadata> = {
+  Icon: IconClipboardCheck,
+  Body: SuggestedTaskBody,
+  getDisplayTitle: (m) => m.title || "Suggested task",
 };
 
 const UNKNOWN_CONFIG: AttentionItemTypeConfig = {
@@ -48,6 +70,8 @@ const REGISTRY: Partial<
   Record<AttentionItemType, AttentionItemTypeConfig<any>>
 > = {
   tagged_message: TAGGED_MESSAGE_CONFIG,
+  task: TASK_CONFIG,
+  suggested_task: SUGGESTED_TASK_CONFIG,
 };
 
 export function getAttentionItemConfig(

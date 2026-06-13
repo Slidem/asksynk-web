@@ -114,9 +114,28 @@ export function useAttentionItemsEngine() {
       );
     }
 
+    // Status/field change on an existing item (e.g. a task moved to
+    // in_progress/resolved, or a suggestion accepted). Resolved items are
+    // terminal → drop them from the active inbox; otherwise replace in place.
+    // Silent: no re-alert on update.
+    const handleUpdated = ({ item }: { item: AttentionItemDto }) => {
+      queryClient.setQueriesData<AttentionItemDto[]>(
+        { queryKey: [ATTENTION_ITEMS_KEY_PREFIX] },
+        (current) => {
+          if (!current) return current;
+          if (item.status === "resolved") {
+            return current.filter((i) => i.id !== item.id);
+          }
+          return current.map((i) => (i.id === item.id ? item : i));
+        },
+      );
+    };
+
     socket.on("attention.created", handleCreated);
+    socket.on("attention.updated", handleUpdated);
     return () => {
       socket.off("attention.created", handleCreated);
+      socket.off("attention.updated", handleUpdated);
     };
   }, [queryClient]);
 }

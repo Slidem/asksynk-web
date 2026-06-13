@@ -16,6 +16,7 @@ import { Route as AuthenticatedRouteImport } from "./routes/_authenticated"
 import { Route as IndexRouteImport } from "./routes/index"
 import { Route as PublicSlugRouteImport } from "./routes/public.$slug"
 import { Route as AuthenticatedTimerRouteImport } from "./routes/_authenticated/timer"
+import { Route as AuthenticatedTasksRouteImport } from "./routes/_authenticated/tasks"
 import { Route as AuthenticatedTagsRouteImport } from "./routes/_authenticated/tags"
 import { Route as AuthenticatedSettingsRouteImport } from "./routes/_authenticated/settings"
 import { Route as AuthenticatedScheduleRouteImport } from "./routes/_authenticated/schedule"
@@ -60,6 +61,11 @@ const PublicSlugRoute = PublicSlugRouteImport.update({
 const AuthenticatedTimerRoute = AuthenticatedTimerRouteImport.update({
   id: "/timer",
   path: "/timer",
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
+  id: "/tasks",
+  path: "/tasks",
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedTagsRoute = AuthenticatedTagsRouteImport.update({
@@ -136,6 +142,7 @@ export interface FileRoutesByFullPath {
   "/schedule": typeof AuthenticatedScheduleRoute
   "/settings": typeof AuthenticatedSettingsRoute
   "/tags": typeof AuthenticatedTagsRoute
+  "/tasks": typeof AuthenticatedTasksRoute
   "/timer": typeof AuthenticatedTimerRoute
   "/public/$slug": typeof PublicSlugRoute
   "/invites/$inviteId": typeof AuthenticatedInvitesInviteIdRoute
@@ -154,6 +161,7 @@ export interface FileRoutesByTo {
   "/schedule": typeof AuthenticatedScheduleRoute
   "/settings": typeof AuthenticatedSettingsRoute
   "/tags": typeof AuthenticatedTagsRoute
+  "/tasks": typeof AuthenticatedTasksRoute
   "/timer": typeof AuthenticatedTimerRoute
   "/public/$slug": typeof PublicSlugRoute
   "/invites/$inviteId": typeof AuthenticatedInvitesInviteIdRoute
@@ -175,6 +183,7 @@ export interface FileRoutesById {
   "/_authenticated/schedule": typeof AuthenticatedScheduleRoute
   "/_authenticated/settings": typeof AuthenticatedSettingsRoute
   "/_authenticated/tags": typeof AuthenticatedTagsRoute
+  "/_authenticated/tasks": typeof AuthenticatedTasksRoute
   "/_authenticated/timer": typeof AuthenticatedTimerRoute
   "/public/$slug": typeof PublicSlugRoute
   "/_authenticated/invites/$inviteId": typeof AuthenticatedInvitesInviteIdRoute
@@ -196,6 +205,7 @@ export interface FileRouteTypes {
     | "/schedule"
     | "/settings"
     | "/tags"
+    | "/tasks"
     | "/timer"
     | "/public/$slug"
     | "/invites/$inviteId"
@@ -214,6 +224,7 @@ export interface FileRouteTypes {
     | "/schedule"
     | "/settings"
     | "/tags"
+    | "/tasks"
     | "/timer"
     | "/public/$slug"
     | "/invites/$inviteId"
@@ -234,6 +245,7 @@ export interface FileRouteTypes {
     | "/_authenticated/schedule"
     | "/_authenticated/settings"
     | "/_authenticated/tags"
+    | "/_authenticated/tasks"
     | "/_authenticated/timer"
     | "/public/$slug"
     | "/_authenticated/invites/$inviteId"
@@ -299,6 +311,13 @@ declare module "@tanstack/react-router" {
       path: "/timer"
       fullPath: "/timer"
       preLoaderRoute: typeof AuthenticatedTimerRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    "/_authenticated/tasks": {
+      id: "/_authenticated/tasks"
+      path: "/tasks"
+      fullPath: "/tasks"
+      preLoaderRoute: typeof AuthenticatedTasksRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     "/_authenticated/tags": {
@@ -405,6 +424,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedScheduleRoute: typeof AuthenticatedScheduleRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTagsRoute: typeof AuthenticatedTagsRoute
+  AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
   AuthenticatedTimerRoute: typeof AuthenticatedTimerRoute
   AuthenticatedInvitesInviteIdRoute: typeof AuthenticatedInvitesInviteIdRoute
 }
@@ -418,6 +438,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedScheduleRoute: AuthenticatedScheduleRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTagsRoute: AuthenticatedTagsRoute,
+  AuthenticatedTasksRoute: AuthenticatedTasksRoute,
   AuthenticatedTimerRoute: AuthenticatedTimerRoute,
   AuthenticatedInvitesInviteIdRoute: AuthenticatedInvitesInviteIdRoute,
 }

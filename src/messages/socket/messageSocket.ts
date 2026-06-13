@@ -24,6 +24,7 @@ interface ServerToClient {
   "message.created": (payload: { threadId: string; message: Message }) => void;
   "message.updated": (payload: { threadId: string; message: Message }) => void;
   "attention.created": (payload: { item: AttentionItemDto }) => void;
+  "attention.updated": (payload: { item: AttentionItemDto }) => void;
   "timer.completed": (payload: TimerCompletedEvent) => void;
 }
 

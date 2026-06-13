@@ -1,6 +1,7 @@
 import { Center, Menu, Stack, Text, Tooltip, UnstyledButton } from "@mantine/core";
 import {
   IconCalendar,
+  IconChecklist,
   IconClock,
   IconDashboard,
   IconMessage,
@@ -46,6 +47,7 @@ const navItems = [
   { icon: IconDashboard, label: "Dashboard", to: "/dashboard" },
   { icon: IconCalendar, label: "Schedule", to: "/schedule" },
   { icon: IconClock, label: "Timer", to: "/timer" },
+  { icon: IconChecklist, label: "Tasks", to: "/tasks" },
   { icon: IconTags, label: "Tags", to: "/tags" },
   { icon: IconPlugConnected, label: "Integrations", to: "/integrations" },
   { icon: IconMessage, label: "Messages", to: "/messages" },

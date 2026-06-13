@@ -6,6 +6,7 @@ export type AttentionItemType =
   | "slack_message"
   | "whatsapp_message"
   | "suggested_timeblock"
+  | "task"
   | "suggested_task";
 
 export interface TaggedMessageMetadata {
@@ -18,12 +19,31 @@ export interface TaggedMessageMetadata {
   originalTagIds: string[];
 }
 
+export interface TaskMetadata {
+  type: "task";
+  title: string;
+  taskId?: string;
+  taskBatchId?: string;
+}
+
+export interface SuggestedTaskMetadata {
+  type: "suggested_task";
+  suggestionId: string;
+  suggesterUserId: string;
+  title: string;
+}
+
 export interface UnknownAttentionItemMetadata {
-  type: Exclude<AttentionItemType, "tagged_message">;
+  type: Exclude<
+    AttentionItemType,
+    "tagged_message" | "task" | "suggested_task"
+  >;
 }
 
 export type AttentionItemMetadata =
   | TaggedMessageMetadata
+  | TaskMetadata
+  | SuggestedTaskMetadata
   | UnknownAttentionItemMetadata;
 
 export interface AttentionItemDto {
