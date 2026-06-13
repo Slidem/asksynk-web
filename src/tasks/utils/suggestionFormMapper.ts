@@ -1,11 +1,11 @@
 import { toISOStringWithTimezone } from "@/lib/date";
 import type { SuggestionFormValues } from "@/tasks/models/taskForm";
 import type {
-  SuggestionTaskChild,
   TaskSuggestionCreateInput,
   TaskSuggestionCreatePayload,
   TaskSuggestionPayloadEditInput,
 } from "@/tasks/models/taskSuggestion";
+import { taskChildFormToInput } from "@/tasks/utils/taskChildMapper";
 
 export function suggestionFormValuesToCreateInput(
   values: SuggestionFormValues,
@@ -24,7 +24,7 @@ export function suggestionFormValuesToCreateInput(
     payload.dueDate = toISOStringWithTimezone(new Date(values.dueDate));
   }
   if (values.kind === "batch") {
-    payload.tasks = values.tasks.map(toChildInput);
+    payload.tasks = values.tasks.map(taskChildFormToInput);
   }
 
   return { suggesteeUserId: values.suggesteeUserId, payload };
@@ -45,19 +45,8 @@ export function suggestionFormValuesToPayloadEditInput(
   };
 
   if (values.kind === "batch") {
-    input.tasks = values.tasks.map(toChildInput);
+    input.tasks = values.tasks.map(taskChildFormToInput);
   }
 
   return input;
-}
-
-function toChildInput(
-  child: SuggestionFormValues["tasks"][number],
-): SuggestionTaskChild {
-  const item: SuggestionTaskChild = { title: child.title.trim() };
-  const description = child.description.trim();
-  if (description) {
-    item.description = description;
-  }
-  return item;
 }

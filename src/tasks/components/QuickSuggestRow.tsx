@@ -1,18 +1,19 @@
-import { ActionIcon, Group, Paper, Select, TextInput } from "@mantine/core";
+import { ActionIcon, Group, TextInput } from "@mantine/core";
 import { IconSend } from "@tabler/icons-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
-import { getConnectionDisplayName } from "@/lib/connections";
-import { useNetworkConnectionsQuery } from "@/network/hooks/queries/useNetworkConnectionsQuery";
+import { ConnectionPicker } from "@/network/components/ConnectionPicker";
+import { QuickAddShell } from "@/tasks/components/QuickAddShell";
 import { useCreateTaskSuggestion } from "@/tasks/hooks/mutations/useCreateTaskSuggestion";
 
-// Inline quick-suggest: recipient + title; the full dialog covers the rest.
+// Collapsed "+ Suggest a task" trigger that reveals an inline recipient + title
+// suggest; the full dialog covers description/tags/batch.
 export function QuickSuggestRow() {
-  const { data: connections = [] } = useNetworkConnectionsQuery();
   const { createTaskSuggestion, isCreating } = useCreateTaskSuggestion();
 
   const [suggesteeUserId, setSuggesteeUserId] = useState<string | null>(null);
   const [title, setTitle] = useState("");
+  const titleRef = useRef<HTMLInputElement>(null);
 
   const canSubmit = Boolean(suggesteeUserId) && title.trim().length > 0;
 
@@ -23,26 +24,22 @@ export function QuickSuggestRow() {
       payload: { kind: "task", title: title.trim() },
     });
     setTitle("");
+    titleRef.current?.focus();
   };
 
-  const connectionOptions = connections.map((connection) => ({
-    value: connection.userId,
-    label: getConnectionDisplayName(connection),
-  }));
-
   return (
-    <Paper withBorder radius="md" p="xs">
-      <Group gap="xs" wrap="nowrap">
-        <Select
-          placeholder="Suggest to..."
-          size="xs"
-          w={200}
-          data={connectionOptions}
+    <QuickAddShell label="Suggest a task">
+      <Group gap="xs" wrap="nowrap" align="center">
+        <ConnectionPicker
           value={suggesteeUserId}
           onChange={setSuggesteeUserId}
-          searchable
+          placeholder="Suggest to..."
+          size="xs"
+          w={220}
         />
         <TextInput
+          ref={titleRef}
+          autoFocus
           placeholder="Quick suggest a task..."
           size="xs"
           value={title}
@@ -64,6 +61,6 @@ export function QuickSuggestRow() {
           <IconSend size={14} />
         </ActionIcon>
       </Group>
-    </Paper>
+    </QuickAddShell>
   );
 }

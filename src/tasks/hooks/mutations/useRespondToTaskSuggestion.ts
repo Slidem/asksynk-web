@@ -4,9 +4,10 @@ import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 // Accept/reject a received suggestion. Accept materializes real tasks assigned
-// to the recipient and resolves the inbox item server-side; the resolved item
-// also arrives via `attention.updated`, so the attention invalidate is a
-// belt-and-suspenders fallback.
+// to the recipient and resolves the suggestion's inbox item server-side; both
+// land via `attention.upserted` (eventually consistent — shortly after this
+// REST call returns), so the attention invalidate is a belt-and-suspenders
+// fallback.
 export function useRespondToTaskSuggestion() {
   const queryClient = useQueryClient();
   const mutation = useMutation({

@@ -4,28 +4,33 @@ import {
   Input,
   Modal,
   SegmentedControl,
-  Select,
   Stack,
   Text,
   Textarea,
   TextInput,
 } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
+import {
+  IconAlignLeft,
+  IconCalendarEvent,
+  IconForms,
+  IconTag,
+} from "@tabler/icons-react";
 import { useState } from "react";
 
-import { getConnectionDisplayName } from "@/lib/connections";
+import { ConnectionPicker } from "@/network/components/ConnectionPicker";
 import { useNetworkConnectionsQuery } from "@/network/hooks/queries/useNetworkConnectionsQuery";
 import { UserTagPicker } from "@/tags/components/UserTagPicker";
-import { SuggestionChildrenEditor } from "@/tasks/components/SuggestionChildrenEditor";
+import { TaskChildrenEditor } from "@/tasks/components/TaskChildrenEditor";
 import {
   useCreateTaskSuggestionDialogHandlers,
   useIsCreateTaskSuggestionDialogOpened,
 } from "@/tasks/hooks/dialogs/createTaskSuggestionDialogHooks";
 import { useCreateTaskSuggestion } from "@/tasks/hooks/mutations/useCreateTaskSuggestion";
 import {
-  makeEmptySuggestionChild,
-  type SuggestionChildFormValues,
+  makeEmptyTaskChild,
   type SuggestionFormValues,
+  type TaskChildFormValues,
 } from "@/tasks/models/taskForm";
 import type { SuggestionKind } from "@/tasks/models/taskSuggestion";
 import { suggestionFormValuesToCreateInput } from "@/tasks/utils/suggestionFormMapper";
@@ -42,8 +47,8 @@ export function TaskSuggestionCreateDialog() {
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [tagIds, setTagIds] = useState<string[]>([]);
-  const [children, setChildren] = useState<SuggestionChildFormValues[]>([
-    makeEmptySuggestionChild(),
+  const [children, setChildren] = useState<TaskChildFormValues[]>([
+    makeEmptyTaskChild(),
   ]);
 
   const reset = () => {
@@ -53,7 +58,7 @@ export function TaskSuggestionCreateDialog() {
     setDescription("");
     setDueDate(null);
     setTagIds([]);
-    setChildren([makeEmptySuggestionChild()]);
+    setChildren([makeEmptyTaskChild()]);
   };
 
   const handleClose = () => {
@@ -88,11 +93,6 @@ export function TaskSuggestionCreateDialog() {
     handleClose();
   };
 
-  const connectionOptions = connections.map((connection) => ({
-    value: connection.userId,
-    label: getConnectionDisplayName(connection),
-  }));
-
   return (
     <Modal
       opened={isOpened}
@@ -101,14 +101,12 @@ export function TaskSuggestionCreateDialog() {
       size="lg"
     >
       <Stack gap="sm">
-        <Select
+        <ConnectionPicker
           label="Suggest to"
           placeholder="Pick a connection"
           withAsterisk
-          data={connectionOptions}
           value={suggesteeUserId}
           onChange={handleSuggesteeChange}
-          searchable
         />
 
         <SegmentedControl
@@ -123,6 +121,7 @@ export function TaskSuggestionCreateDialog() {
         <TextInput
           label="Title"
           withAsterisk
+          leftSection={<IconForms size={16} />}
           value={title}
           onChange={(e) => setTitle(e.currentTarget.value)}
         />
@@ -130,6 +129,7 @@ export function TaskSuggestionCreateDialog() {
           label="Description"
           autosize
           minRows={2}
+          leftSection={<IconAlignLeft size={16} />}
           value={description}
           onChange={(e) => setDescription(e.currentTarget.value)}
         />
@@ -137,12 +137,18 @@ export function TaskSuggestionCreateDialog() {
         <DateTimePicker
           label={kind === "batch" ? "Due date (whole batch)" : "Due date"}
           clearable
+          leftSection={<IconCalendarEvent size={16} />}
           value={dueDate}
           onChange={(value) => setDueDate(value ? new Date(value) : null)}
         />
 
         <Input.Wrapper
-          label="Their tags"
+          label={
+            <Group gap={4} component="span">
+              <IconTag size={14} />
+              Their tags
+            </Group>
+          }
           description={
             suggesteeUserId
               ? "Hints show their approximate answer time per tag"
@@ -158,13 +164,10 @@ export function TaskSuggestionCreateDialog() {
         </Input.Wrapper>
 
         {kind === "batch" && (
-          <SuggestionChildrenEditor
-            children_={children}
-            onChange={setChildren}
-          />
+          <TaskChildrenEditor items={children} onChange={setChildren} />
         )}
 
-        {connectionOptions.length === 0 && (
+        {connections.length === 0 && (
           <Text size="xs" c="dimmed">
             Connect with someone in your network to suggest tasks.
           </Text>

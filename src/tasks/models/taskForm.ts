@@ -18,9 +18,15 @@ export const DEFAULT_TASK_FORM_VALUES: TaskFormValues = {
   tagIds: [],
 };
 
-export interface BatchChildFormValues {
+// Shared child-row shape for batch creation AND batch suggestion: a title plus
+// an optional description. Tags and dueDate live at the batch/suggestion level.
+export interface TaskChildFormValues {
   title: string;
   description: string;
+}
+
+export function makeEmptyTaskChild(): TaskChildFormValues {
+  return { title: "", description: "" };
 }
 
 export interface BatchFormValues {
@@ -28,11 +34,7 @@ export interface BatchFormValues {
   description: string;
   dueDate: Date | null;
   tagIds: string[];
-  tasks: BatchChildFormValues[];
-}
-
-export function makeEmptyBatchChild(): BatchChildFormValues {
-  return { title: "", description: "" };
+  tasks: TaskChildFormValues[];
 }
 
 export const DEFAULT_BATCH_FORM_VALUES: BatchFormValues = {
@@ -40,13 +42,8 @@ export const DEFAULT_BATCH_FORM_VALUES: BatchFormValues = {
   description: "",
   dueDate: null,
   tagIds: [],
-  tasks: [makeEmptyBatchChild()],
+  tasks: [makeEmptyTaskChild()],
 };
-
-export interface SuggestionChildFormValues {
-  title: string;
-  description: string;
-}
 
 export interface SuggestionFormValues {
   suggesteeUserId: string;
@@ -55,11 +52,7 @@ export interface SuggestionFormValues {
   description: string;
   dueDate: Date | null;
   tagIds: string[];
-  tasks: SuggestionChildFormValues[]; // batch kind only
-}
-
-export function makeEmptySuggestionChild(): SuggestionChildFormValues {
-  return { title: "", description: "" };
+  tasks: TaskChildFormValues[]; // batch kind only
 }
 
 export const DEFAULT_SUGGESTION_FORM_VALUES: SuggestionFormValues = {
@@ -69,5 +62,5 @@ export const DEFAULT_SUGGESTION_FORM_VALUES: SuggestionFormValues = {
   description: "",
   dueDate: null,
   tagIds: [],
-  tasks: [makeEmptySuggestionChild()],
+  tasks: [makeEmptyTaskChild()],
 };

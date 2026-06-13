@@ -1,6 +1,7 @@
 import {
+  Badge,
   Button,
-  Divider,
+  Fieldset,
   Group,
   Input,
   Modal,
@@ -12,7 +13,14 @@ import {
   TextInput,
 } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
-import { IconPlus } from "@tabler/icons-react";
+import {
+  IconAlignLeft,
+  IconCalendarEvent,
+  IconListCheck,
+  IconPlus,
+  IconStack2,
+  IconTag,
+} from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 
 import { toISOStringWithTimezone } from "@/lib/date";
@@ -97,6 +105,7 @@ export function TaskBatchDetailDialog() {
         <TextInput
           label="Batch title"
           withAsterisk
+          leftSection={<IconStack2 size={16} />}
           value={title}
           onChange={(e) => setTitle(e.currentTarget.value)}
         />
@@ -104,51 +113,80 @@ export function TaskBatchDetailDialog() {
           label="Description"
           autosize
           minRows={2}
+          leftSection={<IconAlignLeft size={16} />}
           value={description}
           onChange={(e) => setDescription(e.currentTarget.value)}
         />
         <DateTimePicker
           label="Due date"
           clearable
+          leftSection={<IconCalendarEvent size={16} />}
           value={dueDate}
           onChange={(value) => setDueDate(value ? new Date(value) : null)}
         />
-        <Input.Wrapper label="Tags (applied to the whole batch)">
+        <Input.Wrapper
+          label={
+            <Group gap={4} component="span">
+              <IconTag size={14} />
+              Tags (applied to the whole batch)
+            </Group>
+          }
+        >
           <UserTagPicker selectedTagIds={tagIds} onChange={setTagIds} />
         </Input.Wrapper>
 
-        <Divider label="Tasks" labelPosition="left" />
-
-        {children.map((task) => (
-          <Paper key={task.id} withBorder radius="md" p="sm">
-            <Group justify="space-between" wrap="nowrap" gap="sm">
-              <Text size="sm" style={{ minWidth: 0 }} truncate>
-                {task.title}
+        <Fieldset
+          variant="filled"
+          radius="md"
+          legend={
+            <Group gap="xs">
+              <IconListCheck size={16} />
+              <Text span size="sm" fw={500}>
+                Tasks
               </Text>
-              <Select
-                size="xs"
-                w={140}
-                data={STATUS_OPTIONS}
-                allowDeselect={false}
-                value={task.status}
-                onChange={(value) => {
-                  if (value && value !== task.status) {
-                    moveTaskStatus({ id: task.id, status: value as TaskStatus });
-                  }
-                }}
-              />
+              <Badge size="sm" variant="light" color="gray">
+                {children.length}
+              </Badge>
             </Group>
-          </Paper>
-        ))}
-
-        <Button
-          variant="subtle"
-          size="xs"
-          leftSection={<IconPlus size={14} />}
-          onClick={() => batchId && openCreateTask(batchId)}
+          }
         >
-          Add task
-        </Button>
+          <Stack gap="xs">
+            {children.map((task) => (
+              <Paper key={task.id} withBorder radius="md" p="sm">
+                <Group justify="space-between" wrap="nowrap" gap="sm">
+                  <Text size="sm" style={{ minWidth: 0 }} truncate>
+                    {task.title}
+                  </Text>
+                  <Select
+                    size="xs"
+                    w={140}
+                    data={STATUS_OPTIONS}
+                    allowDeselect={false}
+                    value={task.status}
+                    onChange={(value) => {
+                      if (value && value !== task.status) {
+                        moveTaskStatus({
+                          id: task.id,
+                          status: value as TaskStatus,
+                        });
+                      }
+                    }}
+                  />
+                </Group>
+              </Paper>
+            ))}
+
+            <Button
+              variant="light"
+              size="xs"
+              leftSection={<IconPlus size={14} />}
+              onClick={() => batchId && openCreateTask(batchId)}
+              style={{ alignSelf: "flex-start" }}
+            >
+              Add task
+            </Button>
+          </Stack>
+        </Fieldset>
 
         <Group justify="flex-end" mt="sm">
           <Button variant="default" onClick={close}>

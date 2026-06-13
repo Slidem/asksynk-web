@@ -9,10 +9,16 @@ import {
   TextInput,
 } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
+import {
+  IconAlignLeft,
+  IconCalendarEvent,
+  IconForms,
+  IconTag,
+} from "@tabler/icons-react";
 import { useState } from "react";
 
 import { UserTagPicker } from "@/tags/components/UserTagPicker";
-import { SuggestionChildrenEditor } from "@/tasks/components/SuggestionChildrenEditor";
+import { TaskChildrenEditor } from "@/tasks/components/TaskChildrenEditor";
 import {
   useEditTaskSuggestionDialogHandlers,
   useIsEditTaskSuggestionDialogOpened,
@@ -21,9 +27,9 @@ import {
 } from "@/tasks/hooks/dialogs/editTaskSuggestionDialogHooks";
 import { useEditTaskSuggestion } from "@/tasks/hooks/mutations/useEditTaskSuggestion";
 import {
-  makeEmptySuggestionChild,
-  type SuggestionChildFormValues,
+  makeEmptyTaskChild,
   type SuggestionFormValues,
+  type TaskChildFormValues,
 } from "@/tasks/models/taskForm";
 import { suggestionFormValuesToPayloadEditInput } from "@/tasks/utils/suggestionFormMapper";
 
@@ -38,8 +44,8 @@ export function TaskSuggestionEditDialog() {
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [tagIds, setTagIds] = useState<string[]>([]);
-  const [children, setChildren] = useState<SuggestionChildFormValues[]>([
-    makeEmptySuggestionChild(),
+  const [children, setChildren] = useState<TaskChildFormValues[]>([
+    makeEmptyTaskChild(),
   ]);
 
   useOnSelectedEditSuggestionChange((selected) => {
@@ -55,7 +61,7 @@ export function TaskSuggestionEditDialog() {
             title: t.title,
             description: t.description ?? "",
           }))
-        : [makeEmptySuggestionChild()],
+        : [makeEmptyTaskChild()],
     );
   });
 
@@ -103,6 +109,7 @@ export function TaskSuggestionEditDialog() {
         <TextInput
           label="Title"
           withAsterisk
+          leftSection={<IconForms size={16} />}
           value={title}
           onChange={(e) => setTitle(e.currentTarget.value)}
         />
@@ -110,18 +117,25 @@ export function TaskSuggestionEditDialog() {
           label="Description"
           autosize
           minRows={2}
+          leftSection={<IconAlignLeft size={16} />}
           value={description}
           onChange={(e) => setDescription(e.currentTarget.value)}
         />
         <DateTimePicker
           label={kind === "batch" ? "Due date (whole batch)" : "Due date"}
           clearable
+          leftSection={<IconCalendarEvent size={16} />}
           value={dueDate}
           onChange={(value) => setDueDate(value ? new Date(value) : null)}
         />
 
         <Input.Wrapper
-          label="Tags"
+          label={
+            <Group gap={4} component="span">
+              <IconTag size={14} />
+              Tags
+            </Group>
+          }
           description="Tags come from the assignee's tag list"
         >
           <UserTagPicker
@@ -132,10 +146,7 @@ export function TaskSuggestionEditDialog() {
         </Input.Wrapper>
 
         {kind === "batch" && (
-          <SuggestionChildrenEditor
-            children_={children}
-            onChange={setChildren}
-          />
+          <TaskChildrenEditor items={children} onChange={setChildren} />
         )}
 
         <Group justify="flex-end" mt="sm">

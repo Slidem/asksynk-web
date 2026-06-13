@@ -23,8 +23,8 @@ export interface TagMessageAck {
 interface ServerToClient {
   "message.created": (payload: { threadId: string; message: Message }) => void;
   "message.updated": (payload: { threadId: string; message: Message }) => void;
-  "attention.created": (payload: { item: AttentionItemDto }) => void;
-  "attention.updated": (payload: { item: AttentionItemDto }) => void;
+  "attention.upserted": (payload: { item: AttentionItemDto }) => void;
+  "attention.removed": (payload: { id: string }) => void;
   "timer.completed": (payload: TimerCompletedEvent) => void;
 }
 

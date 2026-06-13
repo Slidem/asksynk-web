@@ -1,15 +1,17 @@
-import { ActionIcon, Group, Paper, Stack, TextInput } from "@mantine/core";
+import { ActionIcon, Group, Stack, TextInput } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
+import { QuickAddShell } from "@/tasks/components/QuickAddShell";
 import { UserTagPicker } from "@/tags/components/UserTagPicker";
 import { useCreateTask } from "@/tasks/hooks/mutations/useCreateTask";
 
-// Inline quick-create in the "To do" column: title + tags only.
+// Collapsed "+ Add task" trigger that reveals an inline title + tags create.
 export function QuickAddTaskCard() {
   const { createTask, isCreating } = useCreateTask();
   const [title, setTitle] = useState("");
   const [tagIds, setTagIds] = useState<string[]>([]);
+  const titleRef = useRef<HTMLInputElement>(null);
 
   const canSubmit = title.trim().length > 0;
 
@@ -18,13 +20,16 @@ export function QuickAddTaskCard() {
     createTask({ title: title.trim(), tagIds });
     setTitle("");
     setTagIds([]);
+    titleRef.current?.focus();
   };
 
   return (
-    <Paper withBorder radius="md" p="xs" bg="var(--mantine-color-gray-0)">
+    <QuickAddShell label="Add task">
       <Stack gap="xs">
         <Group gap="xs" wrap="nowrap">
           <TextInput
+            ref={titleRef}
+            autoFocus
             placeholder="Quick add a task..."
             size="xs"
             value={title}
@@ -48,6 +53,6 @@ export function QuickAddTaskCard() {
         </Group>
         <UserTagPicker selectedTagIds={tagIds} onChange={setTagIds} />
       </Stack>
-    </Paper>
+    </QuickAddShell>
   );
 }

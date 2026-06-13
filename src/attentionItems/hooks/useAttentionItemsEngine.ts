@@ -2,8 +2,14 @@ import { connectMessageSocket } from "@/messages/socket/messageSocket";
 import { useSession } from "@/auth";
 import type { AttentionItemDto } from "@/attentionItems/models/attentionItem";
 import { useTagAnswerModeMap } from "@/attentionItems/hooks/useTagAnswerModeMap";
-import { playNotificationSound, preloadNotificationSound } from "@/attentionItems/sounds/attentionSoundPlayer";
-import { findCurrentTimeblock, todayRange } from "@/attentionItems/utils/currentTimeblock";
+import {
+  playNotificationSound,
+  preloadNotificationSound,
+} from "@/attentionItems/sounds/attentionSoundPlayer";
+import {
+  findCurrentTimeblock,
+  todayRange,
+} from "@/attentionItems/utils/currentTimeblock";
 import { formatAttentionItemNotification } from "@/attentionItems/utils/formatAttentionItemNotification";
 import { mergeTagNotificationSettings } from "@/attentionItems/utils/mergeTagNotificationSettings";
 import { shouldNotifyAttentionItem } from "@/attentionItems/utils/tagModePredicates";
@@ -24,11 +30,14 @@ function buildTagMap(tags: TagDto[]): Map<string, TagDto> {
 }
 
 /**
- * Single global engine for incoming attention items: listens for the
- * `attention.created` socket event and prepends the item to the list cache so
- * the dashboard updates live. Alerts are gated by `shouldNotifyAttentionItem`
+ * Single global engine for incoming attention items. Attention items are
+ * eventually consistent: task/batch/suggestion REST calls return before the
+ * item exists, then it lands via socket. `attention.upserted` covers create
+ * and update (keyed by id) — we upsert it into the list cache so the dashboard
+ * updates live; `attention.removed` drops it by id. Alerts fire only the first
+ * time we see an item (updates are silent), gated by `shouldNotifyAttentionItem`
  * (urgent tags always; timeblock tags only when in the active timeblock), then
- * fired via the most-permissive browser/sound settings across the item's tags.
+ * via the most-permissive browser/sound settings across the item's tags.
  */
 export function useAttentionItemsEngine() {
   const queryClient = useQueryClient();
@@ -66,8 +75,12 @@ export function useAttentionItemsEngine() {
   useEffect(() => {
     const socket = connectMessageSocket();
 
-    const handleCreated = ({ item }: { item: AttentionItemDto }) => {
-      prependToCaches(item);
+    const handleUpserted = ({ item }: { item: AttentionItemDto }) => {
+      const isNew = upsertIntoCaches(item);
+
+      // Alert only on first appearance; updates (re-upserts) and resolved
+      // (terminal) items are silent.
+      if (!isNew || item.status === "resolved") return;
 
       // Timing gate: urgent tags alert immediately; timeblock tags only when
       // the item fits the active timeblock. Otherwise insert-only (no alert).
@@ -103,39 +116,41 @@ export function useAttentionItemsEngine() {
       }
     };
 
-    function prependToCaches(item: AttentionItemDto) {
+    // Upsert by id: replace in place if present, else prepend. Resolved items
+    // stay in the cache (they surface in the "Resolved" bucket); removal is a
+    // separate `attention.removed` event. Returns true if newly inserted.
+    function upsertIntoCaches(item: AttentionItemDto): boolean {
+      let inserted = false;
       queryClient.setQueriesData<AttentionItemDto[]>(
         { queryKey: [ATTENTION_ITEMS_KEY_PREFIX] },
         (current) => {
           if (!current) return current;
-          if (current.some((i) => i.id === item.id)) return current;
-          return [item, ...current];
+          const idx = current.findIndex((i) => i.id === item.id);
+          if (idx === -1) {
+            inserted = true;
+            return [item, ...current];
+          }
+          const next = [...current];
+          next[idx] = item;
+          return next;
         },
       );
+      return inserted;
     }
 
-    // Status/field change on an existing item (e.g. a task moved to
-    // in_progress/resolved, or a suggestion accepted). Resolved items are
-    // terminal → drop them from the active inbox; otherwise replace in place.
-    // Silent: no re-alert on update.
-    const handleUpdated = ({ item }: { item: AttentionItemDto }) => {
+    // Item deleted/rescinded server-side (e.g. task or suggestion removed).
+    const handleRemoved = ({ id }: { id: string }) => {
       queryClient.setQueriesData<AttentionItemDto[]>(
         { queryKey: [ATTENTION_ITEMS_KEY_PREFIX] },
-        (current) => {
-          if (!current) return current;
-          if (item.status === "resolved") {
-            return current.filter((i) => i.id !== item.id);
-          }
-          return current.map((i) => (i.id === item.id ? item : i));
-        },
+        (current) => (current ? current.filter((i) => i.id !== id) : current),
       );
     };
 
-    socket.on("attention.created", handleCreated);
-    socket.on("attention.updated", handleUpdated);
+    socket.on("attention.upserted", handleUpserted);
+    socket.on("attention.removed", handleRemoved);
     return () => {
-      socket.off("attention.created", handleCreated);
-      socket.off("attention.updated", handleUpdated);
+      socket.off("attention.upserted", handleUpserted);
+      socket.off("attention.removed", handleRemoved);
     };
   }, [queryClient]);
 }
