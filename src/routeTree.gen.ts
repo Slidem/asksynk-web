@@ -26,8 +26,10 @@ import { Route as AuthenticatedMessagesRouteImport } from "./routes/_authenticat
 import { Route as AuthenticatedIntegrationsRouteImport } from "./routes/_authenticated/integrations"
 import { Route as AuthenticatedDashboardRouteImport } from "./routes/_authenticated/dashboard"
 import { Route as AuthenticatedMessagesIndexRouteImport } from "./routes/_authenticated/messages/index"
+import { Route as AuthenticatedTaskTaskIdRouteImport } from "./routes/_authenticated/task.$taskId"
 import { Route as AuthenticatedMessagesThreadIdRouteImport } from "./routes/_authenticated/messages/$threadId"
 import { Route as AuthenticatedInvitesInviteIdRouteImport } from "./routes/_authenticated/invites.$inviteId"
+import { Route as AuthenticatedBatchBatchIdRouteImport } from "./routes/_authenticated/batch.$batchId"
 
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
   id: "/verify-email",
@@ -116,6 +118,11 @@ const AuthenticatedMessagesIndexRoute =
     path: "/",
     getParentRoute: () => AuthenticatedMessagesRoute,
   } as any)
+const AuthenticatedTaskTaskIdRoute = AuthenticatedTaskTaskIdRouteImport.update({
+  id: "/task/$taskId",
+  path: "/task/$taskId",
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedMessagesThreadIdRoute =
   AuthenticatedMessagesThreadIdRouteImport.update({
     id: "/$threadId",
@@ -126,6 +133,12 @@ const AuthenticatedInvitesInviteIdRoute =
   AuthenticatedInvitesInviteIdRouteImport.update({
     id: "/invites/$inviteId",
     path: "/invites/$inviteId",
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedBatchBatchIdRoute =
+  AuthenticatedBatchBatchIdRouteImport.update({
+    id: "/batch/$batchId",
+    path: "/batch/$batchId",
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 
@@ -145,8 +158,10 @@ export interface FileRoutesByFullPath {
   "/tasks": typeof AuthenticatedTasksRoute
   "/timer": typeof AuthenticatedTimerRoute
   "/public/$slug": typeof PublicSlugRoute
+  "/batch/$batchId": typeof AuthenticatedBatchBatchIdRoute
   "/invites/$inviteId": typeof AuthenticatedInvitesInviteIdRoute
   "/messages/$threadId": typeof AuthenticatedMessagesThreadIdRoute
+  "/task/$taskId": typeof AuthenticatedTaskTaskIdRoute
   "/messages/": typeof AuthenticatedMessagesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -164,8 +179,10 @@ export interface FileRoutesByTo {
   "/tasks": typeof AuthenticatedTasksRoute
   "/timer": typeof AuthenticatedTimerRoute
   "/public/$slug": typeof PublicSlugRoute
+  "/batch/$batchId": typeof AuthenticatedBatchBatchIdRoute
   "/invites/$inviteId": typeof AuthenticatedInvitesInviteIdRoute
   "/messages/$threadId": typeof AuthenticatedMessagesThreadIdRoute
+  "/task/$taskId": typeof AuthenticatedTaskTaskIdRoute
   "/messages": typeof AuthenticatedMessagesIndexRoute
 }
 export interface FileRoutesById {
@@ -186,8 +203,10 @@ export interface FileRoutesById {
   "/_authenticated/tasks": typeof AuthenticatedTasksRoute
   "/_authenticated/timer": typeof AuthenticatedTimerRoute
   "/public/$slug": typeof PublicSlugRoute
+  "/_authenticated/batch/$batchId": typeof AuthenticatedBatchBatchIdRoute
   "/_authenticated/invites/$inviteId": typeof AuthenticatedInvitesInviteIdRoute
   "/_authenticated/messages/$threadId": typeof AuthenticatedMessagesThreadIdRoute
+  "/_authenticated/task/$taskId": typeof AuthenticatedTaskTaskIdRoute
   "/_authenticated/messages/": typeof AuthenticatedMessagesIndexRoute
 }
 export interface FileRouteTypes {
@@ -208,8 +227,10 @@ export interface FileRouteTypes {
     | "/tasks"
     | "/timer"
     | "/public/$slug"
+    | "/batch/$batchId"
     | "/invites/$inviteId"
     | "/messages/$threadId"
+    | "/task/$taskId"
     | "/messages/"
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -227,8 +248,10 @@ export interface FileRouteTypes {
     | "/tasks"
     | "/timer"
     | "/public/$slug"
+    | "/batch/$batchId"
     | "/invites/$inviteId"
     | "/messages/$threadId"
+    | "/task/$taskId"
     | "/messages"
   id:
     | "__root__"
@@ -248,8 +271,10 @@ export interface FileRouteTypes {
     | "/_authenticated/tasks"
     | "/_authenticated/timer"
     | "/public/$slug"
+    | "/_authenticated/batch/$batchId"
     | "/_authenticated/invites/$inviteId"
     | "/_authenticated/messages/$threadId"
+    | "/_authenticated/task/$taskId"
     | "/_authenticated/messages/"
   fileRoutesById: FileRoutesById
 }
@@ -383,6 +408,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthenticatedMessagesIndexRouteImport
       parentRoute: typeof AuthenticatedMessagesRoute
     }
+    "/_authenticated/task/$taskId": {
+      id: "/_authenticated/task/$taskId"
+      path: "/task/$taskId"
+      fullPath: "/task/$taskId"
+      preLoaderRoute: typeof AuthenticatedTaskTaskIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     "/_authenticated/messages/$threadId": {
       id: "/_authenticated/messages/$threadId"
       path: "/$threadId"
@@ -395,6 +427,13 @@ declare module "@tanstack/react-router" {
       path: "/invites/$inviteId"
       fullPath: "/invites/$inviteId"
       preLoaderRoute: typeof AuthenticatedInvitesInviteIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    "/_authenticated/batch/$batchId": {
+      id: "/_authenticated/batch/$batchId"
+      path: "/batch/$batchId"
+      fullPath: "/batch/$batchId"
+      preLoaderRoute: typeof AuthenticatedBatchBatchIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
   }
@@ -426,7 +465,9 @@ interface AuthenticatedRouteChildren {
   AuthenticatedTagsRoute: typeof AuthenticatedTagsRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
   AuthenticatedTimerRoute: typeof AuthenticatedTimerRoute
+  AuthenticatedBatchBatchIdRoute: typeof AuthenticatedBatchBatchIdRoute
   AuthenticatedInvitesInviteIdRoute: typeof AuthenticatedInvitesInviteIdRoute
+  AuthenticatedTaskTaskIdRoute: typeof AuthenticatedTaskTaskIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -440,7 +481,9 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedTagsRoute: AuthenticatedTagsRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
   AuthenticatedTimerRoute: AuthenticatedTimerRoute,
+  AuthenticatedBatchBatchIdRoute: AuthenticatedBatchBatchIdRoute,
   AuthenticatedInvitesInviteIdRoute: AuthenticatedInvitesInviteIdRoute,
+  AuthenticatedTaskTaskIdRoute: AuthenticatedTaskTaskIdRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

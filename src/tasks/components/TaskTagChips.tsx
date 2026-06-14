@@ -24,7 +24,7 @@ export function TaskTagChips({ tagIds, userId }: Props) {
   if (resolved.length === 0) return null;
 
   return (
-    <Group gap={4} wrap="nowrap">
+    <Group gap={4} wrap="wrap">
       {resolved.slice(0, TAG_LIMIT).map((tag) => (
         <Badge key={tag.id} size="xs" variant="dot" color={tag.color}>
           {tag.name}

@@ -1,12 +1,4 @@
-import {
-  Divider,
-  Group,
-  Input,
-  Select,
-  Stack,
-  Textarea,
-  TextInput,
-} from "@mantine/core";
+import { Flex, Group, Input, Select, Stack, TextInput } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import type { UseFormReturnType } from "@mantine/form";
 import {
@@ -19,7 +11,9 @@ import {
 } from "@tabler/icons-react";
 import { useState } from "react";
 
+import { DescriptionEditor } from "@/components/DescriptionEditor";
 import { UserTagPicker } from "@/tags/components/UserTagPicker";
+import { CollapsibleSection } from "@/tasks/components/CollapsibleSection";
 import { TASK_STATUS_LABELS, TASK_STATUS_ORDER } from "@/tasks/models/task";
 import type { TaskFormValues } from "@/tasks/models/taskForm";
 
@@ -42,6 +36,10 @@ export function TaskForm({ form, mode, batched = false }: Props) {
   // change (uncontrolled Mantine form doesn't re-render on setFieldValue).
   const [tagIds, setTagIds] = useState<string[]>(form.getValues().tagIds);
   form.watch("tagIds", ({ value }) => setTagIds(value));
+  const [description, setDescription] = useState<string>(
+    form.getValues().description,
+  );
+  form.watch("description", ({ value }) => setDescription(value));
 
   // Details (status/due/tags) only render in edit mode or for standalone tasks.
   const showDetails = mode === "edit" || !batched;
@@ -55,64 +53,62 @@ export function TaskForm({ form, mode, batched = false }: Props) {
         key={form.key("title")}
         {...form.getInputProps("title")}
       />
-      <Textarea
-        label="Description"
-        autosize
-        minRows={2}
-        leftSection={<IconAlignLeft size={16} />}
-        key={form.key("description")}
-        {...form.getInputProps("description")}
-      />
+      <CollapsibleSection icon={<IconAlignLeft size={14} />} title="Description">
+        <DescriptionEditor
+          content={description}
+          onChange={(html) => form.setFieldValue("description", html)}
+        />
+      </CollapsibleSection>
 
       {showDetails && (
-        <>
-          <Divider
-            my={4}
-            labelPosition="left"
-            label={
-              <Group gap={4} component="span">
-                <IconListDetails size={14} />
-                Details
-              </Group>
-            }
-          />
-          <Group grow align="flex-start">
-            {mode === "edit" && (
-              <Select
-                label="Status"
-                data={STATUS_OPTIONS}
-                allowDeselect={false}
-                leftSection={<IconProgressCheck size={16} />}
-                key={form.key("status")}
-                {...form.getInputProps("status")}
-              />
-            )}
-            {!batched && (
-              <DateTimePicker
-                label="Due date"
-                clearable
-                leftSection={<IconCalendarEvent size={16} />}
-                key={form.key("dueDate")}
-                {...form.getInputProps("dueDate")}
-              />
-            )}
-          </Group>
-          {!batched && (
-            <Input.Wrapper
-              label={
-                <Group gap={4} component="span">
-                  <IconTag size={14} />
-                  Tags
-                </Group>
-              }
+        <CollapsibleSection icon={<IconListDetails size={14} />} title="Details">
+          <Stack gap="sm">
+            <Flex
+              direction={{ base: "column", xs: "row" }}
+              gap="sm"
+              align="flex-start"
             >
-              <UserTagPicker
-                selectedTagIds={tagIds}
-                onChange={(value) => form.setFieldValue("tagIds", value)}
-              />
-            </Input.Wrapper>
-          )}
-        </>
+              {mode === "edit" && (
+                <Select
+                  label="Status"
+                  data={STATUS_OPTIONS}
+                  allowDeselect={false}
+                  leftSection={<IconProgressCheck size={16} />}
+                  style={{ flex: 1 }}
+                  w="100%"
+                  key={form.key("status")}
+                  {...form.getInputProps("status")}
+                />
+              )}
+              {!batched && (
+                <DateTimePicker
+                  label="Due date"
+                  clearable
+                  leftSection={<IconCalendarEvent size={16} />}
+                  style={{ flex: 1 }}
+                  w="100%"
+                  key={form.key("dueDate")}
+                  {...form.getInputProps("dueDate")}
+                />
+              )}
+            </Flex>
+            {!batched && (
+              <Input.Wrapper
+                label={
+                  <Group gap={4} component="span">
+                    <IconTag size={14} />
+                    Tags
+                  </Group>
+                }
+              >
+                <UserTagPicker
+                  selectedTagIds={tagIds}
+                  onChange={(value) => form.setFieldValue("tagIds", value)}
+                />
+              </Input.Wrapper>
+            )}
+          </Stack>
+        </CollapsibleSection>
       )}
     </Stack>
   );

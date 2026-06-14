@@ -1,4 +1,4 @@
-import { Group } from "@mantine/core";
+import { SimpleGrid } from "@mantine/core";
 import {
   DndContext,
   DragOverlay,
@@ -20,6 +20,7 @@ import { useFocusFlash } from "@/tasks/hooks/useFocusFlash";
 import { useMoveTaskStatus } from "@/tasks/hooks/mutations/useMoveTaskStatus";
 import { useTaskBatches } from "@/tasks/hooks/queries/useTaskBatches";
 import { useTasks } from "@/tasks/hooks/queries/useTasks";
+import { filterStaleCompletedTasks } from "@/tasks/utils/filterStaleCompletedTasks";
 import { groupBoardItems } from "@/tasks/utils/groupBoardItems";
 
 interface Props {
@@ -48,7 +49,10 @@ export function TaskBoard({ focusTaskId, focusBatchId }: Props) {
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
   );
 
-  const grouped = useMemo(() => groupBoardItems(tasks), [tasks]);
+  const grouped = useMemo(
+    () => groupBoardItems(filterStaleCompletedTasks(tasks)),
+    [tasks],
+  );
 
   const batchIds = useMemo(
     () =>
@@ -94,7 +98,7 @@ export function TaskBoard({ focusTaskId, focusBatchId }: Props) {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <Group align="flex-start" gap="md" grow wrap="nowrap">
+      <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md" verticalSpacing="md">
         {TASK_STATUS_ORDER.map((status) => (
           <TaskColumn
             key={status}
@@ -105,7 +109,7 @@ export function TaskBoard({ focusTaskId, focusBatchId }: Props) {
             highlightedId={highlightedId}
           />
         ))}
-      </Group>
+      </SimpleGrid>
 
       <DragOverlay>
         {activeTask ? <TaskCardOverlay task={activeTask} /> : null}

@@ -5,7 +5,6 @@ import {
   Input,
   Modal,
   Stack,
-  Textarea,
   TextInput,
 } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
@@ -13,11 +12,15 @@ import {
   IconAlignLeft,
   IconCalendarEvent,
   IconForms,
+  IconListCheck,
   IconTag,
 } from "@tabler/icons-react";
 import { useState } from "react";
 
+import { useIsMobile } from "@/app/hooks/useIsMobile";
+import { DescriptionEditor } from "@/components/DescriptionEditor";
 import { UserTagPicker } from "@/tags/components/UserTagPicker";
+import { CollapsibleSection } from "@/tasks/components/CollapsibleSection";
 import { TaskChildrenEditor } from "@/tasks/components/TaskChildrenEditor";
 import {
   useEditTaskSuggestionDialogHandlers,
@@ -39,6 +42,7 @@ export function TaskSuggestionEditDialog() {
   const suggestion = useOpenedEditSuggestion();
   const { close } = useEditTaskSuggestionDialogHandlers();
   const { editTaskSuggestion, isEditing } = useEditTaskSuggestion();
+  const isMobile = useIsMobile();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -104,6 +108,7 @@ export function TaskSuggestionEditDialog() {
         </Group>
       }
       size="lg"
+      fullScreen={isMobile}
     >
       <Stack gap="sm">
         <TextInput
@@ -113,40 +118,56 @@ export function TaskSuggestionEditDialog() {
           value={title}
           onChange={(e) => setTitle(e.currentTarget.value)}
         />
-        <Textarea
-          label="Description"
-          autosize
-          minRows={2}
-          leftSection={<IconAlignLeft size={16} />}
-          value={description}
-          onChange={(e) => setDescription(e.currentTarget.value)}
-        />
-        <DateTimePicker
-          label={kind === "batch" ? "Due date (whole batch)" : "Due date"}
-          clearable
-          leftSection={<IconCalendarEvent size={16} />}
-          value={dueDate}
-          onChange={(value) => setDueDate(value ? new Date(value) : null)}
-        />
+        <CollapsibleSection icon={<IconAlignLeft size={14} />} title="Description">
+          <DescriptionEditor content={description} onChange={setDescription} />
+        </CollapsibleSection>
 
-        <Input.Wrapper
-          label={
-            <Group gap={4} component="span">
-              <IconTag size={14} />
-              Tags
-            </Group>
-          }
-          description="Tags come from the assignee's tag list"
+        <CollapsibleSection
+          icon={<IconCalendarEvent size={14} />}
+          title="Due date & tags"
         >
-          <UserTagPicker
-            userId={suggestion?.suggesteeUserId}
-            selectedTagIds={tagIds}
-            onChange={setTagIds}
-          />
-        </Input.Wrapper>
+          <Stack gap="sm">
+            <DateTimePicker
+              label={kind === "batch" ? "Due date (whole batch)" : "Due date"}
+              clearable
+              leftSection={<IconCalendarEvent size={16} />}
+              value={dueDate}
+              onChange={(value) => setDueDate(value ? new Date(value) : null)}
+            />
+            <Input.Wrapper
+              label={
+                <Group gap={4} component="span">
+                  <IconTag size={14} />
+                  Tags
+                </Group>
+              }
+              description="Tags come from the assignee's tag list"
+            >
+              <UserTagPicker
+                userId={suggestion?.suggesteeUserId}
+                selectedTagIds={tagIds}
+                onChange={setTagIds}
+              />
+            </Input.Wrapper>
+          </Stack>
+        </CollapsibleSection>
 
         {kind === "batch" && (
-          <TaskChildrenEditor items={children} onChange={setChildren} />
+          <CollapsibleSection
+            icon={<IconListCheck size={14} />}
+            title="Tasks"
+            action={
+              <Badge size="sm" variant="light" color="gray">
+                {children.length}
+              </Badge>
+            }
+          >
+            <TaskChildrenEditor
+              items={children}
+              onChange={setChildren}
+              hideHeader
+            />
+          </CollapsibleSection>
         )}
 
         <Group justify="flex-end" mt="sm">

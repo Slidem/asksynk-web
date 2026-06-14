@@ -1,12 +1,15 @@
 import { Card, Group, Stack, Text } from "@mantine/core";
-import { IconCalendarDue } from "@tabler/icons-react";
+import { IconCalendarDue, IconCircleCheck } from "@tabler/icons-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import dayjs from "dayjs";
 
 import type { TaskDto } from "@/tasks/models/task";
 import { TaskTagChips } from "@/tasks/components/TaskTagChips";
+import { TaskDeleteButton } from "@/tasks/components/TaskDeleteButton";
 import { useEditTaskDialogHandlers } from "@/tasks/hooks/dialogs/editTaskDialogHooks";
+import { htmlToText } from "@/lib/htmlToText";
+import { isBlankHtml } from "@/lib/isBlankHtml";
 import classes from "@/tasks/components/focusFlash.module.css";
 
 interface Props {
@@ -49,9 +52,21 @@ export function TaskCard({ task, flashRef, highlighted = false }: Props) {
       onClick={() => open(task)}
     >
       <Stack gap="xs">
-        <Text size="sm" fw={600} lineClamp={2}>
-          {task.title}
-        </Text>
+        <Group justify="space-between" wrap="nowrap" gap="xs">
+          <Group gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
+            <IconCircleCheck size={16} color="var(--mantine-color-blue-6)" />
+            <Text size="sm" fw={600} lineClamp={2}>
+              {task.title}
+            </Text>
+          </Group>
+          <TaskDeleteButton taskId={task.id} />
+        </Group>
+
+        {!isBlankHtml(task.description) && (
+          <Text size="xs" c="dimmed" lineClamp={2}>
+            {htmlToText(task.description)}
+          </Text>
+        )}
 
         <TaskTagChips tagIds={task.tagIds} />
 

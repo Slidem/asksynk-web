@@ -1,6 +1,9 @@
-import { Button, Group, Modal } from "@mantine/core";
+import { Button, Group, Modal, Stack } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { IconArrowUpRight } from "@tabler/icons-react";
+import { useNavigate } from "@tanstack/react-router";
 
+import { useIsMobile } from "@/app/hooks/useIsMobile";
 import { TaskForm } from "@/tasks/components/TaskForm";
 import {
   useCreateTaskDialogHandlers,
@@ -20,6 +23,8 @@ export function TaskCreateDialog() {
   const isOpened = useIsCreateTaskDialogOpened();
   const presetBatchId = useCreateTaskPresetBatchId();
   const { close: closeDialog } = useCreateTaskDialogHandlers();
+  const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const form = useForm<TaskFormValues>({
     mode: "uncontrolled",
@@ -35,17 +40,54 @@ export function TaskCreateDialog() {
     closeDialog();
   };
 
-  const handleCreate = () => {
-    const { hasErrors } = form.validate();
-    if (hasErrors) return;
-
+  const buildInput = () => {
     const values = form.getValues();
     if (presetBatchId) {
       values.batchId = presetBatchId;
     }
-    createTask(taskFormValuesToCreateInput(values));
+    return taskFormValuesToCreateInput(values);
+  };
+
+  const handleCreate = () => {
+    const { hasErrors } = form.validate();
+    if (hasErrors) return;
+    createTask(buildInput());
     handleClose();
   };
+
+  const handleCreateAndOpen = () => {
+    const { hasErrors } = form.validate();
+    if (hasErrors) return;
+    createTask(buildInput(), {
+      onSuccess: (task) =>
+        navigate({ to: "/task/$taskId", params: { taskId: task.id } }),
+    });
+    handleClose();
+  };
+
+  const cancelButton = (
+    <Button variant="default" onClick={handleClose} fullWidth={isMobile}>
+      Cancel
+    </Button>
+  );
+
+  const createAndOpenButton = (
+    <Button
+      variant="light"
+      leftSection={<IconArrowUpRight size={16} />}
+      loading={isCreating}
+      onClick={handleCreateAndOpen}
+      fullWidth={isMobile}
+    >
+      Create & open
+    </Button>
+  );
+
+  const createButton = (
+    <Button loading={isCreating} onClick={handleCreate} fullWidth={isMobile}>
+      Create task
+    </Button>
+  );
 
   return (
     <Modal
@@ -53,16 +95,22 @@ export function TaskCreateDialog() {
       onClose={handleClose}
       title={presetBatchId ? "Add task to batch" : "Create task"}
       size="lg"
+      fullScreen={isMobile}
     >
       <TaskForm form={form} mode="create" batched={Boolean(presetBatchId)} />
-      <Group justify="flex-end" mt="md">
-        <Button variant="default" onClick={handleClose}>
-          Cancel
-        </Button>
-        <Button loading={isCreating} onClick={handleCreate}>
-          Create task
-        </Button>
-      </Group>
+      {isMobile ? (
+        <Stack gap="xs" mt="md">
+          {createButton}
+          {createAndOpenButton}
+          {cancelButton}
+        </Stack>
+      ) : (
+        <Group justify="flex-end" mt="md">
+          {cancelButton}
+          {createAndOpenButton}
+          {createButton}
+        </Group>
+      )}
     </Modal>
   );
 }

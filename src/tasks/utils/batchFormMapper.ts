@@ -1,4 +1,5 @@
 import { toISOStringWithTimezone } from "@/lib/date";
+import { isBlankHtml } from "@/lib/isBlankHtml";
 import type { TaskBatchCreateInput } from "@/tasks/models/taskBatch";
 import type { BatchFormValues } from "@/tasks/models/taskForm";
 import { taskChildFormToInput } from "@/tasks/utils/taskChildMapper";
@@ -12,9 +13,8 @@ export function batchFormValuesToCreateInput(
     tasks: values.tasks.map(taskChildFormToInput),
   };
 
-  const description = values.description.trim();
-  if (description) {
-    input.description = description;
+  if (!isBlankHtml(values.description)) {
+    input.description = values.description;
   }
   if (values.dueDate) {
     input.dueDate = toISOStringWithTimezone(new Date(values.dueDate));

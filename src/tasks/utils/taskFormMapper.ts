@@ -1,4 +1,5 @@
 import { toISOStringWithTimezone } from "@/lib/date";
+import { isBlankHtml } from "@/lib/isBlankHtml";
 import type {
   TaskCreateInput,
   TaskDto,
@@ -13,9 +14,8 @@ export function taskFormValuesToCreateInput(
     title: values.title.trim(),
   };
 
-  const description = values.description.trim();
-  if (description) {
-    input.description = description;
+  if (!isBlankHtml(values.description)) {
+    input.description = values.description;
   }
 
   if (values.batchId) {
@@ -41,7 +41,7 @@ export function taskFormValuesToUpdateInput(
   const input: TaskUpdateInput = {
     id,
     title: values.title.trim(),
-    description: values.description.trim() || null,
+    description: isBlankHtml(values.description) ? null : values.description,
     status: values.status,
   };
 

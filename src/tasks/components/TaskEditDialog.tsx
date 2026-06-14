@@ -1,6 +1,9 @@
-import { Button, Group, Modal } from "@mantine/core";
+import { Button, Group, Modal, Stack } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { IconArrowUpRight } from "@tabler/icons-react";
+import { Link } from "@tanstack/react-router";
 
+import { useIsMobile } from "@/app/hooks/useIsMobile";
 import { TaskForm } from "@/tasks/components/TaskForm";
 import {
   useEditTaskDialogHandlers,
@@ -23,6 +26,7 @@ export function TaskEditDialog() {
   const { close: closeDialog } = useEditTaskDialogHandlers();
   const { updateTask, isUpdating } = useUpdateTask();
   const { deleteTask, isDeleting } = useDeleteTask();
+  const isMobile = useIsMobile();
 
   const form = useForm<TaskFormValues>({
     mode: "uncontrolled",
@@ -59,8 +63,56 @@ export function TaskEditDialog() {
     handleClose();
   };
 
+  const deleteButton = (
+    <Button
+      variant="subtle"
+      color="red"
+      loading={isDeleting}
+      onClick={handleDelete}
+      fullWidth={isMobile}
+    >
+      Delete
+    </Button>
+  );
+
+  const openButton = selectedTask && (
+    <Button
+      variant="light"
+      leftSection={<IconArrowUpRight size={16} />}
+      fullWidth={isMobile}
+      renderRoot={(props) => (
+        <Link
+          to="/task/$taskId"
+          params={{ taskId: selectedTask.id }}
+          onClick={handleClose}
+          {...props}
+        />
+      )}
+    >
+      Open full page
+    </Button>
+  );
+
+  const cancelButton = (
+    <Button variant="default" onClick={handleClose} fullWidth={isMobile}>
+      Cancel
+    </Button>
+  );
+
+  const saveButton = (
+    <Button loading={isUpdating} onClick={handleSave} fullWidth={isMobile}>
+      Save
+    </Button>
+  );
+
   return (
-    <Modal opened={isOpened} onClose={handleClose} title="Task details" size="lg">
+    <Modal
+      opened={isOpened}
+      onClose={handleClose}
+      title="Task details"
+      size="lg"
+      fullScreen={isMobile}
+    >
       {selectedTask && (
         <TaskForm
           form={form}
@@ -69,24 +121,27 @@ export function TaskEditDialog() {
         />
       )}
 
-      <Group justify="space-between" mt="md">
-        <Button
-          variant="subtle"
-          color="red"
-          loading={isDeleting}
-          onClick={handleDelete}
-        >
-          Delete
-        </Button>
-        <Group gap="xs">
-          <Button variant="default" onClick={handleClose}>
-            Cancel
-          </Button>
-          <Button loading={isUpdating} onClick={handleSave}>
-            Save
-          </Button>
+      {isMobile ? (
+        <Stack gap="xs" mt="md">
+          {saveButton}
+          {cancelButton}
+          <Group grow gap="xs">
+            {deleteButton}
+            {openButton}
+          </Group>
+        </Stack>
+      ) : (
+        <Group justify="space-between" mt="md">
+          <Group gap="xs">
+            {deleteButton}
+            {openButton}
+          </Group>
+          <Group gap="xs">
+            {cancelButton}
+            {saveButton}
+          </Group>
         </Group>
-      </Group>
+      )}
     </Modal>
   );
 }

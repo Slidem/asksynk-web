@@ -1,0 +1,9 @@
+.content {
+  & :global(.tiptap) {
+    font-size: var(--mantine-font-size-sm);
+    min-height: 3.5rem;
+  }
+  & :global(.tiptap p) {
+    font-size: var(--mantine-font-size-sm);
+  }
+}

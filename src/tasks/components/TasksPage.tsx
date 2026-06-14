@@ -1,6 +1,7 @@
 import { Container, Stack, Tabs } from "@mantine/core";
 import { getRouteApi } from "@tanstack/react-router";
 
+import { useIsMobile } from "@/app/hooks/useIsMobile";
 import { QuickSuggestRow } from "@/tasks/components/QuickSuggestRow";
 import { SuggestionsList } from "@/tasks/components/SuggestionsList";
 import { TaskBatchCreateDialog } from "@/tasks/components/TaskBatchCreateDialog";
@@ -19,6 +20,7 @@ export function TasksPage() {
   const { tab, focusTaskId, focusBatchId, focusSuggestionId } =
     routeApi.useSearch();
   const navigate = routeApi.useNavigate();
+  const isMobile = useIsMobile();
 
   const handleTabChange = (value: string | null) => {
     if (!value) return;
@@ -32,10 +34,16 @@ export function TasksPage() {
         <TasksPageHeader />
 
         <Tabs value={tab} onChange={handleTabChange}>
-          <Tabs.List>
-            <Tabs.Tab value="my-tasks">My Tasks</Tabs.Tab>
-            <Tabs.Tab value="suggested-to-me">Suggested to me</Tabs.Tab>
-            <Tabs.Tab value="suggested-by-me">Suggested by me</Tabs.Tab>
+          <Tabs.List grow={isMobile}>
+            <Tabs.Tab value="my-tasks">
+              {isMobile ? "Mine" : "My Tasks"}
+            </Tabs.Tab>
+            <Tabs.Tab value="suggested-to-me">
+              {isMobile ? "To me" : "Suggested to me"}
+            </Tabs.Tab>
+            <Tabs.Tab value="suggested-by-me">
+              {isMobile ? "By me" : "Suggested by me"}
+            </Tabs.Tab>
           </Tabs.List>
 
           <Tabs.Panel value="my-tasks" pt="md">

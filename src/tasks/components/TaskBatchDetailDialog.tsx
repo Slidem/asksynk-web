@@ -1,37 +1,35 @@
 import {
   Badge,
   Button,
-  Fieldset,
+  Divider,
   Group,
   Input,
   Modal,
-  Paper,
-  Select,
   Stack,
   Text,
-  Textarea,
   TextInput,
 } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import {
   IconAlignLeft,
+  IconArrowUpRight,
   IconCalendarEvent,
   IconListCheck,
-  IconPlus,
   IconStack2,
   IconTag,
 } from "@tabler/icons-react";
-import { useCallback, useEffect, useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { Fragment, useCallback, useEffect, useState } from "react";
 
+import { useIsMobile } from "@/app/hooks/useIsMobile";
+import { DescriptionEditor } from "@/components/DescriptionEditor";
 import { toISOStringWithTimezone } from "@/lib/date";
+import { isBlankHtml } from "@/lib/isBlankHtml";
 import { UserTagPicker } from "@/tags/components/UserTagPicker";
-import {
-  TASK_STATUS_LABELS,
-  TASK_STATUS_ORDER,
-  type TaskDto,
-  type TaskStatus,
-} from "@/tasks/models/task";
-import { useCreateTaskDialogHandlers } from "@/tasks/hooks/dialogs/createTaskDialogHooks";
+import { BatchDeleteButton } from "@/tasks/components/BatchDeleteButton";
+import { BatchTaskRow } from "@/tasks/components/BatchTaskRow";
+import { CollapsibleSection } from "@/tasks/components/CollapsibleSection";
+import type { TaskDto } from "@/tasks/models/task";
 import {
   useIsTaskBatchDetailDialogOpened,
   useTaskBatchDetailDialogBatchId,
@@ -42,16 +40,10 @@ import { useUpdateTaskBatch } from "@/tasks/hooks/mutations/useUpdateTaskBatch";
 import { useTaskBatch } from "@/tasks/hooks/queries/useTaskBatch";
 import { useTasks } from "@/tasks/hooks/queries/useTasks";
 
-const STATUS_OPTIONS = TASK_STATUS_ORDER.map((status) => ({
-  value: status,
-  label: TASK_STATUS_LABELS[status],
-}));
-
 export function TaskBatchDetailDialog() {
   const isOpened = useIsTaskBatchDetailDialogOpened();
   const batchId = useTaskBatchDetailDialogBatchId();
   const { close } = useTaskBatchDetailDialogHandlers();
-  const { open: openCreateTask } = useCreateTaskDialogHandlers();
 
   const { data: batch } = useTaskBatch(batchId, { enabled: isOpened });
   // Children come from the board's task list cache so optimistic status flips
@@ -64,6 +56,7 @@ export function TaskBatchDetailDialog() {
 
   const { updateTaskBatch, isUpdating } = useUpdateTaskBatch();
   const { moveTaskStatus } = useMoveTaskStatus();
+  const isMobile = useIsMobile();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -87,12 +80,56 @@ export function TaskBatchDetailDialog() {
     updateTaskBatch({
       id: batchId,
       title: title.trim(),
-      description: description.trim() || null,
+      description: isBlankHtml(description) ? null : description,
       dueDate: dueDate ? toISOStringWithTimezone(new Date(dueDate)) : null,
       tagIds,
     });
     close();
   };
+
+  const deleteButton = batchId && (
+    <BatchDeleteButton
+      batchId={batchId}
+      taskCount={children.length}
+      onDeleted={close}
+      fullWidth={isMobile}
+    />
+  );
+
+  const openButton = (
+    <Button
+      variant="light"
+      leftSection={<IconArrowUpRight size={16} />}
+      fullWidth={isMobile}
+      renderRoot={(props) => (
+        <Link
+          to="/batch/$batchId"
+          params={{ batchId: batchId ?? "" }}
+          onClick={close}
+          {...props}
+        />
+      )}
+    >
+      Open full page
+    </Button>
+  );
+
+  const cancelButton = (
+    <Button variant="default" onClick={close} fullWidth={isMobile}>
+      Cancel
+    </Button>
+  );
+
+  const saveButton = (
+    <Button
+      loading={isUpdating}
+      disabled={!title.trim()}
+      onClick={handleSave}
+      fullWidth={isMobile}
+    >
+      Save
+    </Button>
+  );
 
   return (
     <Modal
@@ -100,6 +137,7 @@ export function TaskBatchDetailDialog() {
       onClose={close}
       title="Batch details"
       size="lg"
+      fullScreen={isMobile}
     >
       <Stack gap="sm">
         <TextInput
@@ -109,97 +147,87 @@ export function TaskBatchDetailDialog() {
           value={title}
           onChange={(e) => setTitle(e.currentTarget.value)}
         />
-        <Textarea
-          label="Description"
-          autosize
-          minRows={2}
-          leftSection={<IconAlignLeft size={16} />}
-          value={description}
-          onChange={(e) => setDescription(e.currentTarget.value)}
-        />
-        <DateTimePicker
-          label="Due date"
-          clearable
-          leftSection={<IconCalendarEvent size={16} />}
-          value={dueDate}
-          onChange={(value) => setDueDate(value ? new Date(value) : null)}
-        />
-        <Input.Wrapper
-          label={
-            <Group gap={4} component="span">
-              <IconTag size={14} />
-              Tags (applied to the whole batch)
-            </Group>
-          }
-        >
-          <UserTagPicker selectedTagIds={tagIds} onChange={setTagIds} />
-        </Input.Wrapper>
 
-        <Fieldset
-          variant="filled"
-          radius="md"
-          legend={
-            <Group gap="xs">
-              <IconListCheck size={16} />
-              <Text span size="sm" fw={500}>
-                Tasks
-              </Text>
-              <Badge size="sm" variant="light" color="gray">
-                {children.length}
-              </Badge>
-            </Group>
-          }
+        <CollapsibleSection icon={<IconAlignLeft size={14} />} title="Description">
+          <DescriptionEditor content={description} onChange={setDescription} />
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          icon={<IconCalendarEvent size={14} />}
+          title="Due date & tags"
         >
-          <Stack gap="xs">
-            {children.map((task) => (
-              <Paper key={task.id} withBorder radius="md" p="sm">
-                <Group justify="space-between" wrap="nowrap" gap="sm">
-                  <Text size="sm" style={{ minWidth: 0 }} truncate>
-                    {task.title}
-                  </Text>
-                  <Select
-                    size="xs"
-                    w={140}
-                    data={STATUS_OPTIONS}
-                    allowDeselect={false}
-                    value={task.status}
-                    onChange={(value) => {
-                      if (value && value !== task.status) {
-                        moveTaskStatus({
-                          id: task.id,
-                          status: value as TaskStatus,
-                        });
-                      }
-                    }}
-                  />
+          <Stack gap="sm">
+            <DateTimePicker
+              label="Due date"
+              clearable
+              leftSection={<IconCalendarEvent size={16} />}
+              value={dueDate}
+              onChange={(value) => setDueDate(value ? new Date(value) : null)}
+            />
+            <Input.Wrapper
+              label={
+                <Group gap={4} component="span">
+                  <IconTag size={14} />
+                  Tags (applied to the whole batch)
                 </Group>
-              </Paper>
-            ))}
-
-            <Button
-              variant="light"
-              size="xs"
-              leftSection={<IconPlus size={14} />}
-              onClick={() => batchId && openCreateTask(batchId)}
-              style={{ alignSelf: "flex-start" }}
+              }
             >
-              Add task
-            </Button>
+              <UserTagPicker selectedTagIds={tagIds} onChange={setTagIds} />
+            </Input.Wrapper>
           </Stack>
-        </Fieldset>
+        </CollapsibleSection>
 
-        <Group justify="flex-end" mt="sm">
-          <Button variant="default" onClick={close}>
-            Cancel
-          </Button>
-          <Button
-            loading={isUpdating}
-            disabled={!title.trim()}
-            onClick={handleSave}
-          >
-            Save
-          </Button>
-        </Group>
+        <CollapsibleSection
+          icon={<IconListCheck size={14} />}
+          title="Tasks"
+          action={
+            <Badge size="sm" variant="light" color="gray">
+              {children.length}
+            </Badge>
+          }
+        >
+          {children.length === 0 ? (
+            <Text size="sm" c="dimmed" fs="italic">
+              No tasks yet — open the full page to add some.
+            </Text>
+          ) : (
+            <Stack gap="xs">
+              {children.map((task, i) => (
+                <Fragment key={task.id}>
+                  {i > 0 && <Divider />}
+                  <BatchTaskRow
+                    task={task}
+                    onStatusChange={(status) =>
+                      moveTaskStatus({ id: task.id, status })
+                    }
+                  />
+                </Fragment>
+              ))}
+            </Stack>
+          )}
+        </CollapsibleSection>
+
+        {isMobile ? (
+          <Stack gap="xs" mt="sm">
+            {saveButton}
+            {cancelButton}
+            <Group grow gap="xs">
+              {deleteButton}
+              {openButton}
+            </Group>
+          </Stack>
+        ) : (
+          <Group justify="space-between" mt="sm">
+            <Group gap="xs">
+              {deleteButton}
+              {openButton}
+            </Group>
+            <Group gap="xs">
+              {cancelButton}
+              {saveButton}
+            </Group>
+          </Group>
+        )}
       </Stack>
     </Modal>
   );

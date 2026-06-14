@@ -1,4 +1,5 @@
 import {
+  Badge,
   Button,
   Group,
   Input,
@@ -6,7 +7,6 @@ import {
   SegmentedControl,
   Stack,
   Text,
-  Textarea,
   TextInput,
 } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
@@ -14,13 +14,17 @@ import {
   IconAlignLeft,
   IconCalendarEvent,
   IconForms,
+  IconListCheck,
   IconTag,
 } from "@tabler/icons-react";
 import { useState } from "react";
 
+import { useIsMobile } from "@/app/hooks/useIsMobile";
+import { DescriptionEditor } from "@/components/DescriptionEditor";
 import { ConnectionPicker } from "@/network/components/ConnectionPicker";
 import { useNetworkConnectionsQuery } from "@/network/hooks/queries/useNetworkConnectionsQuery";
 import { UserTagPicker } from "@/tags/components/UserTagPicker";
+import { CollapsibleSection } from "@/tasks/components/CollapsibleSection";
 import { TaskChildrenEditor } from "@/tasks/components/TaskChildrenEditor";
 import {
   useCreateTaskSuggestionDialogHandlers,
@@ -40,6 +44,7 @@ export function TaskSuggestionCreateDialog() {
   const { close } = useCreateTaskSuggestionDialogHandlers();
   const { createTaskSuggestion, isCreating } = useCreateTaskSuggestion();
   const { data: connections = [] } = useNetworkConnectionsQuery();
+  const isMobile = useIsMobile();
 
   const [suggesteeUserId, setSuggesteeUserId] = useState<string | null>(null);
   const [kind, setKind] = useState<SuggestionKind>("task");
@@ -99,6 +104,7 @@ export function TaskSuggestionCreateDialog() {
       onClose={handleClose}
       title="Suggest a task"
       size="lg"
+      fullScreen={isMobile}
     >
       <Stack gap="sm">
         <ConnectionPicker
@@ -125,46 +131,61 @@ export function TaskSuggestionCreateDialog() {
           value={title}
           onChange={(e) => setTitle(e.currentTarget.value)}
         />
-        <Textarea
-          label="Description"
-          autosize
-          minRows={2}
-          leftSection={<IconAlignLeft size={16} />}
-          value={description}
-          onChange={(e) => setDescription(e.currentTarget.value)}
-        />
+        <CollapsibleSection icon={<IconAlignLeft size={14} />} title="Description">
+          <DescriptionEditor content={description} onChange={setDescription} />
+        </CollapsibleSection>
 
-        <DateTimePicker
-          label={kind === "batch" ? "Due date (whole batch)" : "Due date"}
-          clearable
-          leftSection={<IconCalendarEvent size={16} />}
-          value={dueDate}
-          onChange={(value) => setDueDate(value ? new Date(value) : null)}
-        />
-
-        <Input.Wrapper
-          label={
-            <Group gap={4} component="span">
-              <IconTag size={14} />
-              Their tags
-            </Group>
-          }
-          description={
-            suggesteeUserId
-              ? "Hints show their approximate answer time per tag"
-              : "Pick a connection to choose from their tags"
-          }
+        <CollapsibleSection
+          icon={<IconCalendarEvent size={14} />}
+          title="Due date & tags"
         >
-          <UserTagPicker
-            userId={suggesteeUserId ?? undefined}
-            selectedTagIds={tagIds}
-            onChange={setTagIds}
-            disabled={!suggesteeUserId}
-          />
-        </Input.Wrapper>
+          <Stack gap="sm">
+            <DateTimePicker
+              label={kind === "batch" ? "Due date (whole batch)" : "Due date"}
+              clearable
+              leftSection={<IconCalendarEvent size={16} />}
+              value={dueDate}
+              onChange={(value) => setDueDate(value ? new Date(value) : null)}
+            />
+            <Input.Wrapper
+              label={
+                <Group gap={4} component="span">
+                  <IconTag size={14} />
+                  Their tags
+                </Group>
+              }
+              description={
+                suggesteeUserId
+                  ? "Hints show their approximate answer time per tag"
+                  : "Pick a connection to choose from their tags"
+              }
+            >
+              <UserTagPicker
+                userId={suggesteeUserId ?? undefined}
+                selectedTagIds={tagIds}
+                onChange={setTagIds}
+                disabled={!suggesteeUserId}
+              />
+            </Input.Wrapper>
+          </Stack>
+        </CollapsibleSection>
 
         {kind === "batch" && (
-          <TaskChildrenEditor items={children} onChange={setChildren} />
+          <CollapsibleSection
+            icon={<IconListCheck size={14} />}
+            title="Tasks"
+            action={
+              <Badge size="sm" variant="light" color="gray">
+                {children.length}
+              </Badge>
+            }
+          >
+            <TaskChildrenEditor
+              items={children}
+              onChange={setChildren}
+              hideHeader
+            />
+          </CollapsibleSection>
         )}
 
         {connections.length === 0 && (

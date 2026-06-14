@@ -21,6 +21,7 @@ import { useState } from "react";
 import { TASK_STATUS_LABELS, type TaskDto } from "@/tasks/models/task";
 import type { TaskBatch } from "@/tasks/models/taskBatch";
 import { TaskTagChips } from "@/tasks/components/TaskTagChips";
+import { BatchDeleteButton } from "@/tasks/components/BatchDeleteButton";
 import { useTaskBatchDetailDialogHandlers } from "@/tasks/hooks/dialogs/taskBatchDetailDialogHooks";
 import classes from "@/tasks/components/focusFlash.module.css";
 
@@ -65,21 +66,28 @@ export function BatchBoardCard({
               {batch?.title ?? "Batch"}
             </Text>
           </Group>
-          <ActionIcon
-            variant="subtle"
-            size="sm"
-            aria-label={expanded ? "Collapse batch" : "Expand batch"}
-            onClick={(e) => {
-              e.stopPropagation();
-              setExpanded((prev) => !prev);
-            }}
-          >
-            {expanded ? (
-              <IconChevronDown size={14} />
-            ) : (
-              <IconChevronRight size={14} />
-            )}
-          </ActionIcon>
+          <Group gap={4} wrap="nowrap">
+            <BatchDeleteButton
+              iconOnly
+              batchId={batchId}
+              taskCount={tasks.length}
+            />
+            <ActionIcon
+              variant="subtle"
+              size="sm"
+              aria-label={expanded ? "Collapse batch" : "Expand batch"}
+              onClick={(e) => {
+                e.stopPropagation();
+                setExpanded((prev) => !prev);
+              }}
+            >
+              {expanded ? (
+                <IconChevronDown size={14} />
+              ) : (
+                <IconChevronRight size={14} />
+              )}
+            </ActionIcon>
+          </Group>
         </Group>
 
         {batch && <TaskTagChips tagIds={batch.tagIds} />}

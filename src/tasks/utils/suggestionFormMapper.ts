@@ -1,4 +1,5 @@
 import { toISOStringWithTimezone } from "@/lib/date";
+import { isBlankHtml } from "@/lib/isBlankHtml";
 import type { SuggestionFormValues } from "@/tasks/models/taskForm";
 import type {
   TaskSuggestionCreateInput,
@@ -16,9 +17,8 @@ export function suggestionFormValuesToCreateInput(
     tagIds: values.tagIds,
   };
 
-  const description = values.description.trim();
-  if (description) {
-    payload.description = description;
+  if (!isBlankHtml(values.description)) {
+    payload.description = values.description;
   }
   if (values.dueDate) {
     payload.dueDate = toISOStringWithTimezone(new Date(values.dueDate));
@@ -37,7 +37,7 @@ export function suggestionFormValuesToPayloadEditInput(
   const input: TaskSuggestionPayloadEditInput = {
     id,
     title: values.title.trim(),
-    description: values.description.trim() || null,
+    description: isBlankHtml(values.description) ? null : values.description,
     dueDate: values.dueDate
       ? toISOStringWithTimezone(new Date(values.dueDate))
       : null,

@@ -2,6 +2,7 @@ import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
 
 import { Box } from "@mantine/core";
 import { Navbar } from "@/app/components/Navbar/Navbar";
+import { MobileNav } from "@/app/components/Navbar/MobileNav";
 import { authClient } from "@/auth";
 import { useAppSocketConnection } from "@/app/hooks/useAppSocketConnection";
 import { AttentionItemsEngine } from "@/attentionItems/components/AttentionItemsEngine";
@@ -33,11 +34,14 @@ function AuthenticatedLayout() {
 
   return (
     <Box style={{ display: "flex" }}>
-      <Navbar />
+      <Box visibleFrom="sm">
+        <Navbar />
+      </Box>
       <Box
         component="main"
-        style={{ flex: 1, padding: "var(--mantine-spacing-md)" }}
+        style={{ flex: 1, minWidth: 0, padding: "var(--mantine-spacing-md)" }}
       >
+        <MobileNav />
         <Outlet />
       </Box>
       <TimerEngine />

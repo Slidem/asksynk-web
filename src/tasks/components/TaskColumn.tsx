@@ -42,7 +42,7 @@ export function TaskColumn({
       radius="md"
       p="sm"
       bg={isOver ? "var(--mantine-color-blue-light)" : undefined}
-      style={{ flex: 1, minWidth: 0, alignSelf: "flex-start" }}
+      style={{ minWidth: 0, alignSelf: "flex-start" }}
     >
       <Stack gap="sm">
         <Group justify="space-between">

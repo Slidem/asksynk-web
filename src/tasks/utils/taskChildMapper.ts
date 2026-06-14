@@ -1,3 +1,4 @@
+import { isBlankHtml } from "@/lib/isBlankHtml";
 import type { TaskChildFormValues } from "@/tasks/models/taskForm";
 
 // Batch children (BatchChildTaskInput) and suggestion children
@@ -10,9 +11,8 @@ export function taskChildFormToInput(child: TaskChildFormValues): {
     title: child.title.trim(),
   };
 
-  const description = child.description.trim();
-  if (description) {
-    input.description = description;
+  if (!isBlankHtml(child.description)) {
+    input.description = child.description;
   }
 
   return input;

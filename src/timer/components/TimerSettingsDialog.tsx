@@ -9,6 +9,7 @@ import {
   Stack,
   Switch,
   Text,
+  Tooltip,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import {
@@ -16,6 +17,7 @@ import {
   IconBrain,
   IconClock,
   IconCoffee,
+  IconInfoCircle,
   IconMoon,
   IconRepeat,
   IconVolume,
@@ -172,8 +174,22 @@ export function TimerSettingsDialog() {
             {...form.getInputProps("longBreakMinutes")}
           />
           <NumberInput
-            label="Long break interval"
-            description="Long break after N focus sessions"
+            label={
+              <Group gap={4} wrap="nowrap" component="span">
+                <span>Long break interval</span>
+                <Tooltip
+                  label="Long break after N focus sessions"
+                  withArrow
+                  multiline
+                  w={200}
+                >
+                  <IconInfoCircle
+                    size={14}
+                    style={{ cursor: "help", verticalAlign: "middle" }}
+                  />
+                </Tooltip>
+              </Group>
+            }
             leftSection={<IconRepeat size={16} />}
             min={1}
             max={50}
@@ -194,25 +210,27 @@ export function TimerSettingsDialog() {
 
         <Divider label="Sounds" labelPosition="left" />
 
-        <Switch
-          label="Sound"
-          checked={soundEnabled}
-          onChange={(event) => setSoundEnabled(event.currentTarget.checked)}
-        />
-        {soundEnabled && (
-          <Group gap="sm" wrap="nowrap">
-            <IconVolume size={16} />
-            <Slider
-              flex={1}
-              min={0}
-              max={1}
-              step={0.05}
-              value={volume}
-              onChange={setVolume}
-              label={(value) => `${Math.round(value * 100)}%`}
-            />
-          </Group>
-        )}
+        <Group gap="md" wrap="nowrap">
+          <Switch
+            label="Sound"
+            checked={soundEnabled}
+            onChange={(event) => setSoundEnabled(event.currentTarget.checked)}
+          />
+          {soundEnabled && (
+            <Group gap="sm" wrap="nowrap" flex={1}>
+              <IconVolume size={16} />
+              <Slider
+                flex={1}
+                min={0}
+                max={1}
+                step={0.05}
+                value={volume}
+                onChange={setVolume}
+                label={(value) => `${Math.round(value * 100)}%`}
+              />
+            </Group>
+          )}
+        </Group>
 
         {notifState !== "unsupported" && (
           <Switch
