@@ -9,6 +9,7 @@ import { AttentionItemsEngine } from "@/attentionItems/components/AttentionItems
 import { TimerEngine } from "@/timer/components/TimerEngine";
 import { FloatingTimer } from "@/timer/components/FloatingTimer";
 import { TimerSettingsDialog } from "@/timer/components/TimerSettingsDialog";
+import { TaskSuggestionCreateDialog } from "@/tasks/components/TaskSuggestionCreateDialog";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ location }) => {
@@ -48,6 +49,7 @@ function AuthenticatedLayout() {
       <AttentionItemsEngine />
       <FloatingTimer />
       <TimerSettingsDialog />
+      <TaskSuggestionCreateDialog />
     </Box>
   );
 }

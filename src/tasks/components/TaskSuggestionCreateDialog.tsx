@@ -29,6 +29,7 @@ import { TaskChildrenEditor } from "@/tasks/components/TaskChildrenEditor";
 import {
   useCreateTaskSuggestionDialogHandlers,
   useIsCreateTaskSuggestionDialogOpened,
+  useOnCreateSuggestionPresetChange,
 } from "@/tasks/hooks/dialogs/createTaskSuggestionDialogHooks";
 import { useCreateTaskSuggestion } from "@/tasks/hooks/mutations/useCreateTaskSuggestion";
 import {
@@ -65,6 +66,18 @@ export function TaskSuggestionCreateDialog() {
     setTagIds([]);
     setChildren([makeEmptyTaskChild()]);
   };
+
+  // Populate synchronously on open; preset preselects connection + their tags.
+  useOnCreateSuggestionPresetChange((preset) => {
+    if (!preset) return;
+    setSuggesteeUserId(preset.suggesteeUserId ?? null);
+    setKind("task");
+    setTitle("");
+    setDescription("");
+    setDueDate(null);
+    setTagIds(preset.tagIds ?? []);
+    setChildren([makeEmptyTaskChild()]);
+  });
 
   const handleClose = () => {
     reset();

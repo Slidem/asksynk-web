@@ -15,7 +15,6 @@ import {
   IconInfoCircle,
   IconLink,
   IconMapPin,
-  IconMessage,
   IconRepeat,
   IconTag,
 } from "@tabler/icons-react";
@@ -26,7 +25,7 @@ import {
   useCalendarEventReadonlyDialogHandlers,
 } from "@/network/hooks/dialogs/calendarEventReadonlyDialogHooks";
 import { useUserAvailabilityDialogHandlers } from "@/network/hooks/dialogs/userAvailabilityDialogHooks";
-import { useStartTaggedThread } from "@/messages/hooks/useStartTaggedThread";
+import { NetworkActionsMenu } from "@/network/components/NetworkActionsMenu";
 import { formatEventTime } from "@/schedule/utils/formatEventTime";
 import { useUserTagsService } from "@/tags/hooks/useUserTagsService";
 
@@ -84,7 +83,6 @@ export function CalendarEventReadonlyDialog({ userId }: Props) {
   const { close } = useCalendarEventReadonlyDialogHandlers();
   const { close: closeParent } = useUserAvailabilityDialogHandlers();
   const { tags } = useUserTagsService(userId);
-  const { start, isStarting } = useStartTaggedThread();
 
   const eventTags = event?.tagIds?.length
     ? event.tagIds
@@ -92,13 +90,6 @@ export function CalendarEventReadonlyDialog({ userId }: Props) {
         .filter((t) => t !== undefined)
     : [];
   const hasTags = eventTags.length > 0;
-
-  const handleStartThread = async () => {
-    if (!event || !hasTags) return;
-    await start(userId, event.tagIds ?? []);
-    close();
-    closeParent();
-  };
 
   return (
     <Modal opened={opened} onClose={close} title="Event details" size="md">
@@ -180,13 +171,16 @@ export function CalendarEventReadonlyDialog({ userId }: Props) {
               Close
             </Button>
             {hasTags && (
-              <Button
-                leftSection={<IconMessage size={14} />}
-                onClick={handleStartThread}
-                loading={isStarting}
-              >
-                Start a thread
-              </Button>
+              <NetworkActionsMenu
+                userId={userId}
+                tagIds={event.tagIds ?? []}
+                onAfterAction={() => {
+                  close();
+                  closeParent();
+                }}
+                size="sm"
+                variant="filled"
+              />
             )}
           </Group>
         </Stack>

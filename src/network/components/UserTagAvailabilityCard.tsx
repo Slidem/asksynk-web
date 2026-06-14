@@ -1,16 +1,7 @@
-import {
-  Button,
-  ColorSwatch,
-  Group,
-  Paper,
-  Stack,
-  Text,
-  Tooltip,
-} from "@mantine/core";
-import { IconMessage } from "@tabler/icons-react";
+import { ColorSwatch, Group, Paper, Stack, Text, Tooltip } from "@mantine/core";
 
 import { htmlToPreview } from "@/lib/htmlToPreview";
-import { useStartTaggedThread } from "@/messages/hooks/useStartTaggedThread";
+import { NetworkActionsMenu } from "@/network/components/NetworkActionsMenu";
 import { useUserAvailabilityDialogHandlers } from "@/network/hooks/dialogs/userAvailabilityDialogHooks";
 import { TagAvailabilityHint } from "@/tags/components/TagAvailabilityHint";
 import type { TagDto } from "@/tags/models/tag";
@@ -24,13 +15,7 @@ const TOOLTIP =
   "If addressing a question based on this tag, this is the approximate answer time";
 
 export function UserTagAvailabilityCard({ tag, userId }: Props) {
-  const { start, isStarting } = useStartTaggedThread();
   const { close } = useUserAvailabilityDialogHandlers();
-
-  const handleStart = async () => {
-    await start(userId, [tag.id]);
-    close();
-  };
 
   return (
     <Paper withBorder radius="md" p="sm">
@@ -56,15 +41,11 @@ export function UserTagAvailabilityCard({ tag, userId }: Props) {
           </Tooltip>
         </Group>
         <Group justify="flex-end">
-          <Button
-            size="xs"
-            variant="light"
-            leftSection={<IconMessage size={14} />}
-            onClick={handleStart}
-            loading={isStarting}
-          >
-            Start a thread
-          </Button>
+          <NetworkActionsMenu
+            userId={userId}
+            tagIds={[tag.id]}
+            onAfterAction={close}
+          />
         </Group>
       </Stack>
     </Paper>

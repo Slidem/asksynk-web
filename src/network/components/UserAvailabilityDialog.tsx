@@ -12,11 +12,10 @@ import {
   useUserAvailabilityDialog,
   useUserAvailabilityDialogHandlers,
 } from "@/network/hooks/dialogs/userAvailabilityDialogHooks";
+import { NetworkActionsMenu } from "@/network/components/NetworkActionsMenu";
 import { UserAvailabilityCalendar } from "@/network/components/UserAvailabilityCalendar";
 import { UserTagAvailabilityCard } from "@/network/components/UserTagAvailabilityCard";
-import { useStartTaggedThread } from "@/messages/hooks/useStartTaggedThread";
 import { UpcomingEventCard } from "@/schedule/components/UpcomingEventCard";
-import type { CalendarEvent } from "@/schedule/models/calendarEvent";
 import { useUpcomingUserCalendarEvents } from "@/schedule/hooks/queries/useUpcomingUserCalendarEvents";
 import { useUserTagsService } from "@/tags/hooks/useUserTagsService";
 import type { TagDto } from "@/tags/models/tag";
@@ -130,12 +129,6 @@ function TimeblocksPanel({ userId }: { userId: string }) {
   const { data, isLoading } = useUpcomingUserCalendarEvents(userId);
   const { tags } = useUserTagsService(userId);
   const { close } = useUserAvailabilityDialogHandlers();
-  const { start, isStarting } = useStartTaggedThread();
-
-  const handleAsk = async (event: CalendarEvent) => {
-    await start(userId, event.tagIds ?? []);
-    close();
-  };
 
   if (isLoading) {
     return (
@@ -159,8 +152,15 @@ function TimeblocksPanel({ userId }: { userId: string }) {
             key={event.id}
             event={event}
             tags={eventTags}
-            onAsk={() => handleAsk(event)}
-            isAsking={isStarting}
+            actions={
+              eventTags.length > 0 ? (
+                <NetworkActionsMenu
+                  userId={userId}
+                  tagIds={event.tagIds ?? []}
+                  onAfterAction={close}
+                />
+              ) : undefined
+            }
           />
         );
       })}

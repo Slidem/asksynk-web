@@ -3,19 +3,24 @@ import {
   IconClipboardList,
   IconClockHour4,
   IconClockPlus,
+  IconMessage,
 } from "@tabler/icons-react";
 
 import { UserBadge } from "@/components/UserBadge";
+import { useStartTaggedThread } from "@/messages/hooks/useStartTaggedThread";
 import {
   useUserActionsDialog,
   useUserActionsDialogHandlers,
 } from "@/network/hooks/dialogs/userActionsDialogHooks";
 import { useUserAvailabilityDialogHandlers } from "@/network/hooks/dialogs/userAvailabilityDialogHooks";
+import { useCreateTaskSuggestionDialogHandlers } from "@/tasks/hooks/dialogs/createTaskSuggestionDialogHooks";
 
 export function UserActionsDialog() {
   const { opened, user } = useUserActionsDialog();
   const { close } = useUserActionsDialogHandlers();
   const { open: openAvailability } = useUserAvailabilityDialogHandlers();
+  const { start, isStarting } = useStartTaggedThread();
+  const { open: openSuggestion } = useCreateTaskSuggestionDialogHandlers();
 
   const displayName =
     user?.name ||
@@ -26,6 +31,18 @@ export function UserActionsDialog() {
   const handleShowAvailability = () => {
     if (!user) return;
     openAvailability(user);
+    close();
+  };
+
+  const handleStartThread = async () => {
+    if (!user) return;
+    await start(user.userId, []);
+    close();
+  };
+
+  const handleSuggestTask = () => {
+    if (!user) return;
+    openSuggestion({ suggesteeUserId: user.userId });
     close();
   };
 
@@ -59,6 +76,16 @@ export function UserActionsDialog() {
           variant="default"
           fullWidth
           justify="flex-start"
+          leftSection={<IconMessage size={18} />}
+          onClick={handleStartThread}
+          loading={isStarting}
+        >
+          Start a thread
+        </Button>
+        <Button
+          variant="default"
+          fullWidth
+          justify="flex-start"
           leftSection={<IconClockPlus size={18} />}
           disabled
         >
@@ -69,7 +96,7 @@ export function UserActionsDialog() {
           fullWidth
           justify="flex-start"
           leftSection={<IconClipboardList size={18} />}
-          disabled
+          onClick={handleSuggestTask}
         >
           Suggest task
         </Button>

@@ -1,11 +1,6 @@
-import { Badge, Button, Group, Paper, Stack, Text } from "@mantine/core";
-import {
-  IconClock,
-  IconLink,
-  IconMapPin,
-  IconMessage,
-  IconRepeat,
-} from "@tabler/icons-react";
+import { Badge, Group, Paper, Stack, Text } from "@mantine/core";
+import { IconClock, IconLink, IconMapPin, IconRepeat } from "@tabler/icons-react";
+import type { ReactNode } from "react";
 
 import type { CalendarEvent } from "@/schedule/models/calendarEvent";
 import { formatEventTime } from "@/schedule/utils/formatEventTime";
@@ -16,8 +11,7 @@ const TAG_LIMIT = 3;
 interface Props {
   event: CalendarEvent;
   tags?: TagDto[];
-  onAsk?: () => void;
-  isAsking?: boolean;
+  actions?: ReactNode;
 }
 
 const FREQ_LABELS: Record<string, string> = {
@@ -32,7 +26,7 @@ function rruleToCadence(rrule: string): string {
   return (match && FREQ_LABELS[match[1]]) ?? "Recurring";
 }
 
-export function UpcomingEventCard({ event, tags, onAsk, isAsking }: Props) {
+export function UpcomingEventCard({ event, tags, actions }: Props) {
   const color = event.color ?? "var(--mantine-color-gray-4)";
   const hasMeta = !!(event.location || event.link || event.rrule);
 
@@ -94,7 +88,7 @@ export function UpcomingEventCard({ event, tags, onAsk, isAsking }: Props) {
             )}
           </Group>
         )}
-        {onAsk && (
+        {actions && (
           <Group justify="space-between" gap="xs" mt={4} wrap="nowrap">
             <Group
               gap={4}
@@ -125,16 +119,7 @@ export function UpcomingEventCard({ event, tags, onAsk, isAsking }: Props) {
                 </Badge>
               )}
             </Group>
-            <Button
-              size="xs"
-              variant="light"
-              leftSection={<IconMessage size={14} />}
-              onClick={onAsk}
-              loading={isAsking}
-              style={{ flexShrink: 0 }}
-            >
-              Start a thread
-            </Button>
+            {actions}
           </Group>
         )}
       </Stack>
