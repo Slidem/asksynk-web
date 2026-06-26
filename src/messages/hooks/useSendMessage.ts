@@ -5,6 +5,7 @@ import { threadMessagesQueryKey } from "@/messages/hooks/queries/useThreadMessag
 import type { Message } from "@/messages/models/message";
 import { getMessageSocket } from "@/messages/socket/messageSocket";
 import { bumpReplyCount } from "@/messages/utils/bumpReplyCount";
+import type { TaskSuggestionCreatePayload } from "@/tasks/models/taskSuggestion";
 import { notifications } from "@mantine/notifications";
 import type { InfiniteData } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
@@ -12,6 +13,7 @@ import { useCallback, useState } from "react";
 
 interface SendMessageOptions {
   parentMessageId?: string;
+  taskSuggestion?: TaskSuggestionCreatePayload;
 }
 
 export function useSendMessage(threadId: string) {
@@ -21,10 +23,10 @@ export function useSendMessage(threadId: string) {
 
   const sendMessage = useCallback(
     (body: string, tagIds: string[], options: SendMessageOptions = {}) => {
-      const { parentMessageId } = options;
+      const { parentMessageId, taskSuggestion } = options;
       const hasBody = body.trim().length > 0;
       const hasTags = tagIds.length > 0;
-      if (!hasBody && !hasTags) {
+      if (!hasBody && !hasTags && !taskSuggestion) {
         return;
       }
 
@@ -55,6 +57,7 @@ export function useSendMessage(threadId: string) {
         tagIds,
         createdAt: new Date().toISOString(),
         replyCount: 0,
+        suggestionId: null,
       };
 
       const queryKey = parentMessageId
@@ -69,11 +72,11 @@ export function useSendMessage(threadId: string) {
 
       socket.emit(
         "message.send",
-        { threadId, body, tagIds, parentMessageId },
+        { threadId, body, tagIds, parentMessageId, taskSuggestion },
         (ack) => {
           setIsSending(false);
           if (ack.ok && ack.messageId) {
-            replaceTempIdWithRealId(ack.messageId);
+            replaceTempIdWithRealId(ack.messageId, ack.suggestionId);
             return;
           }
 
@@ -108,7 +111,7 @@ export function useSendMessage(threadId: string) {
         );
       }
 
-      function replaceTempIdWithRealId(realId: string) {
+      function replaceTempIdWithRealId(realId: string, suggestionId?: string) {
         queryClient.setQueryData<InfiniteData<Message[]>>(
           queryKey,
           (current) => {
@@ -124,7 +127,13 @@ export function useSendMessage(threadId: string) {
                 existsReal
                   ? page.filter((m) => m.id !== tempId)
                   : page.map((m) =>
-                      m.id === tempId ? { ...m, id: realId } : m,
+                      m.id === tempId
+                        ? {
+                            ...m,
+                            id: realId,
+                            suggestionId: suggestionId ?? m.suggestionId,
+                          }
+                        : m,
                     ),
               ),
             };

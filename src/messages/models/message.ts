@@ -10,4 +10,6 @@ export interface Message {
   tagIds: string[];
   createdAt: string;
   replyCount: number;
+  /** Immutable pointer to a task suggestion sent with this message, if any. */
+  suggestionId: string | null;
 }

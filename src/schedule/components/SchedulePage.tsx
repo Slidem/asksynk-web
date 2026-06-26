@@ -4,6 +4,7 @@ import { useEnsureCalendar } from "@/schedule/hooks/queries/useEnsureCalendar";
 import { useSyncSelectedUserFromUrl } from "@/schedule/hooks/useSyncSelectedUserFromUrl";
 import { SchedulePageHeader } from "./SchedulePageHeader";
 import { CalendarUserRow } from "./CalendarUserRow";
+import { CalendarSyncErrorBanner } from "./CalendarSyncErrorBanner";
 import { CalendarIntegrationsLegend } from "./CalendarIntegrationsLegend";
 import { ScheduleCalendar } from "./ScheduleCalendar";
 import { CalendarEventDialog } from "./CalendarEventDialog";
@@ -38,6 +39,7 @@ export function SchedulePage() {
           }}
         >
           <CalendarUserRow />
+          <CalendarSyncErrorBanner />
           <CalendarIntegrationsLegend />
           <ScheduleCalendar />
         </Paper>

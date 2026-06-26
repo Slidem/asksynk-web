@@ -20,9 +20,11 @@ export function suggestionFormValuesToCreateInput(
   if (!isBlankHtml(values.description)) {
     payload.description = values.description;
   }
+
   if (values.dueDate) {
     payload.dueDate = toISOStringWithTimezone(new Date(values.dueDate));
   }
+
   if (values.kind === "batch") {
     payload.tasks = values.tasks.map(taskChildFormToInput);
   }

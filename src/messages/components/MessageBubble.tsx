@@ -15,10 +15,13 @@ import {
 } from "@tabler/icons-react";
 import { useState } from "react";
 import { UserBadge } from "@/components/UserBadge";
+import type { AttentionItemDto } from "@/attentionItems/models/attentionItem";
 import type { Message } from "@/messages/models/message";
 import DOMPurify from "dompurify";
 import { isoStringToFullDate, isoStringToTime } from "@/lib/date";
 import classes from "@/messages/components/MessageBubble.module.css";
+import { MessageAttentionStatusControl } from "@/messages/components/MessageAttentionStatusControl";
+import { MessageTaskSuggestionCard } from "@/messages/components/MessageTaskSuggestionCard";
 import { TagChipsRow } from "@/messages/components/TagChipsRow";
 import { TagPickerDialog } from "@/messages/components/TagPickerDialog";
 import { useTagMessage } from "@/messages/hooks/useTagMessage";
@@ -36,6 +39,8 @@ interface Props {
   showHeader: boolean;
   /** null for guest threads; disables tag actions/lookups. */
   recipientUserId: string | null;
+  /** The viewer's tagged_message attention item for this message, if they own one. */
+  attentionItem?: AttentionItemDto;
   isReply?: boolean;
   onReply?: () => void;
   onShowReplies?: () => void;
@@ -48,6 +53,7 @@ export function MessageBubble({
   sender,
   showHeader,
   recipientUserId,
+  attentionItem,
   isReply = false,
   onReply,
   onShowReplies,
@@ -112,11 +118,18 @@ export function MessageBubble({
           </Group>
         )}
         <Box className={isTagged ? classes.tagged : undefined}>
-          {isTagged && (
-            <TagChipsRow
-              tagIds={message.tagIds}
-              userId={isOwn ? (recipientUserId ?? undefined) : undefined}
-            />
+          {(isTagged || attentionItem) && (
+            <Group gap="xs" align="center" mb={4} wrap="wrap">
+              {isTagged && (
+                <TagChipsRow
+                  tagIds={message.tagIds}
+                  userId={isOwn ? (recipientUserId ?? undefined) : undefined}
+                />
+              )}
+              {attentionItem && (
+                <MessageAttentionStatusControl item={attentionItem} />
+              )}
+            </Group>
           )}
           {message.body && (
             <Box
@@ -125,6 +138,9 @@ export function MessageBubble({
             />
           )}
         </Box>
+        {message.suggestionId && (
+          <MessageTaskSuggestionCard suggestionId={message.suggestionId} />
+        )}
         {showReplyControls && replyCount > 0 && onShowReplies && (
           <Anchor
             component="button"

@@ -19,7 +19,16 @@ import { buildSlashCommandItems } from "@/messages/tiptap/slashCommandItems";
 import { TagSuggestion } from "@/messages/tiptap/TagSuggestion";
 import { findTaggedMarker } from "@/messages/tiptap/addTagToMarker";
 import { extractTaggedMessage } from "@/messages/tiptap/extractTaggedMessage";
+import { extractTaskSuggestion } from "@/messages/tiptap/extractTaskSuggestion";
+import {
+  TaskSuggestionMarker,
+  findTaskSuggestionMarker,
+  insertTaskSuggestionMarker,
+  updateTaskSuggestionMarker,
+} from "@/messages/tiptap/TaskSuggestionMarker";
 import { TagPickerDialog } from "@/messages/components/TagPickerDialog";
+import { TaskSuggestionQuickAdd } from "@/messages/components/TaskSuggestionQuickAdd";
+import type { TaskSuggestionDraft } from "@/messages/models/taskSuggestionDraft";
 import { useUserTagsService } from "@/tags/hooks/useUserTagsService";
 import type { TagDto } from "@/tags/models/tag";
 
@@ -45,6 +54,19 @@ const CLOSED: PickerState = {
   editPos: null,
 };
 
+interface SuggestState {
+  open: boolean;
+  draft: TaskSuggestionDraft | null;
+  /** marker node position when editing existing marker; null when creating */
+  editPos: number | null;
+}
+
+const SUGGEST_CLOSED: SuggestState = {
+  open: false,
+  draft: null,
+  editPos: null,
+};
+
 export function MessageComposer({
   threadId,
   frozen = false,
@@ -54,6 +76,7 @@ export function MessageComposer({
 }: Props) {
   const { sendMessage, isSending } = useSendMessage(threadId);
   const [picker, setPicker] = useState<PickerState>(CLOSED);
+  const [suggest, setSuggest] = useState<SuggestState>(SUGGEST_CLOSED);
   const canTag = !parentMessageId && recipientUserId != null;
   const seedTagIds = canTag ? initialTagIds : undefined;
 
@@ -81,6 +104,10 @@ export function MessageComposer({
                   editPos: pos,
                 }),
             }),
+            TaskSuggestionMarker.configure({
+              onRequestEdit: (pos: number, draft: TaskSuggestionDraft) =>
+                setSuggest({ open: true, draft, editPos: pos }),
+            }),
             SlashCommands.configure({
               getItems: () =>
                 buildSlashCommandItems({
@@ -90,6 +117,19 @@ export function MessageComposer({
                       initialTagIds: [],
                       editPos: null,
                     }),
+                  onSuggestTasks: () => {
+                    const e = editorRef.current;
+                    const existing = e ? findTaskSuggestionMarker(e) : null;
+                    setSuggest(
+                      existing
+                        ? {
+                            open: true,
+                            draft: existing.draft,
+                            editPos: existing.pos,
+                          }
+                        : { open: true, draft: null, editPos: null },
+                    );
+                  },
                 }),
               onOpenChange: (open) => {
                 menuOpenRef.current = open;
@@ -135,10 +175,26 @@ export function MessageComposer({
   const handleSend = useCallback(() => {
     if (!editor || frozen) return;
     const { body, tagIds, isEmptyBody } = extractTaggedMessage(editor);
-    if (isEmptyBody && tagIds.length === 0) return;
-    sendMessage(body, tagIds, { parentMessageId });
+    const taskSuggestion = extractTaskSuggestion(editor);
+    if (isEmptyBody && tagIds.length === 0 && !taskSuggestion) return;
+    sendMessage(body, tagIds, {
+      parentMessageId,
+      taskSuggestion: taskSuggestion ?? undefined,
+    });
     editor.commands.clearContent();
   }, [editor, frozen, sendMessage, parentMessageId]);
+
+  const handleConfirmSuggest = useCallback(
+    (draft: TaskSuggestionDraft) => {
+      if (!editor) return;
+      if (suggest.editPos != null) {
+        updateTaskSuggestionMarker(editor, suggest.editPos, draft);
+      } else {
+        insertTaskSuggestionMarker(editor, draft);
+      }
+    },
+    [editor, suggest.editPos],
+  );
 
   const handleConfirm = useCallback(
     (tagIds: string[]) => {
@@ -215,6 +271,15 @@ export function MessageComposer({
           confirmLabel={picker.editPos != null ? "Save" : "Tag thread"}
           onConfirm={handleConfirm}
           onClose={() => setPicker(CLOSED)}
+        />
+      )}
+      {canTag && recipientUserId != null && (
+        <TaskSuggestionQuickAdd
+          opened={suggest.open}
+          recipientUserId={recipientUserId}
+          initialDraft={suggest.draft}
+          onConfirm={handleConfirmSuggest}
+          onClose={() => setSuggest(SUGGEST_CLOSED)}
         />
       )}
     </Stack>

@@ -1,5 +1,6 @@
 import { Box, Center, Loader, ScrollArea, Stack, Text } from "@mantine/core";
 import { useSession } from "@/auth";
+import { useTaggedMessageAttentionItemMap } from "@/attentionItems/hooks/queries/useTaggedMessageAttentionItemMap";
 import { MessageBubble } from "@/messages/components/MessageBubble";
 import classes from "@/messages/components/MessageList.module.css";
 import { useReplyPanelHandlers } from "@/messages/hooks/dialogs/replyPanelHooks";
@@ -37,6 +38,8 @@ export function MessageList({
 }: Props) {
   const { data: session } = useSession();
   const { open: openReplyPanel } = useReplyPanelHandlers();
+  // Seeds + shares the ['attention-items'] cache; only the owner has entries.
+  const attentionItems = useTaggedMessageAttentionItemMap();
   const currentUserId = session?.user?.id;
   const currentUserName = session?.user?.name ?? null;
   const currentUserEmail = session?.user?.email ?? null;
@@ -129,13 +132,16 @@ export function MessageList({
       focusedHandledRef.current = null;
       return;
     }
+
     if (focusedHandledRef.current === focusMessageId) {
       return;
     }
+
     const el = messageRefs.current.get(focusMessageId);
     if (!el) {
       return;
     }
+
     focusedHandledRef.current = focusMessageId;
     requestAnimationFrame(() => {
       el.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -209,6 +215,7 @@ export function MessageList({
               sender={sender}
               showHeader={showHeader}
               recipientUserId={recipientUserId}
+              attentionItem={attentionItems.get(message.id)}
               onReply={() => openReplyPanel(message.id)}
               onShowReplies={() => openReplyPanel(message.id)}
             />

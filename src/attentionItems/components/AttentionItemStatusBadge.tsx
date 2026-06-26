@@ -15,11 +15,13 @@ const COLORS: Record<AttentionItemStatus, string> = {
 
 interface Props {
   status: AttentionItemStatus;
+  /** Override the pill default to line up with squared chips (e.g. in messages). */
+  radius?: string;
 }
 
-export function AttentionItemStatusBadge({ status }: Props) {
+export function AttentionItemStatusBadge({ status, radius }: Props) {
   return (
-    <Badge size="sm" variant="light" color={COLORS[status]}>
+    <Badge size="sm" radius={radius} variant="light" color={COLORS[status]}>
       {LABELS[status]}
     </Badge>
   );

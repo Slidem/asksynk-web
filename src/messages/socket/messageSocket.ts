@@ -2,11 +2,17 @@ import { apiBaseUrl } from "@/lib/api";
 import { io, type Socket } from "socket.io-client";
 import type { AttentionItemDto } from "@/attentionItems/models/attentionItem";
 import type { Message } from "@/messages/models/message";
+import type {
+  TaskSuggestion,
+  TaskSuggestionCreatePayload,
+} from "@/tasks/models/taskSuggestion";
 import type { TimerCompletedEvent } from "@/timer/models/timer";
 
 export interface SendMessageAck {
   ok: boolean;
   messageId?: string;
+  /** Set when the message carried a task suggestion; links the inline card. */
+  suggestionId?: string;
   error?: string;
 }
 
@@ -25,6 +31,9 @@ interface ServerToClient {
   "message.updated": (payload: { threadId: string; message: Message }) => void;
   "attention.upserted": (payload: { item: AttentionItemDto }) => void;
   "attention.removed": (payload: { id: string }) => void;
+  // Fired to BOTH participants when a thread suggestion's status or any of its
+  // materialized tasks' status changes — keeps the inline card live both ways.
+  "suggestion.updated": (payload: { suggestion: TaskSuggestion }) => void;
   "timer.completed": (payload: TimerCompletedEvent) => void;
 }
 
@@ -43,6 +52,9 @@ interface ClientToServer {
       body: string;
       tagIds: string[];
       parentMessageId?: string;
+      // Backend creates the suggestion (suggestee = thread's other participant)
+      // + the recipient's attention item, and links suggestionId to the message.
+      taskSuggestion?: TaskSuggestionCreatePayload;
     },
     ack: (response: SendMessageAck) => void,
   ) => void;

@@ -1,8 +1,19 @@
+import type { TaskStatus } from "@/tasks/models/task";
+
 export type SuggestionStatus = "pending" | "accepted" | "rejected";
 
 export type SuggestionKind = "task" | "batch";
 
 export type SuggestionRole = "sent" | "received";
+
+// Tasks created when a suggestion is accepted. Carries live status so both the
+// suggester and the suggestee can see progress (the suggester never has these in
+// their own ['tasks'] cache).
+export interface MaterializedTask {
+  id: string;
+  title: string;
+  status: TaskStatus;
+}
 
 export interface SuggestionTaskChild {
   title: string;
@@ -26,6 +37,8 @@ export interface TaskSuggestion {
   suggesteeUserId: string;
   status: SuggestionStatus;
   payload: TaskSuggestionPayload;
+  // Present once accepted; lets both sides render per-task progress + check off.
+  materializedTasks?: MaterializedTask[];
   createdAt: string;
   updatedAt: string;
 }

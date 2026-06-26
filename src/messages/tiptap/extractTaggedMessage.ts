@@ -31,6 +31,8 @@ export function extractTaggedMessage(editor: Editor): ExtractedMessage {
 
 function stripMarkerFromHtml(html: string): string {
   const doc = new DOMParser().parseFromString(html, "text/html");
-  doc.querySelectorAll("[data-tagged-marker]").forEach((el) => el.remove());
+  doc
+    .querySelectorAll("[data-tagged-marker], [data-task-suggestion-marker]")
+    .forEach((el) => el.remove());
   return doc.body.innerHTML;
 }

@@ -40,11 +40,14 @@ export function TaskBatchCreateDialog() {
   const isOpened = useIsCreateTaskBatchDialogOpened();
   const { close } = useCreateTaskBatchDialogHandlers();
   const { createTaskBatch, isCreating } = useCreateTaskBatch();
+
   const navigate = useNavigate();
+
   const isMobile = useIsMobile();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [tagIds, setTagIds] = useState<string[]>([]);
   const [children, setChildren] = useState<TaskChildFormValues[]>([
@@ -65,6 +68,7 @@ export function TaskBatchCreateDialog() {
   };
 
   const validChildren = children.filter((c) => c.title.trim().length > 0);
+
   const canSubmit = title.trim().length > 0 && validChildren.length > 0;
 
   const buildInput = () => {
@@ -140,7 +144,10 @@ export function TaskBatchCreateDialog() {
           onChange={(e) => setTitle(e.currentTarget.value)}
         />
 
-        <CollapsibleSection icon={<IconAlignLeft size={14} />} title="Description">
+        <CollapsibleSection
+          icon={<IconAlignLeft size={14} />}
+          title="Description"
+        >
           <DescriptionEditor content={description} onChange={setDescription} />
         </CollapsibleSection>
 
@@ -178,7 +185,11 @@ export function TaskBatchCreateDialog() {
             </Badge>
           }
         >
-          <TaskChildrenEditor items={children} onChange={setChildren} hideHeader />
+          <TaskChildrenEditor
+            items={children}
+            onChange={setChildren}
+            hideHeader
+          />
         </CollapsibleSection>
 
         {isMobile ? (

@@ -5,6 +5,8 @@ import { threadsQueryKey } from "@/messages/hooks/queries/useThreadsQueryData";
 import type { Message } from "@/messages/models/message";
 import type { ThreadListItem } from "@/messages/models/thread";
 import { bumpReplyCount } from "@/messages/utils/bumpReplyCount";
+import { getTaskSuggestionDetailQueryKey } from "@/tasks/hooks/queries/useTaskSuggestionsQueryData";
+import type { TaskSuggestion } from "@/tasks/models/taskSuggestion";
 import type { InfiniteData } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -129,12 +131,26 @@ export function useMessageSocket() {
       );
     };
 
+    const handleSuggestionUpdated = (payload: {
+      suggestion: TaskSuggestion;
+    }) => {
+      const { suggestion } = payload;
+      queryClient.setQueryData(
+        getTaskSuggestionDetailQueryKey(suggestion.id),
+        suggestion,
+      );
+      queryClient.invalidateQueries({ queryKey: ["task-suggestions"] });
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    };
+
     socket.on("message.created", handleMessageCreated);
     socket.on("message.updated", handleMessageUpdated);
+    socket.on("suggestion.updated", handleSuggestionUpdated);
 
     return () => {
       socket.off("message.created", handleMessageCreated);
       socket.off("message.updated", handleMessageUpdated);
+      socket.off("suggestion.updated", handleSuggestionUpdated);
     };
   }, [queryClient]);
 }
