@@ -66,12 +66,20 @@ export function BatchBoardCard({
               {batch?.title ?? "Batch"}
             </Text>
           </Group>
-          <Group gap={4} wrap="nowrap">
-            <BatchDeleteButton
-              iconOnly
-              batchId={batchId}
-              taskCount={tasks.length}
-            />
+          <BatchDeleteButton
+            iconOnly
+            batchId={batchId}
+            taskCount={tasks.length}
+          />
+        </Group>
+
+        {batch && <TaskTagChips tagIds={batch.tagIds} />}
+
+        <Group justify="space-between" align="center" gap="xs">
+          <Group gap={4} wrap="nowrap" align="center">
+            <Text size="xs" c="dimmed">
+              {completed}/{tasks.length} done
+            </Text>
             <ActionIcon
               variant="subtle"
               size="sm"
@@ -88,14 +96,6 @@ export function BatchBoardCard({
               )}
             </ActionIcon>
           </Group>
-        </Group>
-
-        {batch && <TaskTagChips tagIds={batch.tagIds} />}
-
-        <Group justify="space-between" align="center" gap="xs">
-          <Text size="xs" c="dimmed">
-            {completed}/{tasks.length} done
-          </Text>
           {batch?.dueDate && (
             <Group gap={4} wrap="nowrap" c="dimmed">
               <IconCalendarDue size={14} />
