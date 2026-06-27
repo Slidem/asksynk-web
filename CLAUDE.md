@@ -25,6 +25,10 @@ By leveraging tags as a barrier between incoming communication channels and a us
 - **DON'T USE BARREL EXPORTS**
 - **Use import aliases** Avoid relative imports, use import aliases as defined in tsconfig
 
+### Backend API discovery
+
+- **Always check the backend OpenAPI spec before adding a new API.** For any new feature needing a new endpoint, fetch `http://localhost:3000/docs-json` — it lists all available APIs (paths, params, request/response shapes). Faster and more reliable than guessing.
+
 ### Hooks / APIs folder layout
 
 Canonical reference: `src/tags/` and `src/schedule/`.
