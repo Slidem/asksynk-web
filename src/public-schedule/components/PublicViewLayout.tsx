@@ -62,7 +62,9 @@ export function PublicViewLayout({ view, tabs, children }: Props) {
       <Box
         style={{
           flex: 1,
+          minWidth: 0,
           minHeight: 0,
+          overflow: "auto",
           display: "flex",
           flexDirection: "column",
           padding: "var(--mantine-spacing-md)",

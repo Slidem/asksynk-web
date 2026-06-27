@@ -65,7 +65,7 @@ export function PublicViewPage({ slug, tab }: Props) {
 
   if (isGuestSessionLoading || isSessionLoading) {
     return (
-      <Center h="100vh" w="100vw">
+      <Center h="100vh" w="100%">
         <Loader />
       </Center>
     );

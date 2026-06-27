@@ -34,13 +34,18 @@ function AuthenticatedLayout() {
   useAppSocketConnection();
 
   return (
-    <Box style={{ display: "flex" }}>
+    <Box style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
       <Box visibleFrom="sm">
         <Navbar />
       </Box>
       <Box
         component="main"
-        style={{ flex: 1, minWidth: 0, padding: "var(--mantine-spacing-md)" }}
+        style={{
+          flex: 1,
+          minWidth: 0,
+          overflow: "auto",
+          padding: "var(--mantine-spacing-md)",
+        }}
       >
         <MobileNav />
         <Outlet />
