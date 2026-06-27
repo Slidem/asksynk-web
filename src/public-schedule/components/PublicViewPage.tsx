@@ -9,9 +9,13 @@ import {
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 
+import { PublicMessagesPanel } from "@/public-schedule/components/PublicMessagesPanel";
+import { PublicPendingActionsPanel } from "@/public-schedule/components/PublicPendingActionsPanel";
 import { PublicScheduleCalendar } from "@/public-schedule/components/PublicScheduleCalendar";
 import { PublicViewLayout } from "@/public-schedule/components/PublicViewLayout";
 import { PublicViewSignInForm } from "@/public-schedule/components/PublicViewSignInForm";
+import { PublicViewTabs } from "@/public-schedule/components/PublicViewTabs";
+import type { PublicViewTab } from "@/public-schedule/models/publicViewTab";
 import {
   useGuestSession,
   useGuestSessionHandlers,
@@ -23,9 +27,10 @@ import { PublicViewRedirectToApp } from "./PublicViewRedirectToApp";
 
 interface Props {
   slug: string;
+  tab: PublicViewTab;
 }
 
-export function PublicViewPage({ slug }: Props) {
+export function PublicViewPage({ slug, tab }: Props) {
   const [stayOnPublicView, setStayOnPublicView] = useState(false);
 
   const {
@@ -101,8 +106,15 @@ export function PublicViewPage({ slug }: Props) {
   }
 
   return (
-    <PublicViewLayout view={view}>
-      <PublicScheduleCalendar slug={slug} ownerUserId={view.ownerUserId} />
+    <PublicViewLayout
+      view={view}
+      tabs={<PublicViewTabs slug={slug} activeTab={tab} />}
+    >
+      {tab === "calendar" && (
+        <PublicScheduleCalendar slug={slug} ownerUserId={view.ownerUserId} />
+      )}
+      {tab === "pending" && <PublicPendingActionsPanel />}
+      {tab === "messages" && <PublicMessagesPanel />}
     </PublicViewLayout>
   );
 }

@@ -10,10 +10,11 @@ import type { PublicViewMetadataDto } from "@/public-schedule/models/publicView"
 
 interface Props {
   view: PublicViewMetadataDto;
+  tabs?: ReactNode;
   children: ReactNode;
 }
 
-export function PublicViewLayout({ view, children }: Props) {
+export function PublicViewLayout({ view, tabs, children }: Props) {
   const session = useGuestSession();
   const { clear } = useGuestSessionHandlers();
 
@@ -22,7 +23,8 @@ export function PublicViewLayout({ view, children }: Props) {
       gap={0}
       style={{
         height: "100vh",
-        width: "100vw",
+        width: "100%",
+        overflow: "hidden",
         background: "var(--mantine-color-body)",
       }}
     >
@@ -54,6 +56,8 @@ export function PublicViewLayout({ view, children }: Props) {
           </Button>
         </Group>
       </Group>
+
+      {tabs}
 
       <Box
         style={{
