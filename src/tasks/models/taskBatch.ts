@@ -10,7 +10,6 @@ export interface TaskBatch {
   createdBy: string;
   assigneeUserId: string;
   title: string;
-  description: string | null;
   dueDate: string | null;
   tagIds: string[];
   tasks: TaskDto[];
@@ -21,7 +20,6 @@ export interface TaskBatch {
 // Tags and dueDate live at batch level; children are title/description only.
 export interface TaskBatchCreateInput {
   title: string;
-  description?: string;
   dueDate?: string;
   tagIds?: string[];
   tasks: BatchChildTaskInput[];
@@ -30,7 +28,6 @@ export interface TaskBatchCreateInput {
 export interface TaskBatchUpdateInput {
   id: string;
   title?: string;
-  description?: string | null;
   dueDate?: string | null;
   tagIds?: string[];
 }

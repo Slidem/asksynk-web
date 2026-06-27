@@ -31,7 +31,6 @@ export function makeEmptyTaskChild(): TaskChildFormValues {
 
 export interface BatchFormValues {
   title: string;
-  description: string;
   dueDate: Date | null;
   tagIds: string[];
   tasks: TaskChildFormValues[];
@@ -39,7 +38,6 @@ export interface BatchFormValues {
 
 export const DEFAULT_BATCH_FORM_VALUES: BatchFormValues = {
   title: "",
-  description: "",
   dueDate: null,
   tagIds: [],
   tasks: [makeEmptyTaskChild()],

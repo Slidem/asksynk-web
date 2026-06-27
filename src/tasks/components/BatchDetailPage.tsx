@@ -17,7 +17,6 @@ import {
 } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import {
-  IconAlignLeft,
   IconArrowLeft,
   IconCalendarDue,
   IconCalendarEvent,
@@ -25,16 +24,14 @@ import {
   IconListDetails,
   IconPencil,
   IconPlus,
+  IconStack2,
   IconTag,
 } from "@tabler/icons-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import dayjs from "dayjs";
 import { Fragment, useCallback, useState } from "react";
 
-import { DescriptionEditor } from "@/components/DescriptionEditor";
-import { RichTextContent } from "@/components/RichTextContent";
 import { toISOStringWithTimezone } from "@/lib/date";
-import { isBlankHtml } from "@/lib/isBlankHtml";
 import { UserTagPicker } from "@/tags/components/UserTagPicker";
 import { BatchDeleteButton } from "@/tasks/components/BatchDeleteButton";
 import { BatchTaskEditRow } from "@/tasks/components/BatchTaskEditRow";
@@ -67,7 +64,6 @@ export function BatchDetailPage({ batchId }: Props) {
 
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [tagIds, setTagIds] = useState<string[]>([]);
   const [newTitle, setNewTitle] = useState("");
@@ -101,7 +97,6 @@ export function BatchDetailPage({ batchId }: Props) {
 
   const startEditing = () => {
     setTitle(batch.title);
-    setDescription(batch.description ?? "");
     setDueDate(batch.dueDate ? new Date(batch.dueDate) : null);
     setTagIds(batch.tagIds);
     setEditing(true);
@@ -112,7 +107,6 @@ export function BatchDetailPage({ batchId }: Props) {
     updateTaskBatch({
       id: batchId,
       title: title.trim(),
-      description: isBlankHtml(description) ? null : description,
       dueDate: dueDate ? toISOStringWithTimezone(new Date(dueDate)) : null,
       tagIds,
     });
@@ -184,28 +178,28 @@ export function BatchDetailPage({ batchId }: Props) {
           {editing ? (
             <Stack gap="sm">
               <TextInput
-                label="Batch title"
-                withAsterisk
+                placeholder="Batch title"
+                leftSection={<IconStack2 size={16} />}
                 value={title}
                 onChange={(e) => setTitle(e.currentTarget.value)}
-              />
-              <DateTimePicker
-                label="Due date (whole batch)"
-                clearable
-                leftSection={<IconCalendarEvent size={16} />}
-                value={dueDate}
-                onChange={(value) => setDueDate(value ? new Date(value) : null)}
               />
               <Input.Wrapper
                 label={
                   <Group gap={4} component="span">
                     <IconTag size={14} />
-                    Tags (applied to the whole batch)
+                    Tags
                   </Group>
                 }
               >
                 <UserTagPicker selectedTagIds={tagIds} onChange={setTagIds} />
               </Input.Wrapper>
+              <DateTimePicker
+                label="Due date"
+                clearable
+                leftSection={<IconCalendarEvent size={16} />}
+                value={dueDate}
+                onChange={(value) => setDueDate(value ? new Date(value) : null)}
+              />
             </Stack>
           ) : (
             <Stack gap="sm">
@@ -229,14 +223,6 @@ export function BatchDetailPage({ batchId }: Props) {
               />
               {batch.tagIds.length > 0 && <TaskTagChips tagIds={batch.tagIds} />}
             </Stack>
-          )}
-        </DetailSection>
-
-        <DetailSection icon={<IconAlignLeft size={16} />} title="Description">
-          {editing ? (
-            <DescriptionEditor content={description} onChange={setDescription} />
-          ) : (
-            <RichTextContent html={batch.description ?? ""} />
           )}
         </DetailSection>
 

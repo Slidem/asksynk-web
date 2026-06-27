@@ -19,6 +19,7 @@ import {
   IconArrowLeft,
   IconCalendarDue,
   IconCalendarEvent,
+  IconForms,
   IconListDetails,
   IconPencil,
   IconProgressCheck,
@@ -178,28 +179,13 @@ export function TaskDetailPage({ taskId }: Props) {
           {editing ? (
             <Stack gap="sm">
               <TextInput
-                label="Title"
-                withAsterisk
+                placeholder="Task title"
+                leftSection={<IconForms size={16} />}
                 value={title}
                 onChange={(e) => setTitle(e.currentTarget.value)}
               />
-              <Select
-                label="Status"
-                data={STATUS_OPTIONS}
-                allowDeselect={false}
-                leftSection={<IconProgressCheck size={16} />}
-                value={status}
-                onChange={(value) => value && setStatus(value as TaskStatus)}
-              />
               {!batched && (
                 <>
-                  <DateTimePicker
-                    label="Due date"
-                    clearable
-                    leftSection={<IconCalendarEvent size={16} />}
-                    value={dueDate}
-                    onChange={(value) => setDueDate(value ? new Date(value) : null)}
-                  />
                   <Input.Wrapper
                     label={
                       <Group gap={4} component="span">
@@ -210,8 +196,23 @@ export function TaskDetailPage({ taskId }: Props) {
                   >
                     <UserTagPicker selectedTagIds={tagIds} onChange={setTagIds} />
                   </Input.Wrapper>
+                  <DateTimePicker
+                    label="Due date"
+                    clearable
+                    leftSection={<IconCalendarEvent size={16} />}
+                    value={dueDate}
+                    onChange={(value) => setDueDate(value ? new Date(value) : null)}
+                  />
                 </>
               )}
+              <Select
+                label="Status"
+                data={STATUS_OPTIONS}
+                allowDeselect={false}
+                leftSection={<IconProgressCheck size={16} />}
+                value={status}
+                onChange={(value) => value && setStatus(value as TaskStatus)}
+              />
             </Stack>
           ) : (
             <Stack gap="sm">

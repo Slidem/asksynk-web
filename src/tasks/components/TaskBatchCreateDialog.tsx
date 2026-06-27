@@ -9,7 +9,6 @@ import {
 } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import {
-  IconAlignLeft,
   IconArrowUpRight,
   IconCalendarEvent,
   IconListCheck,
@@ -20,7 +19,6 @@ import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
 import { useIsMobile } from "@/app/hooks/useIsMobile";
-import { DescriptionEditor } from "@/components/DescriptionEditor";
 import { UserTagPicker } from "@/tags/components/UserTagPicker";
 import { CollapsibleSection } from "@/tasks/components/CollapsibleSection";
 import { TaskChildrenEditor } from "@/tasks/components/TaskChildrenEditor";
@@ -46,7 +44,6 @@ export function TaskBatchCreateDialog() {
   const isMobile = useIsMobile();
 
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
 
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [tagIds, setTagIds] = useState<string[]>([]);
@@ -56,7 +53,6 @@ export function TaskBatchCreateDialog() {
 
   const reset = () => {
     setTitle("");
-    setDescription("");
     setDueDate(null);
     setTagIds([]);
     setChildren([makeEmptyTaskChild()]);
@@ -74,7 +70,6 @@ export function TaskBatchCreateDialog() {
   const buildInput = () => {
     const values: BatchFormValues = {
       title,
-      description,
       dueDate,
       tagIds,
       tasks: validChildren,
@@ -137,44 +132,30 @@ export function TaskBatchCreateDialog() {
     >
       <Stack gap="sm">
         <TextInput
-          label="Batch title"
-          withAsterisk
+          placeholder="Batch title"
           leftSection={<IconStack2 size={16} />}
           value={title}
           onChange={(e) => setTitle(e.currentTarget.value)}
         />
 
-        <CollapsibleSection
-          icon={<IconAlignLeft size={14} />}
-          title="Description"
+        <Input.Wrapper
+          label={
+            <Group gap={4} component="span">
+              <IconTag size={14} />
+              Tags
+            </Group>
+          }
         >
-          <DescriptionEditor content={description} onChange={setDescription} />
-        </CollapsibleSection>
+          <UserTagPicker selectedTagIds={tagIds} onChange={setTagIds} />
+        </Input.Wrapper>
 
-        <CollapsibleSection
-          icon={<IconCalendarEvent size={14} />}
-          title="Due date & tags"
-        >
-          <Stack gap="sm">
-            <DateTimePicker
-              label="Due date (whole batch)"
-              clearable
-              leftSection={<IconCalendarEvent size={16} />}
-              value={dueDate}
-              onChange={(value) => setDueDate(value ? new Date(value) : null)}
-            />
-            <Input.Wrapper
-              label={
-                <Group gap={4} component="span">
-                  <IconTag size={14} />
-                  Tags (applied to the whole batch)
-                </Group>
-              }
-            >
-              <UserTagPicker selectedTagIds={tagIds} onChange={setTagIds} />
-            </Input.Wrapper>
-          </Stack>
-        </CollapsibleSection>
+        <DateTimePicker
+          label="Due date"
+          clearable
+          leftSection={<IconCalendarEvent size={16} />}
+          value={dueDate}
+          onChange={(value) => setDueDate(value ? new Date(value) : null)}
+        />
 
         <CollapsibleSection
           icon={<IconListCheck size={14} />}

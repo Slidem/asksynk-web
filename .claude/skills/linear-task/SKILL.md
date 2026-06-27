@@ -12,7 +12,7 @@ You have the Linear MCP plugin available. Use whatever issue tools it exposes (f
 ## Two rules that override convenience
 
 1. **Do not write a line of implementation code until the task is unambiguous.** A wrong screen costs far more than a few questions. If anything is unclear, stop and ask.
-2. **Do not move the issue to Done on your own.** Only the user decides it's done. You may reach "ready for review", but the final transition waits for their explicit confirmation.
+2. **Do not move the issue to Done on your own.** Only the user decides it's done. You may reach "ready for review", but the final transition waits for their explicit confirmation.v
 
 ## Phase 1 — Load the issue
 

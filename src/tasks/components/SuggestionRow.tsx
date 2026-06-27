@@ -5,6 +5,7 @@ import {
   Stack,
   Text,
   Tooltip,
+  UnstyledButton,
 } from "@mantine/core";
 import {
   IconCalendarDue,
@@ -21,6 +22,7 @@ import { useNetworkConnectionsQuery } from "@/network/hooks/queries/useNetworkCo
 import { SuggestionStatusBadge } from "@/tasks/components/SuggestionStatusBadge";
 import { TaskTagChips } from "@/tasks/components/TaskTagChips";
 import { useEditTaskSuggestionDialogHandlers } from "@/tasks/hooks/dialogs/editTaskSuggestionDialogHooks";
+import { useTaskSuggestionDetailDialogHandlers } from "@/tasks/hooks/dialogs/taskSuggestionDetailDialogHooks";
 import { useRescindTaskSuggestion } from "@/tasks/hooks/mutations/useRescindTaskSuggestion";
 import { useRespondToTaskSuggestion } from "@/tasks/hooks/mutations/useRespondToTaskSuggestion";
 import type {
@@ -45,6 +47,7 @@ export function SuggestionRow({
   const { rescind, isRescinding } = useRescindTaskSuggestion();
   const { respond, isResponding } = useRespondToTaskSuggestion();
   const { open: openEdit } = useEditTaskSuggestionDialogHandlers();
+  const { open: openDetail } = useTaskSuggestionDetailDialogHandlers();
 
   // Counterparty: who it's for when sent, who it's from when received.
   const counterpartyId =
@@ -66,44 +69,54 @@ export function SuggestionRow({
       px="md"
       py="sm"
     >
-      <Group gap="sm" wrap="nowrap" style={{ minWidth: 0 }}>
-        <UserBadge
-          variant="avatar"
-          name={counterparty ? getConnectionDisplayName(counterparty) : null}
-          email={counterparty?.email}
-          image={counterparty?.image}
-        />
-        <Stack gap={2} style={{ minWidth: 0 }}>
-          <Group gap="xs" wrap="nowrap">
-            <Text size="sm" fw={500} truncate>
-              {payload.title}
-            </Text>
-            {payload.kind === "batch" && (
-              <Badge size="xs" variant="light" color="grape">
-                Batch · {childCount}
-              </Badge>
-            )}
-          </Group>
-          <Group gap="xs" wrap="nowrap">
-            <Text size="xs" c="dimmed">
-              {role === "sent" ? "Sent" : "Received"}{" "}
-              {dayjs(suggestion.createdAt).format("MMM D, YYYY")}
-            </Text>
-            {payload.dueDate && (
-              <Group gap={2} wrap="nowrap" c="dimmed">
-                <IconCalendarDue size={12} />
-                <Text size="xs">
-                  {dayjs(payload.dueDate).format("MMM D")}
-                </Text>
-              </Group>
-            )}
-            <TaskTagChips
-              tagIds={payload.tagIds}
-              userId={role === "sent" ? suggestion.suggesteeUserId : undefined}
-            />
-          </Group>
-        </Stack>
-      </Group>
+      <UnstyledButton
+        onClick={() => openDetail(suggestion, role)}
+        style={{ minWidth: 0, flex: 1 }}
+      >
+        <Group gap="sm" wrap="nowrap" style={{ minWidth: 0 }}>
+          <UserBadge
+            variant="avatar"
+            name={counterparty ? getConnectionDisplayName(counterparty) : null}
+            email={counterparty?.email}
+            image={counterparty?.image}
+          />
+          <Stack gap={2} style={{ minWidth: 0 }}>
+            <Group gap="xs" wrap="nowrap">
+              <Text size="sm" fw={500} truncate>
+                {payload.title}
+              </Text>
+              {payload.kind === "batch" && (
+                <Badge size="xs" variant="light" color="grape">
+                  Batch · {childCount}
+                </Badge>
+              )}
+            </Group>
+            <Group gap="xs" wrap="nowrap">
+              <Text size="xs" c="dimmed">
+                {role === "sent" ? "Sent" : "Received"}{" "}
+                {dayjs(suggestion.createdAt).format("MMM D, YYYY")}
+              </Text>
+              {payload.dueDate && (
+                <Group gap={2} wrap="nowrap" c="dimmed">
+                  <IconCalendarDue size={12} />
+                  <Text size="xs">
+                    {dayjs(payload.dueDate).format("MMM D")}
+                  </Text>
+                </Group>
+              )}
+              <TaskTagChips
+                tagIds={payload.tagIds}
+                userId={
+                  role === "sent" ? suggestion.suggesteeUserId : undefined
+                }
+              />
+              <Text size="xs" c="blue">
+                View details
+              </Text>
+            </Group>
+          </Stack>
+        </Group>
+      </UnstyledButton>
 
       <Group gap="xs" wrap="nowrap">
         <SuggestionStatusBadge status={suggestion.status} />

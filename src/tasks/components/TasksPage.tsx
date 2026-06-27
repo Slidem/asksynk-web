@@ -9,6 +9,7 @@ import { TaskBatchDetailDialog } from "@/tasks/components/TaskBatchDetailDialog"
 import { TaskBoard } from "@/tasks/components/TaskBoard";
 import { TaskCreateDialog } from "@/tasks/components/TaskCreateDialog";
 import { TaskEditDialog } from "@/tasks/components/TaskEditDialog";
+import { TaskSuggestionDetailDialog } from "@/tasks/components/TaskSuggestionDetailDialog";
 import { TaskSuggestionEditDialog } from "@/tasks/components/TaskSuggestionEditDialog";
 import { TasksPageHeader } from "@/tasks/components/TasksPageHeader";
 import type { TasksTab } from "@/tasks/models/tasksTab";
@@ -74,6 +75,7 @@ export function TasksPage() {
       <TaskBatchCreateDialog />
       <TaskBatchDetailDialog />
       <TaskSuggestionEditDialog />
+      <TaskSuggestionDetailDialog />
     </Container>
   );
 }

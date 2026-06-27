@@ -1,16 +1,21 @@
 import {
+  ActionIcon,
   Badge,
   Button,
   Checkbox,
+  Collapse,
   Group,
   Loader,
   Paper,
   Stack,
   Text,
 } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import {
   IconCalendarDue,
   IconCheck,
+  IconChevronDown,
+  IconChevronRight,
   IconClipboardList,
   IconX,
 } from "@tabler/icons-react";
@@ -29,11 +34,13 @@ interface Props {
 
 // Inline card for a task batch suggested within a thread. Suggestee can
 // accept/reject and check tasks off; suggester sees live read-only progress.
+// Subtasks live behind a collapsible dropdown (like the attention items view).
 export function MessageTaskSuggestionCard({ suggestionId }: Props) {
   const { data: session } = useSession();
   const { data: suggestion, isLoading } = useTaskSuggestion(suggestionId);
   const { respond, isResponding } = useRespondToTaskSuggestion();
   const { updateTaskStatus } = useUpdateSuggestedTaskStatus(suggestionId);
+  const [expanded, { toggle }] = useDisclosure(false);
 
   if (isLoading || !suggestion) {
     return (
@@ -47,6 +54,7 @@ export function MessageTaskSuggestionCard({ suggestionId }: Props) {
   const isSuggestee = me === suggestion.suggesteeUserId;
   const { payload, status, materializedTasks } = suggestion;
   const childCount = payload.tasks.length;
+  const hasSubtasks = childCount > 0;
   const doneCount =
     materializedTasks?.filter((t) => t.status === "completed").length ?? 0;
   const totalCount = materializedTasks?.length ?? childCount;
@@ -56,6 +64,20 @@ export function MessageTaskSuggestionCard({ suggestionId }: Props) {
       <Stack gap="xs">
         <Group justify="space-between" wrap="nowrap" gap="xs">
           <Group gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
+            {hasSubtasks && (
+              <ActionIcon
+                variant="subtle"
+                size="sm"
+                aria-label={expanded ? "Hide tasks" : "Show tasks"}
+                onClick={toggle}
+              >
+                {expanded ? (
+                  <IconChevronDown size={14} />
+                ) : (
+                  <IconChevronRight size={14} />
+                )}
+              </ActionIcon>
+            )}
             <IconClipboardList size={16} />
             <Text size="sm" fw={600} truncate>
               {payload.title}
@@ -84,48 +106,59 @@ export function MessageTaskSuggestionCard({ suggestionId }: Props) {
         </Group>
 
         {status === "accepted" && (
-          <Stack gap={4}>
-            <Text size="xs" c="dimmed">
-              {doneCount}/{totalCount} done
-            </Text>
-            {materializedTasks
-              ? materializedTasks.map((task) => (
-                  <Group key={task.id} gap="xs" wrap="nowrap">
-                    <Checkbox
-                      size="xs"
-                      checked={task.status === "completed"}
-                      disabled={!isSuggestee}
-                      onChange={(e) =>
-                        updateTaskStatus({
-                          taskId: task.id,
-                          status: e.currentTarget.checked
-                            ? "completed"
-                            : "todo",
-                        })
-                      }
-                      label={
-                        <Text
-                          size="xs"
-                          td={task.status === "completed" ? "line-through" : undefined}
-                          c={task.status === "completed" ? "dimmed" : undefined}
-                        >
-                          {task.title}
-                        </Text>
-                      }
-                    />
-                    {task.status === "in_progress" && (
-                      <Badge size="xs" variant="light" color="blue">
-                        In progress
-                      </Badge>
-                    )}
-                  </Group>
-                ))
-              : payload.tasks.map((task, index) => (
-                  <Text key={index} size="xs" c="dimmed">
-                    • {task.title}
-                  </Text>
-                ))}
-          </Stack>
+          <Text size="xs" c="dimmed">
+            {doneCount}/{totalCount} done
+          </Text>
+        )}
+
+        {hasSubtasks && (
+          <Collapse in={expanded}>
+            <Stack gap={4} pl="md">
+              {status === "accepted" && materializedTasks
+                ? materializedTasks.map((task) => (
+                    <Group key={task.id} gap="xs" wrap="nowrap">
+                      <Checkbox
+                        size="xs"
+                        checked={task.status === "completed"}
+                        disabled={!isSuggestee}
+                        onChange={(e) =>
+                          updateTaskStatus({
+                            taskId: task.id,
+                            status: e.currentTarget.checked
+                              ? "completed"
+                              : "todo",
+                          })
+                        }
+                        label={
+                          <Text
+                            size="xs"
+                            td={
+                              task.status === "completed"
+                                ? "line-through"
+                                : undefined
+                            }
+                            c={
+                              task.status === "completed" ? "dimmed" : undefined
+                            }
+                          >
+                            {task.title}
+                          </Text>
+                        }
+                      />
+                      {task.status === "in_progress" && (
+                        <Badge size="xs" variant="light" color="blue">
+                          In progress
+                        </Badge>
+                      )}
+                    </Group>
+                  ))
+                : payload.tasks.map((task, index) => (
+                    <Text key={index} size="xs" c="dimmed">
+                      • {task.title}
+                    </Text>
+                  ))}
+            </Stack>
+          </Collapse>
         )}
 
         {status === "pending" && isSuggestee && (
