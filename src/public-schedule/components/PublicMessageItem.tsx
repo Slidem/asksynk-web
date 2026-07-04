@@ -5,7 +5,7 @@ import { UserBadge } from "@/components/UserBadge";
 import { isoStringToFullDate, isoStringToTime } from "@/lib/date";
 import type { Message } from "@/messages/models/message";
 import classes from "@/public-schedule/components/PublicMessageList.module.css";
-import type { PublicTag } from "@/public-schedule/models/publicTag";
+import type { TagDto } from "@/tags/models/tag";
 
 export interface MessageSender {
   name: string | null;
@@ -16,7 +16,7 @@ interface Props {
   message: Message;
   sender: MessageSender;
   showHeader: boolean;
-  tags: PublicTag[];
+  tags: TagDto[];
 }
 
 const AVATAR_SIZE = 36;

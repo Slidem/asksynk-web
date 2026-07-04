@@ -9,11 +9,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { SlashCommands } from "@/messages/tiptap/SlashCommands";
 import type { SlashCommandItem } from "@/messages/tiptap/SlashCommandItem";
 import { PublicTagPickerDialog } from "@/public-schedule/components/PublicTagPickerDialog";
-import { usePublicTagsQuery } from "@/public-schedule/hooks/queries/usePublicTagsQuery";
 import { useSendGuestMessage } from "@/public-schedule/hooks/mutations/useSendGuestMessage";
+import { useUserTags } from "@/tags/hooks/queries/useUserTags";
 
 interface Props {
   slug: string;
+  ownerUserId: string;
 }
 
 // Guest "/" quick actions. Only tagging applies to guests (the owner replies
@@ -34,9 +35,9 @@ function buildGuestSlashItems(onTagMessage: () => void): SlashCommandItem[] {
   ];
 }
 
-export function PublicMessageComposer({ slug }: Props) {
+export function PublicMessageComposer({ slug, ownerUserId }: Props) {
   const { sendMessage, isSending } = useSendGuestMessage(slug);
-  const { data: tags } = usePublicTagsQuery(slug);
+  const { data: tags } = useUserTags(ownerUserId);
   const [tagIds, setTagIds] = useState<string[]>([]);
   const [pickerOpen, setPickerOpen] = useState(false);
 
@@ -157,7 +158,7 @@ export function PublicMessageComposer({ slug }: Props) {
       </Group>
       <PublicTagPickerDialog
         opened={pickerOpen}
-        slug={slug}
+        ownerUserId={ownerUserId}
         initialTagIds={tagIds}
         onConfirm={setTagIds}
         onClose={() => setPickerOpen(false)}

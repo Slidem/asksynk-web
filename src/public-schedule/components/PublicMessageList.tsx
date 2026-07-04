@@ -7,13 +7,14 @@ import {
   type MessageSender,
 } from "@/public-schedule/components/PublicMessageItem";
 import classes from "@/public-schedule/components/PublicMessageList.module.css";
-import { usePublicTagsQuery } from "@/public-schedule/hooks/queries/usePublicTagsQuery";
 import { usePublicThreadMessagesQuery } from "@/public-schedule/hooks/queries/usePublicThreadMessagesQuery";
 import { useGuestSession } from "@/public-schedule/hooks/useGuestSession";
-import type { PublicTag } from "@/public-schedule/models/publicTag";
+import { useUserTags } from "@/tags/hooks/queries/useUserTags";
+import type { TagDto } from "@/tags/models/tag";
 
 interface Props {
   slug: string;
+  ownerUserId: string;
   ownerName: string | null;
   ownerImage: string | null;
   focusMessageId?: string;
@@ -29,12 +30,13 @@ interface DisplayMessage {
 
 export function PublicMessageList({
   slug,
+  ownerUserId,
   ownerName,
   ownerImage,
   focusMessageId,
 }: Props) {
   const guest = useGuestSession();
-  const { data: tags } = usePublicTagsQuery(slug);
+  const { data: tags } = useUserTags(ownerUserId);
   const {
     data,
     isLoading,
@@ -45,7 +47,7 @@ export function PublicMessageList({
   } = usePublicThreadMessagesQuery(slug);
 
   const tagsById = useMemo(() => {
-    const map = new Map<string, PublicTag>();
+    const map = new Map<string, TagDto>();
     for (const tag of tags ?? []) {
       map.set(tag.id, tag);
     }
@@ -178,7 +180,7 @@ export function PublicMessageList({
               showHeader={showHeader}
               tags={message.tagIds
                 .map((id) => tagsById.get(id))
-                .filter((t): t is PublicTag => t != null)}
+                .filter((t): t is TagDto => t != null)}
             />
           </Box>
         ))}

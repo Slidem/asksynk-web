@@ -55,15 +55,13 @@ in the handshake `auth.token`.
   until this ships). Could be derived from #2, but a dedicated endpoint avoids
   over-fetching.
 
-## 4. GET /public/tags
+## 4. Owner tags for guests — RESOLVED (reuse `GET /tags?userId=<owner>`)
 
 - **Purpose** — the view owner's tags, so the guest can tag the messages
-  (questions) they send. The composer picker + message-bubble chips read from
-  this. **Only the guest tags** — the owner replies untagged (the owner's
-  composer in a guest thread already has tagging disabled, `recipientUserId === null`).
-- **Request** — no params. Guest-scoped via the session token.
-- **Response** — `PublicTag[]`: `{ id, name, color }`.
-- **Notes** — backend decides which of the owner's tags are exposed publicly
-  (all, or a "public" subset). UI wired against `fetchPublicTags` /
-  `usePublicTagsQuery` (disabled until this ships); the picker is disabled while
-  empty.
+  (questions) they send. The composer picker + message chips read from this.
+  **Only the guest tags** — the owner replies untagged.
+- **Resolution** — no new endpoint. The existing `GET /tags?userId=<ownerUserId>`
+  already accepts a guest session (`allowGuestSession: true`), same path the
+  public calendar tag filter uses (`useUserTags(ownerUserId)`). Message tagging
+  now reads from it directly; the dead `/public/tags` + `fetchPublicTags` +
+  `usePublicTagsQuery` + `PublicTag` model were removed.

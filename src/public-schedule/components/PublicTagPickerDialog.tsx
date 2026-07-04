@@ -7,13 +7,13 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import { usePublicTagsQuery } from "@/public-schedule/hooks/queries/usePublicTagsQuery";
+import { useUserTags } from "@/tags/hooks/queries/useUserTags";
 
 interface Props {
   opened: boolean;
-  slug: string;
+  ownerUserId: string;
   initialTagIds: string[];
   onConfirm: (tagIds: string[]) => void;
   onClose: () => void;
@@ -21,29 +21,28 @@ interface Props {
 
 export function PublicTagPickerDialog({
   opened,
-  slug,
+  ownerUserId,
   initialTagIds,
   onConfirm,
   onClose,
 }: Props) {
-  const { data: tags } = usePublicTagsQuery(slug);
-  const [tagIds, setTagIds] = useState<string[]>(initialTagIds);
+  const { data: tags } = useUserTags(ownerUserId);
+  const [tagIds, setTagIds] = useState<string[] | null>(null);
 
-  useEffect(() => {
-    if (opened) {
-      setTagIds(initialTagIds);
-    }
-  }, [opened, initialTagIds]);
+  const handleClose = () => {
+    setTagIds(null);
+    onClose();
+  };
 
   return (
-    <Modal opened={opened} onClose={onClose} title="Tag message" centered>
+    <Modal opened={opened} onClose={handleClose} title="Tag message" centered>
       <Stack gap="md">
         {!tags || tags.length === 0 ? (
           <Text size="sm" c="dimmed">
             No tags available yet.
           </Text>
         ) : (
-          <Checkbox.Group value={tagIds} onChange={setTagIds}>
+          <Checkbox.Group value={tagIds ?? initialTagIds} onChange={setTagIds}>
             <Stack gap="xs">
               {tags.map((tag) => (
                 <Checkbox
@@ -61,13 +60,13 @@ export function PublicTagPickerDialog({
           </Checkbox.Group>
         )}
         <Group justify="flex-end" gap="xs">
-          <Button variant="default" onClick={onClose}>
+          <Button variant="default" onClick={handleClose}>
             Cancel
           </Button>
           <Button
             onClick={() => {
-              onConfirm(tagIds);
-              onClose();
+              onConfirm(tagIds ?? initialTagIds);
+              handleClose();
             }}
           >
             Save

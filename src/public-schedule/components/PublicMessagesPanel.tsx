@@ -50,11 +50,12 @@ export function PublicMessagesPanel({ slug, view }: Props) {
       </Group>
       <PublicMessageList
         slug={slug}
+        ownerUserId={view.ownerUserId}
         ownerName={view.name}
         ownerImage={view.ownerImage}
         focusMessageId={focusMessageId}
       />
-      <PublicMessageComposer slug={slug} />
+      <PublicMessageComposer slug={slug} ownerUserId={view.ownerUserId} />
     </Stack>
   );
 }
