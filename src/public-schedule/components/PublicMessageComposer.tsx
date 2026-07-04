@@ -8,8 +8,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { SlashCommands } from "@/messages/tiptap/SlashCommands";
 import type { SlashCommandItem } from "@/messages/tiptap/SlashCommandItem";
-import { PublicTagPickerDialog } from "@/public-schedule/components/PublicTagPickerDialog";
 import { useSendGuestMessage } from "@/public-schedule/hooks/mutations/useSendGuestMessage";
+import { TagPickerDialog } from "@/tags/components/TagPickerDialog";
 import { useUserTags } from "@/tags/hooks/queries/useUserTags";
 
 interface Props {
@@ -156,10 +156,12 @@ export function PublicMessageComposer({ slug, ownerUserId }: Props) {
           <IconSend size={18} />
         </ActionIcon>
       </Group>
-      <PublicTagPickerDialog
+      <TagPickerDialog
         opened={pickerOpen}
-        ownerUserId={ownerUserId}
         initialTagIds={tagIds}
+        targetUserId={ownerUserId}
+        title="Tag message"
+        confirmLabel="Save"
         onConfirm={setTagIds}
         onClose={() => setPickerOpen(false)}
       />

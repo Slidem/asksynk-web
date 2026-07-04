@@ -23,7 +23,7 @@ import classes from "@/messages/components/MessageBubble.module.css";
 import { MessageAttentionStatusControl } from "@/messages/components/MessageAttentionStatusControl";
 import { MessageTaskSuggestionCard } from "@/messages/components/MessageTaskSuggestionCard";
 import { TagChipsRow } from "@/messages/components/TagChipsRow";
-import { TagPickerDialog } from "@/messages/components/TagPickerDialog";
+import { TagPickerDialog } from "@/tags/components/TagPickerDialog";
 import { useTagMessage } from "@/messages/hooks/useTagMessage";
 import { useSession } from "@/auth";
 

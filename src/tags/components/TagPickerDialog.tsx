@@ -1,6 +1,6 @@
 import { Button, Group, Modal, Stack } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { TagPickerList } from "@/tags/components/TagPickerList";
 
 interface Props {
@@ -23,17 +23,19 @@ export function TagPickerDialog({
   onConfirm,
   onClose,
 }: Props) {
-  const [tagIds, setTagIds] = useState<string[]>(initialTagIds);
+  // null = untouched this open → fall back to initialTagIds; reset on close.
+  const [tagIds, setTagIds] = useState<string[] | null>(null);
   const isMobile = useMediaQuery("(max-width: 48em)");
 
-  useEffect(() => {
-    if (opened) setTagIds(initialTagIds);
-  }, [opened, initialTagIds]);
+  const handleClose = () => {
+    setTagIds(null);
+    onClose();
+  };
 
   return (
     <Modal
       opened={opened}
-      onClose={onClose}
+      onClose={handleClose}
       title={title}
       size="lg"
       fullScreen={isMobile}
@@ -41,18 +43,18 @@ export function TagPickerDialog({
     >
       <Stack gap="md">
         <TagPickerList
-          selectedTagIds={tagIds}
+          selectedTagIds={tagIds ?? initialTagIds}
           onChange={setTagIds}
           targetUserId={targetUserId}
         />
         <Group justify="flex-end" gap="xs">
-          <Button variant="default" onClick={onClose}>
+          <Button variant="default" onClick={handleClose}>
             Cancel
           </Button>
           <Button
             onClick={() => {
-              onConfirm(tagIds);
-              onClose();
+              onConfirm(tagIds ?? initialTagIds);
+              handleClose();
             }}
           >
             {confirmLabel}

@@ -26,7 +26,7 @@ import {
   insertTaskSuggestionMarker,
   updateTaskSuggestionMarker,
 } from "@/messages/tiptap/TaskSuggestionMarker";
-import { TagPickerDialog } from "@/messages/components/TagPickerDialog";
+import { TagPickerDialog } from "@/tags/components/TagPickerDialog";
 import { TaskSuggestionQuickAdd } from "@/messages/components/TaskSuggestionQuickAdd";
 import type { TaskSuggestionDraft } from "@/messages/models/taskSuggestionDraft";
 import { useUserTagsService } from "@/tags/hooks/useUserTagsService";

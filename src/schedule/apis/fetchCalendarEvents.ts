@@ -18,8 +18,11 @@ export async function fetchCalendarEvents(
     params.append("userId", userId);
   }
 
+  // allowGuestSession is a no-op off public views (see apiFetch); on a public
+  // view it lets guests read the owner's calendar (e.g. tag availability hints).
   const response = await apiFetch(
     buildApiUrl(`/calendar-events?${params.toString()}`),
+    { allowGuestSession: true },
   );
 
   if (!response.ok) throw new Error("Failed to fetch calendar events");

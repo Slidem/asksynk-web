@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
+import { isOnPublicView } from "@/lib/public";
 import { fetchCalendarEvents } from "@/schedule/apis/fetchCalendarEvents";
 import { calendarEventsQueryKey } from "@/schedule/hooks/queries/useCalendarEventsQueryData";
 import { dtoToCalendarEvent } from "@/schedule/utils/calendarEventMapper";
@@ -14,9 +15,13 @@ export function useUpcomingTagCalendarEvents(
   const { start, end } = useOneWeekCalendarPeriod();
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
+  // On a public view the guest session already scopes /calendar-events to the
+  // view owner, so omit userId (guests can't query another user's calendar by id).
+  const effectiveUserId = isOnPublicView() ? null : (userId ?? null);
+
   return useQuery({
-    queryKey: calendarEventsQueryKey(start, end, userId ?? null),
-    queryFn: () => fetchCalendarEvents(start, end, timezone, userId),
+    queryKey: calendarEventsQueryKey(start, end, effectiveUserId),
+    queryFn: () => fetchCalendarEvents(start, end, timezone, effectiveUserId),
     select: (data) =>
       data
         .map(dtoToCalendarEvent)
