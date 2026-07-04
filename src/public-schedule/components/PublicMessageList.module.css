@@ -1,0 +1,13 @@
+.highlight {
+  background-color: var(--mantine-color-yellow-light);
+  border-radius: 6px;
+  transition: background-color 1.2s ease-out;
+}
+
+.body {
+  word-break: break-word;
+}
+
+.body p {
+  margin: 0;
+}

@@ -114,7 +114,7 @@ export function PublicViewPage({ slug, tab }: Props) {
         <PublicScheduleCalendar slug={slug} ownerUserId={view.ownerUserId} />
       )}
       {tab === "pending" && <PublicPendingActionsPanel />}
-      {tab === "messages" && <PublicMessagesPanel />}
+      {tab === "messages" && <PublicMessagesPanel slug={slug} view={view} />}
     </PublicViewLayout>
   );
 }
