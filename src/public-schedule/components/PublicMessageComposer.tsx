@@ -50,9 +50,17 @@ export function PublicMessageComposer({ slug }: Props) {
 
   const doSend = useCallback(() => {
     const editor = editorRef.current;
-    if (!editor) return;
+
+    if (!editor) {
+      return;
+    }
+
     const ids = tagIdsRef.current;
-    if (editor.getText().trim().length === 0 && ids.length === 0) return;
+
+    if (editor.getText().trim().length === 0 && ids.length === 0) {
+      return;
+    }
+
     sendMessage(editor.getHTML(), ids);
     editor.commands.clearContent();
     setTagIds([]);
@@ -62,6 +70,7 @@ export function PublicMessageComposer({ slug }: Props) {
     extensions: [
       StarterKit.configure({ link: false }),
       Link,
+      // eslint-disable-next-line react-hooks/refs
       SlashCommands.configure({
         getItems: () => buildGuestSlashItems(() => setPickerOpen(true)),
         onOpenChange: (open) => {

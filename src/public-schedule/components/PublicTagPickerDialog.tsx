@@ -30,7 +30,9 @@ export function PublicTagPickerDialog({
   const [tagIds, setTagIds] = useState<string[]>(initialTagIds);
 
   useEffect(() => {
-    if (opened) setTagIds(initialTagIds);
+    if (opened) {
+      setTagIds(initialTagIds);
+    }
   }, [opened, initialTagIds]);
 
   return (
