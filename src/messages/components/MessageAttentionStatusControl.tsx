@@ -43,30 +43,30 @@ export function MessageAttentionStatusControl({ item }: Props) {
           </UnstyledButton>
         </Menu.Target>
         <Menu.Dropdown>
-        {item.status !== "in_progress" && (
-          <Menu.Item
-            leftSection={<IconPlayerPlay size={14} />}
-            onClick={() => set("in_progress")}
-          >
-            Mark in progress
-          </Menu.Item>
-        )}
-        {item.status !== "resolved" && (
-          <Menu.Item
-            leftSection={<IconCheck size={14} />}
-            onClick={() => set("resolved")}
-          >
-            Resolve
-          </Menu.Item>
-        )}
-        {item.status !== "created" && (
-          <Menu.Item
-            leftSection={<IconArrowBackUp size={14} />}
-            onClick={() => set("created")}
-          >
-            Reopen
-          </Menu.Item>
-        )}
+          {item.status !== "in_progress" && (
+            <Menu.Item
+              leftSection={<IconPlayerPlay size={14} />}
+              onClick={() => set("in_progress")}
+            >
+              Mark in progress
+            </Menu.Item>
+          )}
+          {item.status !== "resolved" && (
+            <Menu.Item
+              leftSection={<IconCheck size={14} />}
+              onClick={() => set("resolved")}
+            >
+              Resolve
+            </Menu.Item>
+          )}
+          {item.status !== "created" && (
+            <Menu.Item
+              leftSection={<IconArrowBackUp size={14} />}
+              onClick={() => set("created")}
+            >
+              Reopen
+            </Menu.Item>
+          )}
         </Menu.Dropdown>
       </Menu>
       {!isResolved && (

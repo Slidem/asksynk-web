@@ -147,6 +147,7 @@ export function MessageList({
       el.scrollIntoView({ behavior: "smooth", block: "center" });
     });
     setHighlightedId(focusMessageId);
+
     const timer = window.setTimeout(() => setHighlightedId(null), 1500);
     return () => window.clearTimeout(timer);
   }, [focusMessageId, displayMessages]);
