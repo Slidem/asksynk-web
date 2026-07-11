@@ -122,7 +122,12 @@ export function ReplyPanel({
               message={parent}
               sender={parentSender}
               showHeader
+              isOwn={
+                parent.senderKind === "user" &&
+                parent.senderId === session?.user?.id
+              }
               recipientUserId={recipientUserId}
+              canManageStatus={false}
               isReply
             />
           </Stack>

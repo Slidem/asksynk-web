@@ -1,3 +1,4 @@
+import type { AttentionItemStatus } from "@/attentionItems/models/attentionItem";
 import { threadMessagesQueryKey } from "@/messages/hooks/queries/useThreadMessagesQueryData";
 import type { Message } from "@/messages/models/message";
 import { getMessageSocket } from "@/messages/socket/messageSocket";
@@ -6,12 +7,12 @@ import type { InfiniteData } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 
-export function useTagMessage(threadId: string) {
+export function useUpdateMessageStatus(threadId: string) {
   const queryClient = useQueryClient();
-  const [isTagging, setIsTagging] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
-  const tagMessage = useCallback(
-    (messageId: string, tagIds: string[]) => {
+  const updateStatus = useCallback(
+    (messageId: string, status: AttentionItemStatus) => {
       const socket = getMessageSocket();
       if (!socket) {
         notifications.show({
@@ -23,7 +24,7 @@ export function useTagMessage(threadId: string) {
       }
 
       const queryKey = threadMessagesQueryKey(threadId);
-      let prevTagIds: string[] | null = null;
+      let prevStatus: AttentionItemStatus | null = null;
 
       queryClient.setQueryData<InfiniteData<Message[]>>(queryKey, (current) => {
         if (!current) return current;
@@ -31,28 +32,30 @@ export function useTagMessage(threadId: string) {
           ...current,
           pages: current.pages.map((page) =>
             page.map((m) => {
-              if (m.id !== messageId) return m;
-              prevTagIds = m.tagIds;
-              return { ...m, tagIds };
+              if (m.id !== messageId || !m.managedStatus) return m;
+              prevStatus = m.managedStatus.status;
+              return { ...m, managedStatus: { ...m.managedStatus, status } };
             }),
           ),
         };
       });
 
-      setIsTagging(true);
-      socket.emit("message.tag", { messageId, tagIds }, (ack) => {
-        setIsTagging(false);
+      setIsUpdating(true);
+      socket.emit("message.updateStatus", { messageId, status }, (ack) => {
+        setIsUpdating(false);
         if (ack.ok) return;
 
         queryClient.setQueryData<InfiniteData<Message[]>>(
           queryKey,
           (current) => {
-            if (!current) return current;
+            if (!current || prevStatus === null) return current;
             return {
               ...current,
               pages: current.pages.map((page) =>
                 page.map((m) =>
-                  m.id === messageId ? { ...m, tagIds: prevTagIds ?? [] } : m,
+                  m.id === messageId && m.managedStatus
+                    ? { ...m, managedStatus: { ...m.managedStatus, status: prevStatus! } }
+                    : m,
                 ),
               ),
             };
@@ -60,7 +63,7 @@ export function useTagMessage(threadId: string) {
         );
         notifications.show({
           color: "red",
-          title: "Could not tag message",
+          title: "Could not update status",
           message: ack.error ?? "Please try again",
         });
       });
@@ -68,5 +71,5 @@ export function useTagMessage(threadId: string) {
     [queryClient, threadId],
   );
 
-  return { tagMessage, isTagging };
+  return { updateStatus, isUpdating };
 }

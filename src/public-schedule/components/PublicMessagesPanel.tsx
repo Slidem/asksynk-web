@@ -1,10 +1,9 @@
-import { Alert, Group, Stack } from "@mantine/core";
+import { Alert, Stack } from "@mantine/core";
 import { IconBulb } from "@tabler/icons-react";
 import { useState } from "react";
 
 import { PublicMessageComposer } from "@/public-schedule/components/PublicMessageComposer";
 import { PublicMessageList } from "@/public-schedule/components/PublicMessageList";
-import { PublicTaggedSearch } from "@/public-schedule/components/PublicTaggedSearch";
 import { PublicTaggedStatsBar } from "@/public-schedule/components/PublicTaggedStatsBar";
 import { useGuestMessageSocket } from "@/public-schedule/hooks/useGuestMessageSocket";
 import type { PublicViewMetadataDto } from "@/public-schedule/models/publicView";
@@ -15,10 +14,9 @@ interface Props {
 }
 
 // Direct-message view between the guest and the public-view owner (ASK-12).
-// No threads sidebar — a single conversation, with tagged-message stats +
-// quick search above the message list.
+// No threads sidebar — a single conversation, with tagged-message stats above
+// the message list.
 export function PublicMessagesPanel({ slug, view }: Props) {
-  const [focusMessageId, setFocusMessageId] = useState<string | undefined>();
   const [tipDismissed, setTipDismissed] = useState(false);
   useGuestMessageSocket(slug);
 
@@ -33,27 +31,24 @@ export function PublicMessagesPanel({ slug, view }: Props) {
           onClose={() => setTipDismissed(true)}
           p="xs"
         >
-          Tip: type <b>/</b> in the message box for quick actions — e.g. tag your
-          message so the owner knows how to route it.
+          Tip: type <b>/</b> in the message box for quick actions — e.g. tag
+          your message so the owner knows how to route it.
         </Alert>
       )}
-      <Group
-        justify="space-between"
-        align="center"
-        wrap="wrap"
+      <Stack
         gap="sm"
         pb="sm"
-        style={{ borderBottom: "1px solid var(--mantine-color-default-border)" }}
+        style={{
+          borderBottom: "1px solid var(--mantine-color-default-border)",
+        }}
       >
         <PublicTaggedStatsBar slug={slug} />
-        <PublicTaggedSearch slug={slug} onSelect={setFocusMessageId} />
-      </Group>
+      </Stack>
       <PublicMessageList
         slug={slug}
         ownerUserId={view.ownerUserId}
         ownerName={view.name}
         ownerImage={view.ownerImage}
-        focusMessageId={focusMessageId}
       />
       <PublicMessageComposer slug={slug} ownerUserId={view.ownerUserId} />
     </Stack>

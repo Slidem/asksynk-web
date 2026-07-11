@@ -1,18 +1,18 @@
-import { threadMessagesQueryKey } from "@/messages/hooks/queries/useThreadMessagesQueryData";
 import type { Message } from "@/messages/models/message";
-import { getMessageSocket } from "@/messages/socket/messageSocket";
+import { publicThreadMessagesQueryKey } from "@/public-schedule/hooks/queries/usePublicThreadMessagesQueryData";
+import { getGuestMessageSocket } from "@/public-schedule/socket/guestMessageSocket";
 import { notifications } from "@mantine/notifications";
 import type { InfiniteData } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 
-export function useTagMessage(threadId: string) {
+export function useTagGuestMessage(slug: string) {
   const queryClient = useQueryClient();
   const [isTagging, setIsTagging] = useState(false);
 
   const tagMessage = useCallback(
     (messageId: string, tagIds: string[]) => {
-      const socket = getMessageSocket();
+      const socket = getGuestMessageSocket();
       if (!socket) {
         notifications.show({
           color: "red",
@@ -22,7 +22,7 @@ export function useTagMessage(threadId: string) {
         return;
       }
 
-      const queryKey = threadMessagesQueryKey(threadId);
+      const queryKey = publicThreadMessagesQueryKey(slug);
       let prevTagIds: string[] | null = null;
 
       queryClient.setQueryData<InfiniteData<Message[]>>(queryKey, (current) => {
@@ -65,7 +65,7 @@ export function useTagMessage(threadId: string) {
         });
       });
     },
-    [queryClient, threadId],
+    [queryClient, slug],
   );
 
   return { tagMessage, isTagging };

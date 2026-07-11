@@ -1,16 +1,18 @@
 import { Box, Center, Loader, ScrollArea, Stack, Text } from "@mantine/core";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { MessageBubble } from "@/messages/components/MessageBubble";
 import type { Message } from "@/messages/models/message";
-import {
-  PublicMessageItem,
-  type MessageSender,
-} from "@/public-schedule/components/PublicMessageItem";
 import classes from "@/public-schedule/components/PublicMessageList.module.css";
+import { useTagGuestMessage } from "@/public-schedule/hooks/mutations/useTagGuestMessage";
 import { usePublicThreadMessagesQuery } from "@/public-schedule/hooks/queries/usePublicThreadMessagesQuery";
 import { useGuestSession } from "@/public-schedule/hooks/useGuestSession";
-import { useUserTags } from "@/tags/hooks/queries/useUserTags";
-import type { TagDto } from "@/tags/models/tag";
+
+interface MessageSender {
+  name: string | null;
+  email: string | null;
+  image: string | null;
+}
 
 interface Props {
   slug: string;
@@ -26,6 +28,7 @@ interface DisplayMessage {
   message: Message;
   sender: MessageSender;
   showHeader: boolean;
+  isOwn: boolean;
 }
 
 export function PublicMessageList({
@@ -36,7 +39,7 @@ export function PublicMessageList({
   focusMessageId,
 }: Props) {
   const guest = useGuestSession();
-  const { data: tags } = useUserTags(ownerUserId);
+  const { tagMessage } = useTagGuestMessage(slug);
   const {
     data,
     isLoading,
@@ -46,14 +49,6 @@ export function PublicMessageList({
     isFetchingNextPage,
   } = usePublicThreadMessagesQuery(slug);
 
-  const tagsById = useMemo(() => {
-    const map = new Map<string, TagDto>();
-    for (const tag of tags ?? []) {
-      map.set(tag.id, tag);
-    }
-    return map;
-  }, [tags]);
-
   const viewportRef = useRef<HTMLDivElement>(null);
   const lastMessageIdRef = useRef<string | null>(null);
   const messageRefs = useRef<Map<string, HTMLDivElement>>(new Map());
@@ -61,11 +56,11 @@ export function PublicMessageList({
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
   const ownerSender = useMemo<MessageSender>(
-    () => ({ name: ownerName, image: ownerImage }),
+    () => ({ name: ownerName, email: null, image: ownerImage }),
     [ownerName, ownerImage],
   );
   const selfSender = useMemo<MessageSender>(
-    () => ({ name: guest?.displayName ?? "You", image: null }),
+    () => ({ name: guest?.displayName ?? "You", email: null, image: null }),
     [guest?.displayName],
   );
 
@@ -84,7 +79,7 @@ export function PublicMessageList({
         new Date(message.createdAt).getTime() -
           new Date(prev.createdAt).getTime() >
           GROUP_GAP_MS;
-      return { message, sender, showHeader };
+      return { message, sender, showHeader, isOwn };
     });
   }, [data, guest?.guestId, selfSender, ownerSender]);
 
@@ -163,7 +158,7 @@ export function PublicMessageList({
             <Loader size="xs" />
           </Center>
         )}
-        {displayMessages.map(({ message, sender, showHeader }) => (
+        {displayMessages.map(({ message, sender, showHeader, isOwn }) => (
           <Box
             key={message.id}
             ref={(el: HTMLDivElement | null) => {
@@ -174,13 +169,14 @@ export function PublicMessageList({
               highlightedId === message.id ? classes.highlight : undefined
             }
           >
-            <PublicMessageItem
+            <MessageBubble
               message={message}
               sender={sender}
               showHeader={showHeader}
-              tags={message.tagIds
-                .map((id) => tagsById.get(id))
-                .filter((t): t is TagDto => t != null)}
+              isOwn={isOwn}
+              recipientUserId={ownerUserId}
+              canManageStatus={false}
+              onTag={tagMessage}
             />
           </Box>
         ))}

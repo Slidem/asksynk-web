@@ -1,7 +1,10 @@
 import { apiBaseUrl } from "@/lib/api";
 import { io, type Socket } from "socket.io-client";
-import type { AttentionItemDto } from "@/attentionItems/models/attentionItem";
-import type { Message } from "@/messages/models/message";
+import type {
+  AttentionItemDto,
+  AttentionItemStatus,
+} from "@/attentionItems/models/attentionItem";
+import type { ManagedStatus, Message } from "@/messages/models/message";
 import type {
   TaskSuggestion,
   TaskSuggestionCreatePayload,
@@ -29,6 +32,11 @@ export interface TagMessageAck {
 interface ServerToClient {
   "message.created": (payload: { threadId: string; message: Message }) => void;
   "message.updated": (payload: { threadId: string; message: Message }) => void;
+  "message.status.updated": (payload: {
+    threadId: string;
+    messageId: string;
+    managedStatus: ManagedStatus;
+  }) => void;
   "attention.upserted": (payload: { item: AttentionItemDto }) => void;
   "attention.removed": (payload: { id: string }) => void;
   // Fired to BOTH participants when a thread suggestion's status or any of its
@@ -61,6 +69,11 @@ interface ClientToServer {
   "message.tag": (
     payload: { messageId: string; tagIds: string[] },
     ack: (response: TagMessageAck) => void,
+  ) => void;
+  // Recipient-only: change a tagged message's status.
+  "message.updateStatus": (
+    payload: { messageId: string; status: AttentionItemStatus },
+    ack: (response: { ok: boolean; error?: string }) => void,
   ) => void;
 }
 

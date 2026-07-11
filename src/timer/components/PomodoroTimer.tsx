@@ -9,8 +9,12 @@ import {
   Title,
 } from "@mantine/core";
 import { IconSettings } from "@tabler/icons-react";
+import { useAttentionItemsByUrgency } from "@/attentionItems/hooks/useAttentionItemsByUrgency";
 import { useTimerView } from "@/timer/hooks/useTimerView";
 import { useTimerSettingsDialogHandlers } from "@/timer/hooks/dialogs/timerSettingsDialogHooks";
+import { CurrentTimeblockPanel } from "./CurrentTimeblockPanel";
+import { FocusNowList } from "./FocusNowList";
+import { FocusOverduePanel } from "./FocusOverduePanel";
 import { SessionCompleteBanner } from "./SessionCompleteBanner";
 import { SessionTypePicker } from "./SessionTypePicker";
 import { StartNextControls } from "./StartNextControls";
@@ -21,6 +25,7 @@ import { TimerProgressBar } from "./TimerProgressBar";
 export function PomodoroTimer() {
   const view = useTimerView();
   const { open: openSettings } = useTimerSettingsDialogHandlers();
+  const { grouped, isLoading } = useAttentionItemsByUrgency();
 
   const sessionLabel = view.isActive ? view.label : `Next · ${view.label}`;
 
@@ -82,6 +87,10 @@ export function PomodoroTimer() {
             )}
           </Stack>
         </Card>
+
+        <CurrentTimeblockPanel />
+        <FocusNowList items={grouped.now} isLoading={isLoading} />
+        <FocusOverduePanel items={grouped.overdue} />
       </Stack>
     </Container>
   );

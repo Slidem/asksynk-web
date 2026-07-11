@@ -10,7 +10,7 @@ interface Props {
 export function PublicTaggedStatsBar({ slug }: Props) {
   const { data } = usePublicTaggedMessageStatsQuery(slug);
   const resolved = data?.resolved ?? 0;
-  const pending = data?.pending ?? 0;
+  const pending = (data?.created ?? 0) + (data?.inProgress ?? 0);
 
   return (
     <Group gap="xs" align="center" wrap="nowrap">

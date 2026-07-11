@@ -1,4 +1,4 @@
-import type { Message } from "@/messages/models/message";
+import type { ManagedStatus, Message } from "@/messages/models/message";
 import { publicThreadMessagesQueryKey } from "@/public-schedule/hooks/queries/usePublicThreadMessagesQueryData";
 import {
   connectGuestMessageSocket,
@@ -34,10 +34,33 @@ export function useGuestMessageSocket(slug: string) {
       );
     };
 
+    const handleStatusUpdated = (payload: {
+      messageId: string;
+      managedStatus: ManagedStatus;
+    }) => {
+      const { messageId, managedStatus } = payload;
+      queryClient.setQueryData<InfiniteData<Message[]>>(
+        publicThreadMessagesQueryKey(slug),
+        (current) => {
+          if (!current) return current;
+          return {
+            ...current,
+            pages: current.pages.map((page) =>
+              page.map((m) =>
+                m.id === messageId ? { ...m, managedStatus } : m,
+              ),
+            ),
+          };
+        },
+      );
+    };
+
     socket.on("message.created", handleMessageCreated);
+    socket.on("message.status.updated", handleStatusUpdated);
 
     return () => {
       socket.off("message.created", handleMessageCreated);
+      socket.off("message.status.updated", handleStatusUpdated);
       disconnectGuestMessageSocket();
     };
   }, [queryClient, slug]);

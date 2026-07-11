@@ -63,45 +63,56 @@ export function useSendGuestMessage(slug: string) {
       });
 
       function addToCache(message: Message) {
-        queryClient.setQueryData<InfiniteData<Message[]>>(queryKey, (current) => {
-          if (!current) {
-            return { pages: [[message]], pageParams: [undefined] };
-          }
-          const firstPage = current.pages[0] ?? [];
-          return {
-            ...current,
-            pages: [[message, ...firstPage], ...current.pages.slice(1)],
-          };
-        });
+        queryClient.setQueryData<InfiniteData<Message[]>>(
+          queryKey,
+          (current) => {
+            if (!current) {
+              return { pages: [[message]], pageParams: [undefined] };
+            }
+            const firstPage = current.pages[0] ?? [];
+            return {
+              ...current,
+              pages: [[message, ...firstPage], ...current.pages.slice(1)],
+            };
+          },
+        );
       }
 
       function replaceTempId(realId: string) {
-        queryClient.setQueryData<InfiniteData<Message[]>>(queryKey, (current) => {
-          if (!current) return current;
-          const existsReal = current.pages.some((page) =>
-            page.some((m) => m.id === realId),
-          );
-          return {
-            ...current,
-            pages: current.pages.map((page) =>
-              existsReal
-                ? page.filter((m) => m.id !== tempId)
-                : page.map((m) => (m.id === tempId ? { ...m, id: realId } : m)),
-            ),
-          };
-        });
+        queryClient.setQueryData<InfiniteData<Message[]>>(
+          queryKey,
+          (current) => {
+            if (!current) return current;
+            const existsReal = current.pages.some((page) =>
+              page.some((m) => m.id === realId),
+            );
+            return {
+              ...current,
+              pages: current.pages.map((page) =>
+                existsReal
+                  ? page.filter((m) => m.id !== tempId)
+                  : page.map((m) =>
+                      m.id === tempId ? { ...m, id: realId } : m,
+                    ),
+              ),
+            };
+          },
+        );
       }
 
       function removeTemp() {
-        queryClient.setQueryData<InfiniteData<Message[]>>(queryKey, (current) => {
-          if (!current) return current;
-          return {
-            ...current,
-            pages: current.pages.map((page) =>
-              page.filter((m) => m.id !== tempId),
-            ),
-          };
-        });
+        queryClient.setQueryData<InfiniteData<Message[]>>(
+          queryKey,
+          (current) => {
+            if (!current) return current;
+            return {
+              ...current,
+              pages: current.pages.map((page) =>
+                page.filter((m) => m.id !== tempId),
+              ),
+            };
+          },
+        );
       }
     },
     [queryClient, session?.guestId, slug],

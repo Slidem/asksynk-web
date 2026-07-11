@@ -8,13 +8,12 @@ export function todayRange(): { start: Date; end: Date } {
   return { start, end };
 }
 
-// The event whose range contains `now` (start ≤ now < end), or null.
-export function findCurrentTimeblock(
+// All events whose range contains `now` (start ≤ now < end). Multiple when
+// timeblocks overlap.
+export function findCurrentTimeblocks(
   events: readonly CalendarEvent[],
   now: Date,
-): CalendarEvent | null {
+): CalendarEvent[] {
   const t = now.getTime();
-  return (
-    events.find((e) => e.start.getTime() <= t && t < e.end.getTime()) ?? null
-  );
+  return events.filter((e) => e.start.getTime() <= t && t < e.end.getTime());
 }

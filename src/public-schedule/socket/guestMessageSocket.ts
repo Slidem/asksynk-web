@@ -1,5 +1,5 @@
 import { apiBaseUrl } from "@/lib/api";
-import type { Message } from "@/messages/models/message";
+import type { ManagedStatus, Message } from "@/messages/models/message";
 import { getGuestToken } from "@/public-schedule/store/guestSessionStore";
 import { io, type Socket } from "socket.io-client";
 
@@ -9,9 +9,20 @@ export interface GuestSendMessageAck {
   error?: string;
 }
 
+export interface GuestTagMessageAck {
+  ok: boolean;
+  error?: string;
+}
+
 interface ServerToClient {
   // Server infers the guest's single thread; threadId is echoed back on the message.
   "message.created": (payload: { message: Message }) => void;
+  // Readonly status sync for the guest's tagged messages (owner resolves).
+  "message.status.updated": (payload: {
+    threadId: string;
+    messageId: string;
+    managedStatus: ManagedStatus;
+  }) => void;
 }
 
 interface ClientToServer {
@@ -20,6 +31,11 @@ interface ClientToServer {
   "message.send": (
     payload: { body: string; tagIds: string[] },
     ack: (response: GuestSendMessageAck) => void,
+  ) => void;
+  // Re-tag one of the guest's own already-sent messages.
+  "message.tag": (
+    payload: { messageId: string; tagIds: string[] },
+    ack: (response: GuestTagMessageAck) => void,
   ) => void;
 }
 

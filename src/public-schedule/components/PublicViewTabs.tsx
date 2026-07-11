@@ -46,7 +46,7 @@ export function PublicViewTabs({ slug, activeTab }: Props) {
             ) : undefined
           }
         >
-          Pending actions
+          Your items
         </Tabs.Tab>
         <Tabs.Tab value="messages" py="sm">
           Messages

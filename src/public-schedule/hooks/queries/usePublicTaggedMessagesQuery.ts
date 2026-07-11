@@ -2,18 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 
 import { fetchPublicTaggedMessages } from "@/public-schedule/apis/fetchPublicTaggedMessages";
 
-export function publicTaggedMessagesQueryKey(slug: string, query: string) {
-  return ["public-tagged-messages", slug, query] as const;
+export function publicTaggedMessagesQueryKey(slug: string) {
+  return ["public-tagged-messages", slug] as const;
 }
 
-// TODO(missingApis): ASK-12 — kept disabled until the guest tagged-message
-// search endpoint exists (see missingApis/ASK-12.md). Flip `enabled` to
-// `query.trim().length > 0` once the backend ships it.
-export function usePublicTaggedMessagesQuery(slug: string, query: string) {
+export function usePublicTaggedMessagesQuery(slug: string) {
   return useQuery({
-    queryKey: publicTaggedMessagesQueryKey(slug, query),
-    queryFn: () => fetchPublicTaggedMessages(query),
-    enabled: false,
+    queryKey: publicTaggedMessagesQueryKey(slug),
+    queryFn: fetchPublicTaggedMessages,
     retry: false,
   });
 }

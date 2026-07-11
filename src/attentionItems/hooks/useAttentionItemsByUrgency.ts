@@ -1,9 +1,10 @@
 import { useMemo } from "react";
 
 import { useAttentionItems } from "@/attentionItems/hooks/queries/useAttentionItems";
-import { useCurrentTimeblock } from "@/attentionItems/hooks/useCurrentTimeblock";
+import { useCurrentTimeblocks } from "@/attentionItems/hooks/useCurrentTimeblocks";
 import { useTagAnswerModeMap } from "@/attentionItems/hooks/useTagAnswerModeMap";
 import { useAttentionItemsSearchStore } from "@/attentionItems/store/attentionItemsSearchStore";
+import { useNow } from "@/lib/useNow";
 import type { AttentionItemDto } from "@/attentionItems/models/attentionItem";
 import type { AttentionUrgency } from "@/attentionItems/models/urgency";
 import { URGENCY_ORDER } from "@/attentionItems/models/urgency";
@@ -15,11 +16,14 @@ export type AttentionItemsByUrgency = Record<
   AttentionItemDto[]
 >;
 
+const TICK_MS = 30_000;
+
 export function useAttentionItemsByUrgency() {
   const { data: items, isLoading, isError } = useAttentionItems();
-  const currentTimeblock = useCurrentTimeblock();
+  const currentTimeblocks = useCurrentTimeblocks();
   const tagAnswerModes = useTagAnswerModeMap();
   const query = useAttentionItemsSearchStore((s) => s.query);
+  const now = useNow(TICK_MS);
 
   const grouped = useMemo<AttentionItemsByUrgency>(() => {
     const empty = emptyBuckets();
@@ -27,8 +31,11 @@ export function useAttentionItemsByUrgency() {
 
     const filtered = filterAttentionItemsByQuery(items, query);
     const ctx = {
-      now: new Date(),
-      currentTimeblockTagIds: new Set(currentTimeblock?.tagIds ?? []),
+      now,
+      currentTimeblockTagIds: new Set(
+        currentTimeblocks.flatMap((b) => b.tagIds ?? []),
+      ),
+      currentTimeblocks,
       tagAnswerModes,
     };
 
@@ -37,7 +44,7 @@ export function useAttentionItemsByUrgency() {
       empty[urgency].push(item);
     }
     return empty;
-  }, [items, query, currentTimeblock, tagAnswerModes]);
+  }, [items, query, currentTimeblocks, tagAnswerModes, now]);
 
   return { grouped, order: URGENCY_ORDER, isLoading, isError };
 }

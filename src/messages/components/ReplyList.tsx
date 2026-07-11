@@ -25,6 +25,7 @@ interface DisplayMessage {
   message: Message;
   sender: SenderInfo;
   showHeader: boolean;
+  isOwn: boolean;
 }
 
 export function ReplyList({
@@ -85,7 +86,7 @@ export function ReplyList({
         new Date(message.createdAt).getTime() -
           new Date(prev.createdAt).getTime() >
           GROUP_GAP_MS;
-      return { message, sender, showHeader };
+      return { message, sender, showHeader, isOwn };
     });
   }, [
     data,
@@ -162,13 +163,15 @@ export function ReplyList({
             <Loader size="xs" />
           </Center>
         )}
-        {displayMessages.map(({ message, sender, showHeader }) => (
+        {displayMessages.map(({ message, sender, showHeader, isOwn }) => (
           <MessageBubble
             key={message.id}
             message={message}
             sender={sender}
             showHeader={showHeader}
+            isOwn={isOwn}
             recipientUserId={recipientUserId}
+            canManageStatus={false}
             isReply
           />
         ))}

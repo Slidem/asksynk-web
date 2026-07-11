@@ -1,6 +1,7 @@
 import type { AttentionItemDto } from "@/attentionItems/models/attentionItem";
 import type { AttentionUrgency } from "@/attentionItems/models/urgency";
 import {
+  dueWithinActiveTimeblock,
   fitsCurrentTimeblock,
   hasImmediateTag,
   hasTimeblockTag,
@@ -25,6 +26,11 @@ export function computeUrgency(
   const fits = fitsCurrentTimeblock(item, ctx.currentTimeblockTagIds);
 
   if (timeblock && fits) return "now";
+
+  // Due-dated items (e.g. tasks) are "now" while their due time sits inside an
+  // active timeblock — before the overdue check so a past-due item stays "now"
+  // until that block ends, instead of flipping straight to "overdue".
+  if (due && dueWithinActiveTimeblock(due, ctx.currentTimeblocks)) return "now";
 
   if (due && due.getTime() < ctx.now.getTime()) return "overdue";
 

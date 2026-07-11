@@ -1,9 +1,15 @@
 import type { AttentionItemDto } from "@/attentionItems/models/attentionItem";
 import type { TagAnswerMode } from "@/tags/models/tag";
 
+export interface TimeRange {
+  start: Date;
+  end: Date;
+}
+
 export interface UrgencyContext {
   now: Date;
   currentTimeblockTagIds: ReadonlySet<string>;
+  currentTimeblocks: readonly TimeRange[];
   tagAnswerModes: ReadonlyMap<string, TagAnswerMode>;
 }
 
@@ -26,6 +32,18 @@ export function fitsCurrentTimeblock(
   currentTimeblockTagIds: ReadonlySet<string>,
 ): boolean {
   return item.tagIds.some((id) => currentTimeblockTagIds.has(id));
+}
+
+// True when a due time falls inside an active timeblock — a due-dated item is
+// actionable "now" while you're in the block it's due in, until that block ends.
+export function dueWithinActiveTimeblock(
+  due: Date,
+  currentTimeblocks: readonly TimeRange[],
+): boolean {
+  const t = due.getTime();
+  return currentTimeblocks.some(
+    (b) => b.start.getTime() <= t && t < b.end.getTime(),
+  );
 }
 
 /**

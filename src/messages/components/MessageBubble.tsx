@@ -15,17 +15,15 @@ import {
 } from "@tabler/icons-react";
 import { useState } from "react";
 import { UserBadge } from "@/components/UserBadge";
-import type { AttentionItemDto } from "@/attentionItems/models/attentionItem";
+import { AttentionItemStatusBadge } from "@/attentionItems/components/AttentionItemStatusBadge";
 import type { Message } from "@/messages/models/message";
 import DOMPurify from "dompurify";
 import { isoStringToFullDate, isoStringToTime } from "@/lib/date";
 import classes from "@/messages/components/MessageBubble.module.css";
-import { MessageAttentionStatusControl } from "@/messages/components/MessageAttentionStatusControl";
+import { MessageStatusControl } from "@/messages/components/MessageStatusControl";
 import { MessageTaskSuggestionCard } from "@/messages/components/MessageTaskSuggestionCard";
 import { TagChipsRow } from "@/messages/components/TagChipsRow";
 import { TagPickerDialog } from "@/tags/components/TagPickerDialog";
-import { useTagMessage } from "@/messages/hooks/useTagMessage";
-import { useSession } from "@/auth";
 
 interface SenderInfo {
   name: string | null;
@@ -37,13 +35,17 @@ interface Props {
   message: Message;
   sender: SenderInfo;
   showHeader: boolean;
+  /** Viewer is the message sender. Computed by the parent (public views have no session). */
+  isOwn: boolean;
   /** null for guest threads; disables tag actions/lookups. */
   recipientUserId: string | null;
-  /** The viewer's tagged_message attention item for this message, if they own one. */
-  attentionItem?: AttentionItemDto;
+  /** Viewer may change this tagged message's status (recipient-only); else readonly badge. */
+  canManageStatus: boolean;
   isReply?: boolean;
   onReply?: () => void;
   onShowReplies?: () => void;
+  /** Tag this message; enables the tag action. Omit to hide it (e.g. readonly views). */
+  onTag?: (messageId: string, tagIds: string[]) => void;
 }
 
 const AVATAR_SIZE = 36;
@@ -52,21 +54,21 @@ export function MessageBubble({
   message,
   sender,
   showHeader,
+  isOwn,
   recipientUserId,
-  attentionItem,
+  canManageStatus,
   isReply = false,
   onReply,
   onShowReplies,
+  onTag,
 }: Props) {
-  const { data: session } = useSession();
-  const { tagMessage } = useTagMessage(message.threadId);
   const [pickerOpen, setPickerOpen] = useState(false);
 
   const sanitized = DOMPurify.sanitize(message.body);
   const displayName = sender.name || sender.email || "User";
-  const isOwn = session?.user?.id === message.senderId;
   const isTagged = (message.tagIds?.length ?? 0) > 0;
-  const canTag = !isReply && isOwn && recipientUserId != null;
+  const managedStatus = message.managedStatus;
+  const canTag = !isReply && isOwn && recipientUserId != null && !!onTag;
   const showReplyControls = !isReply;
   const replyCount = message.replyCount;
   const canShowMenu = canTag || (showReplyControls && !!onReply);
@@ -118,7 +120,7 @@ export function MessageBubble({
           </Group>
         )}
         <Box className={isTagged ? classes.tagged : undefined}>
-          {(isTagged || attentionItem) && (
+          {(isTagged || managedStatus) && (
             <Group gap="xs" align="center" mb={4} wrap="wrap">
               {isTagged && (
                 <TagChipsRow
@@ -126,9 +128,19 @@ export function MessageBubble({
                   userId={isOwn ? (recipientUserId ?? undefined) : undefined}
                 />
               )}
-              {attentionItem && (
-                <MessageAttentionStatusControl item={attentionItem} />
-              )}
+              {managedStatus &&
+                (canManageStatus ? (
+                  <MessageStatusControl
+                    threadId={message.threadId}
+                    messageId={message.id}
+                    status={managedStatus.status}
+                  />
+                ) : (
+                  <AttentionItemStatusBadge
+                    status={managedStatus.status}
+                    radius="sm"
+                  />
+                ))}
             </Group>
           )}
           {message.body && (
@@ -194,7 +206,7 @@ export function MessageBubble({
           targetUserId={recipientUserId ?? undefined}
           title={isTagged ? "Edit tags" : "Tag message"}
           confirmLabel="Save"
-          onConfirm={(tagIds) => tagMessage(message.id, tagIds)}
+          onConfirm={(tagIds) => onTag?.(message.id, tagIds)}
           onClose={() => setPickerOpen(false)}
         />
       )}

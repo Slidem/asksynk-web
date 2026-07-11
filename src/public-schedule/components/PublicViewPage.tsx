@@ -10,7 +10,7 @@ import {
 import { useEffect, useState } from "react";
 
 import { PublicMessagesPanel } from "@/public-schedule/components/PublicMessagesPanel";
-import { PublicPendingActionsPanel } from "@/public-schedule/components/PublicPendingActionsPanel";
+import { PublicYourItemsPanel } from "@/public-schedule/components/PublicYourItemsPanel";
 import { PublicScheduleCalendar } from "@/public-schedule/components/PublicScheduleCalendar";
 import { PublicViewLayout } from "@/public-schedule/components/PublicViewLayout";
 import { PublicViewSignInForm } from "@/public-schedule/components/PublicViewSignInForm";
@@ -113,7 +113,7 @@ export function PublicViewPage({ slug, tab }: Props) {
       {tab === "calendar" && (
         <PublicScheduleCalendar slug={slug} ownerUserId={view.ownerUserId} />
       )}
-      {tab === "pending" && <PublicPendingActionsPanel />}
+      {tab === "pending" && <PublicYourItemsPanel slug={slug} view={view} />}
       {tab === "messages" && <PublicMessagesPanel slug={slug} view={view} />}
     </PublicViewLayout>
   );

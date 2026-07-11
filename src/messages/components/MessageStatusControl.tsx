@@ -8,29 +8,23 @@ import {
 } from "@tabler/icons-react";
 
 import { AttentionItemStatusBadge } from "@/attentionItems/components/AttentionItemStatusBadge";
-import { useUpdateAttentionItem } from "@/attentionItems/hooks/mutations/useUpdateAttentionItem";
-import type {
-  AttentionItemDto,
-  AttentionItemStatus,
-} from "@/attentionItems/models/attentionItem";
+import type { AttentionItemStatus } from "@/attentionItems/models/attentionItem";
+import { useUpdateMessageStatus } from "@/messages/hooks/useUpdateMessageStatus";
 
 interface Props {
-  item: AttentionItemDto;
+  threadId: string;
+  messageId: string;
+  status: AttentionItemStatus;
 }
 
-// Owner-only status control on a tagged message assigned to the viewer. A direct
-// one-click Resolve sits next to a badge-menu for the fuller transitions. The
-// optimistic mutation writes the shared ['attention-items'] cache, so the
-// dashboard reflects the change (and dashboard changes reflect back here via
-// attention.upserted).
-export function MessageAttentionStatusControl({ item }: Props) {
-  const update = useUpdateAttentionItem();
-  const set = (status: AttentionItemStatus) =>
-    update.mutate({ id: item.id, status });
-  const isResolved = item.status === "resolved";
+// Recipient-only status control on a tagged message. A one-click Resolve sits
+// next to a badge-menu for the fuller transitions. The optimistic WS command
+// keeps the thread live; the backend also syncs the recipient's inbox item.
+export function MessageStatusControl({ threadId, messageId, status }: Props) {
+  const { updateStatus } = useUpdateMessageStatus(threadId);
+  const set = (next: AttentionItemStatus) => updateStatus(messageId, next);
+  const isResolved = status === "resolved";
 
-  // Renders as siblings (no wrapper) so the badge + resolve sit on the same
-  // centerline as the tag chips in the parent row.
   return (
     <Fragment>
       <Menu position="bottom-start" withinPortal shadow="md">
@@ -39,11 +33,11 @@ export function MessageAttentionStatusControl({ item }: Props) {
             aria-label="Change status"
             style={{ cursor: "pointer", display: "inline-flex" }}
           >
-            <AttentionItemStatusBadge status={item.status} radius="sm" />
+            <AttentionItemStatusBadge status={status} radius="sm" />
           </UnstyledButton>
         </Menu.Target>
         <Menu.Dropdown>
-          {item.status !== "in_progress" && (
+          {status !== "in_progress" && (
             <Menu.Item
               leftSection={<IconPlayerPlay size={14} />}
               onClick={() => set("in_progress")}
@@ -51,7 +45,7 @@ export function MessageAttentionStatusControl({ item }: Props) {
               Mark in progress
             </Menu.Item>
           )}
-          {item.status !== "resolved" && (
+          {status !== "resolved" && (
             <Menu.Item
               leftSection={<IconCheck size={14} />}
               onClick={() => set("resolved")}
@@ -59,7 +53,7 @@ export function MessageAttentionStatusControl({ item }: Props) {
               Resolve
             </Menu.Item>
           )}
-          {item.status !== "created" && (
+          {status !== "created" && (
             <Menu.Item
               leftSection={<IconArrowBackUp size={14} />}
               onClick={() => set("created")}

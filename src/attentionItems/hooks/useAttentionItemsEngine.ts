@@ -7,7 +7,7 @@ import {
   preloadNotificationSound,
 } from "@/attentionItems/sounds/attentionSoundPlayer";
 import {
-  findCurrentTimeblock,
+  findCurrentTimeblocks,
   todayRange,
 } from "@/attentionItems/utils/currentTimeblock";
 import { formatAttentionItemNotification } from "@/attentionItems/utils/formatAttentionItemNotification";
@@ -45,7 +45,7 @@ export function useAttentionItemsEngine() {
   const tagAnswerModes = useTagAnswerModeMap();
 
   // Today's events drive the "current timeblock" gate; same query key as the
-  // dashboard's useCurrentTimeblock → deduped, no extra fetch.
+  // dashboard's useCurrentTimeblocks → deduped, no extra fetch.
   const { data: session } = useSession();
   const userId = session?.user?.id;
   const range = useMemo(() => todayRange(), []);
@@ -85,10 +85,13 @@ export function useAttentionItemsEngine() {
       // Timing gate: urgent tags alert immediately; timeblock tags only when
       // the item fits the active timeblock. Otherwise insert-only (no alert).
       const now = new Date();
-      const currentBlock = findCurrentTimeblock(eventsRef.current, now);
+      const currentBlocks = findCurrentTimeblocks(eventsRef.current, now);
       const shouldNotify = shouldNotifyAttentionItem(item, {
         now,
-        currentTimeblockTagIds: new Set(currentBlock?.tagIds ?? []),
+        currentTimeblockTagIds: new Set(
+          currentBlocks.flatMap((b) => b.tagIds ?? []),
+        ),
+        currentTimeblocks: currentBlocks,
         tagAnswerModes: tagAnswerModesRef.current,
       });
       if (!shouldNotify) return;

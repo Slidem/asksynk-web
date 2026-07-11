@@ -2,7 +2,7 @@ import { connectMessageSocket } from "@/messages/socket/messageSocket";
 import { messageRepliesQueryKey } from "@/messages/hooks/queries/useMessageRepliesQueryData";
 import { threadMessagesQueryKey } from "@/messages/hooks/queries/useThreadMessagesQueryData";
 import { threadsQueryKey } from "@/messages/hooks/queries/useThreadsQueryData";
-import type { Message } from "@/messages/models/message";
+import type { ManagedStatus, Message } from "@/messages/models/message";
 import type { ThreadListItem } from "@/messages/models/thread";
 import { bumpReplyCount } from "@/messages/utils/bumpReplyCount";
 import { getTaskSuggestionDetailQueryKey } from "@/tasks/hooks/queries/useTaskSuggestionsQueryData";
@@ -131,6 +131,29 @@ export function useMessageSocket() {
       );
     };
 
+    const handleStatusUpdated = (payload: {
+      threadId: string;
+      messageId: string;
+      managedStatus: ManagedStatus;
+    }) => {
+      const { threadId, messageId, managedStatus } = payload;
+
+      queryClient.setQueryData<InfiniteData<Message[]>>(
+        threadMessagesQueryKey(threadId),
+        (current) => {
+          if (!current) return current;
+          return {
+            ...current,
+            pages: current.pages.map((page) =>
+              page.map((m) =>
+                m.id === messageId ? { ...m, managedStatus } : m,
+              ),
+            ),
+          };
+        },
+      );
+    };
+
     const handleSuggestionUpdated = (payload: {
       suggestion: TaskSuggestion;
     }) => {
@@ -145,11 +168,13 @@ export function useMessageSocket() {
 
     socket.on("message.created", handleMessageCreated);
     socket.on("message.updated", handleMessageUpdated);
+    socket.on("message.status.updated", handleStatusUpdated);
     socket.on("suggestion.updated", handleSuggestionUpdated);
 
     return () => {
       socket.off("message.created", handleMessageCreated);
       socket.off("message.updated", handleMessageUpdated);
+      socket.off("message.status.updated", handleStatusUpdated);
       socket.off("suggestion.updated", handleSuggestionUpdated);
     };
   }, [queryClient]);

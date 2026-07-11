@@ -1,10 +1,10 @@
 import { Box, Center, Loader, ScrollArea, Stack, Text } from "@mantine/core";
 import { useSession } from "@/auth";
-import { useTaggedMessageAttentionItemMap } from "@/attentionItems/hooks/queries/useTaggedMessageAttentionItemMap";
 import { MessageBubble } from "@/messages/components/MessageBubble";
 import classes from "@/messages/components/MessageList.module.css";
 import { useReplyPanelHandlers } from "@/messages/hooks/dialogs/replyPanelHooks";
 import { useThreadMessagesQuery } from "@/messages/hooks/queries/useThreadMessagesQuery";
+import { useTagMessage } from "@/messages/hooks/useTagMessage";
 import type { Message } from "@/messages/models/message";
 import type { ThreadOtherParticipant } from "@/messages/models/thread";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -28,6 +28,7 @@ interface DisplayMessage {
   message: Message;
   sender: SenderInfo;
   showHeader: boolean;
+  isOwn: boolean;
 }
 
 export function MessageList({
@@ -38,8 +39,7 @@ export function MessageList({
 }: Props) {
   const { data: session } = useSession();
   const { open: openReplyPanel } = useReplyPanelHandlers();
-  // Seeds + shares the ['attention-items'] cache; only the owner has entries.
-  const attentionItems = useTaggedMessageAttentionItemMap();
+  const { tagMessage } = useTagMessage(threadId);
   const currentUserId = session?.user?.id;
   const currentUserName = session?.user?.name ?? null;
   const currentUserEmail = session?.user?.email ?? null;
@@ -94,7 +94,7 @@ export function MessageList({
         new Date(message.createdAt).getTime() -
           new Date(prev.createdAt).getTime() >
           GROUP_GAP_MS;
-      return { message, sender, showHeader };
+      return { message, sender, showHeader, isOwn };
     });
   }, [
     data,
@@ -200,7 +200,7 @@ export function MessageList({
             <Loader size="xs" />
           </Center>
         )}
-        {displayMessages.map(({ message, sender, showHeader }) => (
+        {displayMessages.map(({ message, sender, showHeader, isOwn }) => (
           <Box
             key={message.id}
             ref={(el: HTMLDivElement | null) => {
@@ -215,8 +215,10 @@ export function MessageList({
               message={message}
               sender={sender}
               showHeader={showHeader}
+              isOwn={isOwn}
               recipientUserId={recipientUserId}
-              attentionItem={attentionItems.get(message.id)}
+              canManageStatus={message.managedStatus != null && !isOwn}
+              onTag={tagMessage}
               onReply={() => openReplyPanel(message.id)}
               onShowReplies={() => openReplyPanel(message.id)}
             />
