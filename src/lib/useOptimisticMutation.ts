@@ -7,7 +7,10 @@ import {
 interface UseOptimisticMutationOptions<TData, TVariables> {
   queryKey: QueryKey;
   mutationFn: (variables: TVariables) => Promise<unknown>;
-  updater: (oldData: TData | undefined, variables: TVariables) => TData;
+  updater: (
+    oldData: TData | undefined,
+    variables: TVariables,
+  ) => TData | undefined;
   skipInvalidateOnSuccess?: boolean;
   onSuccess?: (data: unknown, variables: TVariables) => void;
 }

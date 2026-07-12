@@ -13,7 +13,7 @@ export function useStopTimer() {
     queryKey: timerQueryKey(),
     mutationFn: () => patchTimer({ status: "stopped" }),
     updater: (previous) => {
-      if (!previous) return previous as Timer;
+      if (!previous) return previous;
       const now = Date.now();
       return {
         ...previous,

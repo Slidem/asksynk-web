@@ -35,13 +35,17 @@ export function TaggedMessageBody({ metadata }: Props) {
         </Group>
         <Tooltip label="Open in thread" withArrow>
           <ActionIcon
-            component={Link}
-            to="/messages/$threadId"
-            params={{ threadId: metadata.threadId }}
-            search={{ focusMessageId: metadata.messageId }}
             variant="subtle"
             size="sm"
             aria-label="Open in thread"
+            renderRoot={(props) => (
+              <Link
+                to="/messages/$threadId"
+                params={{ threadId: metadata.threadId }}
+                search={{ focusMessageId: metadata.messageId }}
+                {...props}
+              />
+            )}
           >
             <IconArrowUpRight size={14} />
           </ActionIcon>

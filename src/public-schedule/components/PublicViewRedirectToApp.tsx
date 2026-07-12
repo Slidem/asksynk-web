@@ -35,7 +35,11 @@ export const PublicViewRedirectToApp: React.FC<Props> = ({
             <Button variant="outline" onClick={onStayOnPublicView}>
               Continue in public view
             </Button>
-            <Button onClick={() => navigate({ to: "/schedule" })}>
+            <Button
+              onClick={() =>
+                navigate({ to: "/schedule", search: { userId: undefined } })
+              }
+            >
               Go to app
             </Button>
           </Group>

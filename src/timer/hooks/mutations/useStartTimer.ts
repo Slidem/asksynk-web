@@ -20,7 +20,7 @@ export function useStartTimer() {
     mutationFn: ({ sessionType, durationSeconds }) =>
       patchTimer({ status: "running", sessionType, durationSeconds }),
     updater: (previous, input) => {
-      if (!previous) return previous as Timer;
+      if (!previous) return previous;
       const now = Date.now();
       return {
         ...previous,

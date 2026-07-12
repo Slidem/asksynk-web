@@ -12,7 +12,7 @@ export function usePauseTimer() {
     queryKey: timerQueryKey(),
     mutationFn: () => patchTimer({ status: "paused" }),
     updater: (previous) => {
-      if (!previous) return previous as Timer;
+      if (!previous) return previous;
       const now = Date.now();
       const remaining = previous.completesAt
         ? Math.max(0, (new Date(previous.completesAt).getTime() - now) / 1000)

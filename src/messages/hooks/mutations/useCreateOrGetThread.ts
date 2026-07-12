@@ -25,7 +25,7 @@ export function useCreateOrGetThread() {
   return {
     startThread: (
       recipientUserId: string,
-      onDone?: (data: CreateOrGetThreadResponse) => Promise<void>,
+      onDone?: (data: CreateOrGetThreadResponse) => void | Promise<void>,
     ) => mutation.mutateAsync({ recipientUserId }, { onSuccess: onDone }),
     isStarting: mutation.isPending,
   };
