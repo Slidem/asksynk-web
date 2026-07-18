@@ -30,7 +30,7 @@ const MagicLink = ({ setMode }: Props) => {
         const { error } = await authClient.signIn.magicLink({
           email,
           name: name || undefined,
-          callbackURL: redirectTo || "/dashboard",
+          callbackURL: `${window.location.origin}${redirectTo || "/dashboard"}`,
         });
         if (error) {
           setFormError(error.message || "");
@@ -77,59 +77,63 @@ const MagicLink = ({ setMode }: Props) => {
   );
 };
 
-const MagicLinkForm = memo(({
-  email,
-  setEmail,
-  name,
-  setName,
-}: {
-  email: string;
-  setEmail: (email: string) => void;
-  name: string;
-  setName: (name: string) => void;
-}) => {
-  return (
-    <Stack gap="sm">
-      <TextInput
-        label="Email"
-        placeholder="Your email"
-        value={email}
-        onChange={(event) => setEmail(event.currentTarget.value)}
-        required
-      />
-      <TextInput
-        label="Name"
-        description="Used if this is your first sign in."
-        placeholder="Your name"
-        value={name}
-        onChange={(event) => setName(event.currentTarget.value)}
-      />
-    </Stack>
-  );
-});
+const MagicLinkForm = memo(
+  ({
+    email,
+    setEmail,
+    name,
+    setName,
+  }: {
+    email: string;
+    setEmail: (email: string) => void;
+    name: string;
+    setName: (name: string) => void;
+  }) => {
+    return (
+      <Stack gap="sm">
+        <TextInput
+          label="Email"
+          placeholder="Your email"
+          value={email}
+          onChange={(event) => setEmail(event.currentTarget.value)}
+          required
+        />
+        <TextInput
+          label="Name"
+          description="Used if this is your first sign in."
+          placeholder="Your name"
+          value={name}
+          onChange={(event) => setName(event.currentTarget.value)}
+        />
+      </Stack>
+    );
+  },
+);
 
-const MagicLinkAlert = memo(({
-  formError,
-  magicSent,
-}: {
-  formError: string | null;
-  magicSent: boolean;
-}) => {
-  return (
-    <>
-      {formError ? (
-        <Alert color="red" variant="light">
-          {formError}
-        </Alert>
-      ) : null}
+const MagicLinkAlert = memo(
+  ({
+    formError,
+    magicSent,
+  }: {
+    formError: string | null;
+    magicSent: boolean;
+  }) => {
+    return (
+      <>
+        {formError ? (
+          <Alert color="red" variant="light">
+            {formError}
+          </Alert>
+        ) : null}
 
-      {magicSent ? (
-        <Alert color="green" variant="light">
-          Check your email for a sign in link.
-        </Alert>
-      ) : null}
-    </>
-  );
-});
+        {magicSent ? (
+          <Alert color="green" variant="light">
+            Check your email for a sign in link.
+          </Alert>
+        ) : null}
+      </>
+    );
+  },
+);
 
 export default MagicLink;

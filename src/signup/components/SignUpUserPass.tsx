@@ -17,10 +17,13 @@ const SignUpUserPass = ({ redirectTo, setMode }: Props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const emailVerificationCallback = `/signin?${new URLSearchParams({
-    redirect: redirectTo,
-    verified: "1",
-  }).toString()}`;
+
+  const emailVerificationCallback = `${window.location.origin}/signin?${new URLSearchParams(
+    {
+      redirect: redirectTo,
+      verified: "1",
+    },
+  ).toString()}`;
 
   const handleSubmit = useCallback(
     async (event: SubmitEvent) => {
