@@ -1,7 +1,8 @@
 import { apiFetch, buildApiUrl } from "@/lib/api";
-import type { PatchTimerInput, Timer } from "@/timer/models/timer";
+import { toApiError } from "@/lib/apiError";
+import type { Timer, TimerCommandRequest } from "@/timer/models/timer";
 
-export async function patchTimer(input: PatchTimerInput) {
+export async function sendTimerCommand(input: TimerCommandRequest) {
   const response = await apiFetch(buildApiUrl("/timers"), {
     method: "PATCH",
     headers: {
@@ -11,7 +12,7 @@ export async function patchTimer(input: PatchTimerInput) {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to update timer");
+    throw await toApiError(response, "Failed to update timer");
   }
 
   return response.json() as Promise<Timer>;

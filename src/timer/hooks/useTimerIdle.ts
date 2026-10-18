@@ -4,34 +4,34 @@ import { useEffect, useState } from "react";
 const IDLE_AFTER_MS = 5 * 60 * 1000;
 
 /**
- * Idle = not running/paused and the last transition was > 5 min ago — the timer
+ * Idle = not running/paused and the last activity was > 5 min ago — the timer
  * is stale. A one-shot timeout flips it at the threshold (the engine stops
  * ticking when not running, so nothing else would re-render it).
  */
 export function useTimerIdle(): boolean {
   const { data: timer } = useTimer();
-  // transitionedAt we've marked idle for; render compares it to the current one
+  // lastActivityAt we've marked idle for; render compares it to the current one
   // so a stale `true` can't leak after a transition.
   const [idleAt, setIdleAt] = useState<string | null>(null);
 
   const status = timer?.status ?? "idle";
   const isActive = status === "running" || status === "paused";
-  const transitionedAt = timer?.transitionedAt;
+  const lastActivityAt = timer?.lastActivityAt;
 
   useEffect(() => {
-    if (isActive || !transitionedAt) {
+    if (isActive || !lastActivityAt) {
       return;
     }
     const remaining =
-      IDLE_AFTER_MS - (Date.now() - new Date(transitionedAt).getTime());
+      IDLE_AFTER_MS - (Date.now() - new Date(lastActivityAt).getTime());
 
     const id = setTimeout(
-      () => setIdleAt(transitionedAt),
+      () => setIdleAt(lastActivityAt),
       Math.max(remaining, 0),
     );
 
     return () => clearTimeout(id);
-  }, [isActive, transitionedAt]);
+  }, [isActive, lastActivityAt]);
 
-  return !isActive && !!transitionedAt && idleAt === transitionedAt;
+  return !isActive && !!lastActivityAt && idleAt === lastActivityAt;
 }

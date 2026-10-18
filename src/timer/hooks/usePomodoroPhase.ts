@@ -1,13 +1,13 @@
-import { sessionTypeLabel, type Timer } from "@/timer/models/timer";
+import { modeLabel, type Timer } from "@/timer/models/timer";
 import { useTimerRuntimeStore } from "@/timer/store/timerRuntimeStore";
 import { phaseToColor, type PomodoroPhase } from "@/timer/utils/phaseColor";
 import { useMemo } from "react";
 
 export interface PomodoroPhaseInfo {
   phase: PomodoroPhase;
-  /** Seconds left in the current session (frozen when paused). */
+  /** Seconds left in the current block (frozen when paused). */
   remainingSeconds: number;
-  /** Elapsed progress 0..1 (bar fills as the session advances). */
+  /** Elapsed progress 0..1 (bar fills as the block advances). */
   fraction: number;
   color: string;
   label: string;
@@ -24,7 +24,7 @@ function compute(
 ): Pick<PomodoroPhaseInfo, "phase" | "remainingSeconds" | "fraction"> {
   if (!timer) return { phase: "idle", remainingSeconds: 0, fraction: 0 };
 
-  const total = timer.sessionDurationSeconds || 0;
+  const total = timer.blockDurationSeconds ?? 0;
 
   if (timer.status === "running" && timer.completesAt) {
     const completesAtMs = new Date(timer.completesAt).getTime();
@@ -44,7 +44,7 @@ function compute(
   }
 
   if (timer.status === "paused") {
-    const remaining = timer.remainingSeconds;
+    const remaining = timer.remainingSeconds ?? 0;
     return {
       phase: "paused",
       remainingSeconds: remaining,
@@ -56,12 +56,7 @@ function compute(
     return { phase: "completed", remainingSeconds: 0, fraction: 1 };
   }
 
-  // idle | stopped
-  return {
-    phase: "idle",
-    remainingSeconds: timer.remainingSeconds ?? 0,
-    fraction: 0,
-  };
+  return { phase: "idle", remainingSeconds: 0, fraction: 0 };
 }
 
 export function usePomodoroPhase(timer: Timer | undefined): PomodoroPhaseInfo {
@@ -72,7 +67,7 @@ export function usePomodoroPhase(timer: Timer | undefined): PomodoroPhaseInfo {
     return {
       ...base,
       color: phaseToColor(base.phase),
-      label: sessionTypeLabel(timer?.sessionType ?? null),
+      label: modeLabel(timer?.mode ?? null),
     };
   }, [timer, nowMs]);
 }

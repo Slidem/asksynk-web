@@ -15,19 +15,25 @@ import { useTimerSettingsDialogHandlers } from "@/timer/hooks/dialogs/timerSetti
 import { CurrentTimeblockPanel } from "./CurrentTimeblockPanel";
 import { FocusNowList } from "./FocusNowList";
 import { FocusOverduePanel } from "./FocusOverduePanel";
+import { formatClockTime } from "@/timer/utils/formatTimeblock";
 import { SessionCompleteBanner } from "./SessionCompleteBanner";
-import { SessionTypePicker } from "./SessionTypePicker";
-import { StartNextControls } from "./StartNextControls";
-import { TimerControls } from "./TimerControls";
+import { TimerActions } from "./TimerActions";
 import { TimerDisplay } from "./TimerDisplay";
 import { TimerProgressBar } from "./TimerProgressBar";
+import { TimerSessionSummary } from "./TimerSessionSummary";
 
 export function PomodoroTimer() {
   const view = useTimerView();
   const { open: openSettings } = useTimerSettingsDialogHandlers();
   const { grouped, isLoading } = useAttentionItemsByUrgency();
 
-  const sessionLabel = view.isActive ? view.label : `Next · ${view.label}`;
+  const sessionLabel = !view.isActive
+    ? `Up next · ${view.label}`
+    : view.status === "paused"
+      ? `${view.label} · Paused`
+      : view.completesAt
+        ? `${view.label} · ends ${formatClockTime(view.completesAt)}`
+        : view.label;
 
   return (
     <Container size="sm" py="xl">
@@ -59,7 +65,6 @@ export function PomodoroTimer() {
               style={{ letterSpacing: "0.08em" }}
             >
               {sessionLabel}
-              {view.status === "paused" ? " · Paused" : ""}
             </Text>
 
             <TimerDisplay
@@ -72,19 +77,15 @@ export function PomodoroTimer() {
             <Box w="100%" maw={420}>
               <TimerProgressBar
                 fraction={view.fraction}
-                color={view.color ?? "var(--mantine-color-gray-5)"}
+                color={view.color}
                 pulse={view.pulse}
                 height={10}
               />
             </Box>
 
-            {view.isActive ? (
-              <TimerControls size="xl" iconSize={26} />
-            ) : view.idle ? (
-              <SessionTypePicker size="md" />
-            ) : (
-              <StartNextControls />
-            )}
+            <TimerActions />
+
+            <TimerSessionSummary />
           </Stack>
         </Card>
 

@@ -1,5 +1,5 @@
 export function timerQueryKey() {
-  return ["timer"] as const;
+  return ["timer", "current"] as const;
 }
 
 export function useTimerQueryData() {

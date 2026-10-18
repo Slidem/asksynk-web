@@ -9,7 +9,10 @@ import type {
   TaskSuggestion,
   TaskSuggestionCreatePayload,
 } from "@/tasks/models/taskSuggestion";
-import type { TimerCompletedEvent } from "@/timer/models/timer";
+import type {
+  TimerCompletedEvent,
+  TimerSessionEndedEvent,
+} from "@/timer/models/timer";
 
 export interface SendMessageAck {
   ok: boolean;
@@ -43,6 +46,7 @@ interface ServerToClient {
   // materialized tasks' status changes — keeps the inline card live both ways.
   "suggestion.updated": (payload: { suggestion: TaskSuggestion }) => void;
   "timer.completed": (payload: TimerCompletedEvent) => void;
+  "timer.session_ended": (payload: TimerSessionEndedEvent) => void;
 }
 
 interface ClientToServer {

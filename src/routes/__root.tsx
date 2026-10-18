@@ -4,6 +4,7 @@ import "@mantine/notifications/styles.css";
 import "@mantine/tiptap/styles.css";
 
 import { MantineProvider } from "@mantine/core";
+import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
 import { Outlet, createRootRoute } from "@tanstack/react-router";
 
@@ -29,8 +30,10 @@ function RootLayout() {
       theme={theme}
       colorSchemeManager={colorSchemeManager}
     >
-      <Notifications position="bottom-right" />
-      <Outlet />
+      <ModalsProvider>
+        <Notifications position="bottom-right" />
+        <Outlet />
+      </ModalsProvider>
       {import.meta.env.DEV ? <TanStackRouterDevtools /> : null}
     </MantineProvider>
   );

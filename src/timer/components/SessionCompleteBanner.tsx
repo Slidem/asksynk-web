@@ -1,18 +1,16 @@
 import { Group, Stack, Text, ThemeIcon } from "@mantine/core";
 import { IconCircleCheck } from "@tabler/icons-react";
 import { useTimer } from "@/timer/hooks/queries/useTimer";
-import { sessionTypeLabel } from "@/timer/models/timer";
+import { modeLabel } from "@/timer/models/timer";
 
-/** Shown after a session completes: type + duration with a green check. */
+/** Shown after a block completes: mode + duration with a green check. */
 export function SessionCompleteBanner() {
   const { data: timer } = useTimer();
   if (!timer || timer.status !== "completed") return null;
 
-  const minutes = Math.round(timer.sessionDurationSeconds / 60);
+  const minutes = Math.round((timer.blockDurationSeconds ?? 0) / 60);
   const subtitle =
-    timer.sessionType === "focus"
-      ? `${minutes} min focused`
-      : `${minutes} min break`;
+    timer.mode === "focus" ? `${minutes} min focused` : `${minutes} min break`;
 
   return (
     <Group gap="sm" align="center">
@@ -21,7 +19,7 @@ export function SessionCompleteBanner() {
       </ThemeIcon>
       <Stack gap={0}>
         <Text fw={600} size="sm">
-          {sessionTypeLabel(timer.sessionType)} complete
+          {modeLabel(timer.mode)} complete
         </Text>
         <Text size="xs" c="dimmed">
           {subtitle}

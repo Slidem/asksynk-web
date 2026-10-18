@@ -3,6 +3,10 @@ const timeFormatter = new Intl.DateTimeFormat(undefined, {
   minute: "2-digit",
 });
 
+export function formatClockTime(date: Date): string {
+  return timeFormatter.format(date);
+}
+
 export function formatBlockRange(start: Date, end: Date): string {
   return `${timeFormatter.format(start)} – ${timeFormatter.format(end)}`;
 }

@@ -1,9 +1,11 @@
 import {
+  Alert,
   Button,
   Divider,
   Group,
   Modal,
   NumberInput,
+  Select,
   SimpleGrid,
   Slider,
   Stack,
@@ -13,10 +15,12 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import {
+  IconAlertTriangle,
   IconBolt,
   IconBrain,
   IconClock,
   IconCoffee,
+  IconHourglass,
   IconInfoCircle,
   IconMoon,
   IconRepeat,
@@ -25,18 +29,19 @@ import {
 import { useEffect, useState } from "react";
 import {
   DEFAULT_TIMER_SETTINGS_FORM_VALUES,
+  INACTIVITY_TIMEOUT_OPTIONS,
   TIMER_SETTINGS_PRESETS,
+  differsFromSnapshot,
   formToSettings,
   settingsToForm,
   type TimerSettingsFormValues,
 } from "@/timer/models/timerSettingsForm";
-import { sessionTypeLabel } from "@/timer/models/timer";
+import { useTimer } from "@/timer/hooks/queries/useTimer";
 import {
   useIsTimerSettingsDialogOpened,
   useTimerSettingsDialogHandlers,
 } from "@/timer/hooks/dialogs/timerSettingsDialogHooks";
 import { useTimerSettings } from "@/timer/hooks/queries/useTimerSettings";
-import { useTimerSuggestion } from "@/timer/hooks/queries/useTimerSuggestion";
 import { useUpdateTimerSettings } from "@/timer/hooks/mutations/useUpdateTimerSettings";
 import { useTimerSoundSettingsStore } from "@/timer/sounds/useTimerSoundSettingsStore";
 import {
@@ -59,7 +64,7 @@ export function TimerSettingsDialog() {
   const opened = useIsTimerSettingsDialogOpened();
   const { close } = useTimerSettingsDialogHandlers();
   const { data: settings } = useTimerSettings();
-  const { data: suggestion } = useTimerSuggestion({ enabled: opened });
+  const { data: timer } = useTimer();
   const updateMutation = useUpdateTimerSettings();
 
   const soundEnabled = useTimerSoundSettingsStore((s) => s.enabled);
@@ -71,9 +76,13 @@ export function TimerSettingsDialog() {
     canUseNotifications() ? Notification.permission : "unsupported",
   );
 
+  // Mirrors the uncontrolled form so the session warning can react to edits.
+  const [draft, setDraft] = useState(DEFAULT_TIMER_SETTINGS_FORM_VALUES);
+
   const form = useForm<TimerSettingsFormValues>({
     mode: "uncontrolled",
     initialValues: DEFAULT_TIMER_SETTINGS_FORM_VALUES,
+    onValuesChange: setDraft,
     validate: {
       focusMinutes: minutesValidator,
       shortBreakMinutes: minutesValidator,
@@ -88,6 +97,12 @@ export function TimerSettingsDialog() {
       form.setValues(settingsToForm(settings));
     }
   }, [opened, settings]);
+
+  const session = timer?.session ?? null;
+  const endsSession =
+    session !== null &&
+    differsFromSnapshot(formToSettings(draft), session.settings);
+  const discardsBlock = timer?.status === "running" || timer?.status === "paused";
 
   const handleClose = () => {
     form.reset();
@@ -200,12 +215,26 @@ export function TimerSettingsDialog() {
           />
         </SimpleGrid>
 
-        {suggestion && (
-          <Text size="sm" c="dimmed">
-            Next break: {sessionTypeLabel(suggestion.suggestedSessionType)} ·{" "}
-            {suggestion.completedFocusSessions}/{suggestion.longBreakInterval}{" "}
-            focus sessions
-          </Text>
+        <Select
+          label="Auto-end idle session"
+          description="Paused or between blocks this long → the session resets."
+          leftSection={<IconHourglass size={16} />}
+          data={INACTIVITY_TIMEOUT_OPTIONS}
+          allowDeselect={false}
+          key={form.key("inactivityTimeout")}
+          {...form.getInputProps("inactivityTimeout")}
+        />
+
+        {endsSession && (
+          <Alert
+            color="orange"
+            variant="light"
+            icon={<IconAlertTriangle size={18} />}
+          >
+            Saving ends your current session ({session.completedFocusBlocks}{" "}
+            focus {session.completedFocusBlocks === 1 ? "block" : "blocks"}).
+            {discardsBlock ? " The current block is discarded." : ""}
+          </Alert>
         )}
 
         <Divider label="Sounds" labelPosition="left" />
@@ -247,15 +276,19 @@ export function TimerSettingsDialog() {
         )}
 
         <Text size="xs" c="dimmed">
-          Changes apply to your next session.
+          Duration changes start a new session.
         </Text>
 
         <Group justify="flex-end">
           <Button variant="default" onClick={handleClose}>
             Cancel
           </Button>
-          <Button onClick={handleSave} loading={updateMutation.isPending}>
-            Save
+          <Button
+            color={endsSession ? "orange" : undefined}
+            onClick={handleSave}
+            loading={updateMutation.isPending}
+          >
+            {endsSession ? "Save & end session" : "Save"}
           </Button>
         </Group>
       </Stack>

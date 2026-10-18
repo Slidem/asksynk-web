@@ -1,7 +1,6 @@
 import { Box, Card, Group, Stack, Text } from "@mantine/core";
 import { useTimerView } from "@/timer/hooks/useTimerView";
-import { StartNextControls } from "./StartNextControls";
-import { TimerControls } from "./TimerControls";
+import { TimerActions } from "./TimerActions";
 import { TimerDisplay } from "./TimerDisplay";
 import { TimerProgressBar } from "./TimerProgressBar";
 
@@ -10,7 +9,11 @@ export function DashboardTimer() {
 
   if (view.idle) return null;
 
-  const sessionLabel = view.isActive ? view.label : `Next · ${view.label}`;
+  const sessionLabel = !view.isActive
+    ? `Up next · ${view.label}`
+    : view.status === "paused"
+      ? `${view.label} · Paused`
+      : view.label;
 
   return (
     <Card radius="lg" padding="lg">
@@ -24,7 +27,6 @@ export function DashboardTimer() {
             style={{ letterSpacing: "0.06em" }}
           >
             {sessionLabel}
-            {view.status === "paused" ? " · Paused" : ""}
           </Text>
           <TimerDisplay
             seconds={view.displaySeconds}
@@ -36,16 +38,12 @@ export function DashboardTimer() {
         <Box style={{ flex: 1 }}>
           <TimerProgressBar
             fraction={view.fraction}
-            color={view.color ?? "var(--mantine-color-gray-5)"}
+            color={view.color}
             pulse={view.pulse}
             height={8}
           />
         </Box>
-        {view.isActive ? (
-          <TimerControls size="md" iconSize={18} compact />
-        ) : (
-          <StartNextControls size="sm" iconSize={16} buttonSize="xs" />
-        )}
+        <TimerActions compact size="md" />
       </Group>
     </Card>
   );

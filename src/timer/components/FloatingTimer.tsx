@@ -6,8 +6,7 @@ import { useDraggable } from "@/timer/hooks/useDraggable";
 import { useFloatingTimerVisible } from "@/timer/hooks/useFloatingTimerVisible";
 import { useFloatingTimerHiddenStore } from "@/timer/store/floatingTimerHiddenStore";
 import { useFloatingTimerPositionStore } from "@/timer/store/floatingTimerPositionStore";
-import { StartNextButton } from "./StartNextButton";
-import { TimerControls } from "./TimerControls";
+import { TimerActions } from "./TimerActions";
 import { TimerDisplay } from "./TimerDisplay";
 import { TimerProgressBar } from "./TimerProgressBar";
 import classes from "./FloatingTimer.module.css";
@@ -27,7 +26,11 @@ export function FloatingTimer() {
   const positionStyle = positioned
     ? { left: x, top: y, right: "auto", bottom: "auto" }
     : undefined;
-  const sessionLabel = view.isActive ? view.label : `Next · ${view.label}`;
+  const sessionLabel = !view.isActive
+    ? `Up next · ${view.label}`
+    : view.status === "paused"
+      ? `${view.label} · Paused`
+      : view.label;
 
   return (
     <Paper
@@ -71,17 +74,11 @@ export function FloatingTimer() {
         </Group>
         <TimerProgressBar
           fraction={view.fraction}
-          color={view.color ?? "var(--mantine-color-gray-5)"}
+          color={view.color}
           pulse={view.pulse}
           height={6}
         />
-        <Group justify="center">
-          {view.isActive ? (
-            <TimerControls size="sm" iconSize={16} compact />
-          ) : (
-            <StartNextButton size="sm" iconSize={16} />
-          )}
-        </Group>
+        <TimerActions compact size="sm" />
       </Stack>
     </Paper>
   );

@@ -13,6 +13,6 @@ export function useAmbientTimerVisible(): boolean {
 
   if (HIDDEN_ROUTES.includes(pathname)) return false;
   if (isIdle) return false;
-  // Show once a session exists; hide only when idle / never started.
-  return timer != null && timer.status !== "idle";
+  // Show while a session is open; hide once it ends or goes stale.
+  return timer?.session != null;
 }

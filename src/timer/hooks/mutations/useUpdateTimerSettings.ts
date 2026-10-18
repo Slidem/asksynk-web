@@ -1,6 +1,7 @@
 import { useOptimisticMutation } from "@/lib/useOptimisticMutation";
 import { updateTimerSettings } from "@/timer/apis/updateTimerSettings";
 import type { TimerSettings } from "@/timer/models/timer";
+import { refreshTimer } from "@/timer/utils/refreshTimer";
 import { useQueryClient } from "@tanstack/react-query";
 import { timerSettingsQueryKey } from "../queries/useTimerSettingsQueryData";
 
@@ -14,6 +15,8 @@ export function useUpdateTimerSettings() {
     skipInvalidateOnSuccess: true,
     onSuccess: (data) => {
       queryClient.setQueryData(timerSettingsQueryKey(), data as TimerSettings);
+      // Changed durations end the open session server-side.
+      refreshTimer(queryClient);
     },
   });
 }
