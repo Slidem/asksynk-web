@@ -40,7 +40,9 @@ export function AttentionItemsBucketFilters() {
             >
               <Group gap={6} wrap="nowrap" component="span">
                 <span>{URGENCY_LABELS[urgency]}</span>
-                <span style={{ opacity: 0.55, fontVariantNumeric: "tabular-nums" }}>
+                <span
+                  style={{ opacity: 0.55, fontVariantNumeric: "tabular-nums" }}
+                >
                   {count}
                 </span>
               </Group>

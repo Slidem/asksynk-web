@@ -1,6 +1,6 @@
 import type {
   AttentionItemDto,
-  AttentionItemType,
+  AttentionSourceKind,
 } from "@/attentionItems/models/attentionItem";
 import { htmlToPreview } from "@/lib/htmlToPreview";
 
@@ -9,14 +9,11 @@ interface AttentionNotificationContent {
   body: string;
 }
 
-const TITLE_BY_TYPE: Record<AttentionItemType, string> = {
-  tagged_message: "New tagged message",
-  incoming_email: "New email",
-  slack_message: "New Slack message",
-  whatsapp_message: "New WhatsApp message",
-  suggested_timeblock: "Suggested timeblock",
+const TITLE_BY_KIND: Partial<Record<AttentionSourceKind, string>> = {
+  message: "New tagged message",
   task: "New task",
-  suggested_task: "Suggested task",
+  task_batch: "New task batch",
+  task_suggestion: "Suggested task",
 };
 
 // Toast shows the (near-)full message; cap for readable UX. Content may be
@@ -26,19 +23,7 @@ const MAX_BODY = 280;
 export function formatAttentionItemNotification(
   item: AttentionItemDto,
 ): AttentionNotificationContent {
-  const title = TITLE_BY_TYPE[item.type] ?? "New item needs attention";
-  const raw = bodyText(item);
+  const title = TITLE_BY_KIND[item.source.kind] ?? "New item needs attention";
+  const raw = item.preview.body ?? item.preview.title;
   return { title, body: htmlToPreview(raw, MAX_BODY) };
-}
-
-function bodyText(item: AttentionItemDto): string {
-  switch (item.metadata.type) {
-    case "tagged_message":
-      return item.metadata.content;
-    case "task":
-    case "suggested_task":
-      return item.metadata.title;
-    default:
-      return item.note ?? "";
-  }
 }

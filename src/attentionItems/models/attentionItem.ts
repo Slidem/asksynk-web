@@ -1,74 +1,48 @@
 export type AttentionItemStatus = "created" | "in_progress" | "resolved";
 
-export type AttentionItemType =
-  | "tagged_message"
-  | "incoming_email"
-  | "slack_message"
-  | "whatsapp_message"
-  | "suggested_timeblock"
+// Open string: future channels (gmail, slack…) add kinds without an API change.
+export type AttentionSourceKind =
+  | "message"
   | "task"
-  | "suggested_task";
+  | "task_batch"
+  | "task_suggestion"
+  | (string & {});
 
-export interface TaggedMessageMetadata {
-  type: "tagged_message";
-  messageId: string;
-  threadId: string;
-  senderId: string;
-  senderType: "user" | "guest";
-  content: string;
-  originalTagIds: string[];
+export interface AttentionSource {
+  context: string;
+  kind: AttentionSourceKind;
+  id: string;
 }
 
-export interface TaskMetadata {
-  type: "task";
+export interface AttentionActor {
+  kind: "user" | "guest";
+  id: string;
+}
+
+export interface AttentionPreview {
   title: string;
-  taskId?: string;
-  taskBatchId?: string;
+  body: string | null;
+  actor: AttentionActor | null;
+  // message: { threadId }
+  meta: Record<string, string>;
 }
-
-export interface SuggestedTaskMetadata {
-  type: "suggested_task";
-  suggestionId: string;
-  suggesterUserId: string;
-  title: string;
-}
-
-export interface UnknownAttentionItemMetadata {
-  type: Exclude<
-    AttentionItemType,
-    "tagged_message" | "task" | "suggested_task"
-  >;
-}
-
-export type AttentionItemMetadata =
-  | TaggedMessageMetadata
-  | TaskMetadata
-  | SuggestedTaskMetadata
-  | UnknownAttentionItemMetadata;
 
 export interface AttentionItemDto {
   id: string;
   userId: string;
-  type: AttentionItemType;
+  source: AttentionSource;
+  preview: AttentionPreview;
   status: AttentionItemStatus;
-  dueDate: string | null;
-  note: string | null;
-  metadata: AttentionItemMetadata;
   tagIds: string[];
+  dueDate: string | null;
+  dueDatePinned: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface AttentionItemListFilters {
   status?: AttentionItemStatus;
-  type?: AttentionItemType;
+  sourceKind?: AttentionSourceKind;
   cursor?: string;
   limit?: number;
-}
-
-export interface AttentionItemUpdateInput {
-  id: string;
-  status?: AttentionItemStatus;
-  note?: string | null;
-  tagIds?: string[];
 }

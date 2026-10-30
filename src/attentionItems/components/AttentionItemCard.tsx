@@ -1,6 +1,7 @@
 import { Card, Group, Stack, Text, ThemeIcon } from "@mantine/core";
 
 import type { AttentionItemDto } from "@/attentionItems/models/attentionItem";
+import { getAttentionItemTitle } from "@/attentionItems/utils/getAttentionItemTitle";
 
 import { AttentionItemDueDate } from "./AttentionItemDueDate";
 import { AttentionItemStatusBadge } from "./AttentionItemStatusBadge";
@@ -13,10 +14,8 @@ interface Props {
 }
 
 export function AttentionItemCard({ item }: Props) {
-  const { Icon, Body, getDisplayTitle } = getAttentionItemConfig(
-    item.metadata.type,
-  );
-  const title = getDisplayTitle(item.metadata);
+  const { Icon, Body } = getAttentionItemConfig(item.source.kind);
+  const title = getAttentionItemTitle(item);
 
   return (
     <Card radius="lg" shadow="sm" padding="md" withBorder>
@@ -33,18 +32,15 @@ export function AttentionItemCard({ item }: Props) {
           <AttentionItemStatusMenu item={item} />
         </Group>
 
-        <Body item={item} metadata={item.metadata} />
-
-        {item.note && (
-          <Text size="xs" c="dimmed" lineClamp={2}>
-            v{item.note}
-          </Text>
-        )}
+        <Body item={item} />
 
         <Group gap="xs" wrap="wrap" justify="space-between">
           <Group gap="xs" wrap="wrap">
             <AttentionItemStatusBadge status={item.status} />
-            <AttentionItemDueDate dueDate={item.dueDate} />
+            <AttentionItemDueDate
+              dueDate={item.dueDate}
+              pinned={item.dueDatePinned}
+            />
           </Group>
           <AttentionItemTagChips tagIds={item.tagIds} />
         </Group>

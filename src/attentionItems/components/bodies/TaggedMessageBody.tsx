@@ -3,19 +3,20 @@ import { IconArrowUpRight } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import DOMPurify from "dompurify";
 
-import type { TaggedMessageMetadata } from "@/attentionItems/models/attentionItem";
+import type { AttentionItemDto } from "@/attentionItems/models/attentionItem";
 import { useTaggedMessageSender } from "@/attentionItems/hooks/useTaggedMessageSender";
 import { UserBadge } from "@/components/UserBadge";
 
 import classes from "./TaggedMessageBody.module.css";
 
 interface Props {
-  metadata: TaggedMessageMetadata;
+  item: AttentionItemDto;
 }
 
-export function TaggedMessageBody({ metadata }: Props) {
-  const sender = useTaggedMessageSender(metadata);
-  const sanitized = DOMPurify.sanitize(metadata.content);
+export function TaggedMessageBody({ item }: Props) {
+  const { threadId } = item.preview.meta;
+  const sender = useTaggedMessageSender(item.preview.actor, threadId);
+  const sanitized = DOMPurify.sanitize(item.preview.body ?? "");
   const displayName = sender.name || sender.email || "User";
 
   return (
@@ -41,8 +42,8 @@ export function TaggedMessageBody({ metadata }: Props) {
             renderRoot={(props) => (
               <Link
                 to="/messages/$threadId"
-                params={{ threadId: metadata.threadId }}
-                search={{ focusMessageId: metadata.messageId }}
+                params={{ threadId }}
+                search={{ focusMessageId: item.source.id }}
                 {...props}
               />
             )}

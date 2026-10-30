@@ -4,9 +4,11 @@ import { useMemo } from "react";
 
 interface Props {
   dueDate: string | null;
+  // true = explicit date from the source; false = derived from tags.
+  pinned: boolean;
 }
 
-export function AttentionItemDueDate({ dueDate }: Props) {
+export function AttentionItemDueDate({ dueDate, pinned }: Props) {
   const label = useMemo(
     () => (dueDate ? formatRelative(new Date(dueDate)) : null),
     [dueDate],
@@ -15,7 +17,9 @@ export function AttentionItemDueDate({ dueDate }: Props) {
   if (!dueDate || !label) return null;
 
   return (
-    <Tooltip label={new Date(dueDate).toLocaleString()}>
+    <Tooltip
+      label={`${new Date(dueDate).toLocaleString()} · ${pinned ? "Set on source" : "From tags"}`}
+    >
       <Group gap={4} wrap="nowrap">
         <IconCalendarTime size={12} color="var(--mantine-color-dimmed)" />
         <Text size="xs" c="dimmed">

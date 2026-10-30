@@ -1,14 +1,18 @@
 import { Text } from "@mantine/core";
-import type { AttentionItemMetadata } from "@/attentionItems/models/attentionItem";
+
+import type { AttentionItemDto } from "@/attentionItems/models/attentionItem";
+import { htmlToPreview } from "@/lib/htmlToPreview";
 
 interface Props {
-  metadata: AttentionItemMetadata;
+  item: AttentionItemDto;
 }
 
-export function UnknownTypeBody({ metadata }: Props) {
+export function UnknownTypeBody({ item }: Props) {
+  if (!item.preview.body) return null;
+
   return (
-    <Text size="sm" c="dimmed" fs="italic">
-      Preview unavailable for type "{metadata.type}".
+    <Text size="sm" c="dimmed" lineClamp={3}>
+      {htmlToPreview(item.preview.body, 280)}
     </Text>
   );
 }

@@ -1,5 +1,5 @@
 import type { AttentionItemDto } from "@/attentionItems/models/attentionItem";
-import { getAttentionItemConfig } from "@/attentionItems/components/attentionItemTypeRegistry";
+import { getAttentionItemTitle } from "@/attentionItems/utils/getAttentionItemTitle";
 
 export function filterAttentionItemsByQuery(
   items: AttentionItemDto[],
@@ -8,8 +8,7 @@ export function filterAttentionItemsByQuery(
   const q = query.trim().toLowerCase();
   if (!q) return items;
 
-  return items.filter((item) => {
-    const { getDisplayTitle } = getAttentionItemConfig(item.metadata.type);
-    return getDisplayTitle(item.metadata).toLowerCase().includes(q);
-  });
+  return items.filter((item) =>
+    getAttentionItemTitle(item).toLowerCase().includes(q),
+  );
 }

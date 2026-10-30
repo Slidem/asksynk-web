@@ -21,7 +21,7 @@ import { Link } from "@tanstack/react-router";
 import dayjs from "dayjs";
 import { useState } from "react";
 
-import type { SuggestedTaskMetadata } from "@/attentionItems/models/attentionItem";
+import type { AttentionItemDto } from "@/attentionItems/models/attentionItem";
 import { UserBadge } from "@/components/UserBadge";
 import { getConnectionDisplayName } from "@/lib/connections";
 import { useNetworkConnectionsQuery } from "@/network/hooks/queries/useNetworkConnectionsQuery";
@@ -30,19 +30,21 @@ import { useRespondToTaskSuggestion } from "@/tasks/hooks/mutations/useRespondTo
 import { useTaskSuggestion } from "@/tasks/hooks/queries/useTaskSuggestion";
 
 interface Props {
-  metadata: SuggestedTaskMetadata;
+  item: AttentionItemDto;
 }
 
-export function SuggestedTaskBody({ metadata }: Props) {
+export function SuggestedTaskBody({ item }: Props) {
+  const suggestionId = item.source.id;
+  const suggesterUserId = item.preview.actor?.id;
   const { respond, isResponding } = useRespondToTaskSuggestion();
   const { data: suggester } = useNetworkConnectionsQuery((connections) =>
-    connections.find((c) => c.userId === metadata.suggesterUserId),
+    connections.find((c) => c.userId === suggesterUserId),
   );
 
   const [expanded, setExpanded] = useState(false);
   // Lazy: the payload (batch children, due date, tags) loads on expand.
   const { data: suggestion, isLoading } = useTaskSuggestion(
-    metadata.suggestionId,
+    suggestionId,
     { enabled: expanded },
   );
   const payload = suggestion?.payload;
@@ -74,7 +76,7 @@ export function SuggestedTaskBody({ metadata }: Props) {
             <Text span fw={500}>
               {suggester ? getConnectionDisplayName(suggester) : "Someone"}
             </Text>{" "}
-            suggested: {metadata.title}
+            suggested: {item.preview.title}
           </Text>
         </Group>
         <Tooltip label="Open in tasks" withArrow>
@@ -87,7 +89,7 @@ export function SuggestedTaskBody({ metadata }: Props) {
                 to="/tasks"
                 search={{
                   tab: "suggested-to-me",
-                  focusSuggestionId: metadata.suggestionId,
+                  focusSuggestionId: suggestionId,
                 }}
                 {...props}
               />
@@ -132,13 +134,15 @@ export function SuggestedTaskBody({ metadata }: Props) {
         )}
       </Collapse>
 
+      {/* Accepted/rejected/rescinded → item resolved; nothing left to act on. */}
+      {item.status !== "resolved" && (
       <Group gap="xs">
         <Button
           size="xs"
           leftSection={<IconCheck size={14} />}
           loading={isResponding}
           onClick={() =>
-            respond({ id: metadata.suggestionId, status: "accepted" })
+            respond({ id: suggestionId, status: "accepted" })
           }
         >
           Accept
@@ -149,12 +153,13 @@ export function SuggestedTaskBody({ metadata }: Props) {
           leftSection={<IconX size={14} />}
           disabled={isResponding}
           onClick={() =>
-            respond({ id: metadata.suggestionId, status: "rejected" })
+            respond({ id: suggestionId, status: "rejected" })
           }
         >
           Reject
         </Button>
       </Group>
+      )}
     </Stack>
   );
 }

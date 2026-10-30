@@ -1,5 +1,5 @@
 import { useSession } from "@/auth";
-import type { TaggedMessageMetadata } from "@/attentionItems/models/attentionItem";
+import type { AttentionActor } from "@/attentionItems/models/attentionItem";
 import { useThreadsQuery } from "@/messages/hooks/queries/useThreadsQuery";
 
 export interface TaggedMessageSender {
@@ -9,14 +9,13 @@ export interface TaggedMessageSender {
 }
 
 export function useTaggedMessageSender(
-  metadata: TaggedMessageMetadata,
+  actor: AttentionActor | null,
+  threadId: string | undefined,
 ): TaggedMessageSender {
   const { data: session } = useSession();
   const { data: threads } = useThreadsQuery();
 
-  const isOwn =
-    metadata.senderType === "user" &&
-    metadata.senderId === session?.user?.id;
+  const isOwn = actor?.kind === "user" && actor.id === session?.user?.id;
 
   if (isOwn) {
     return {
@@ -26,7 +25,7 @@ export function useTaggedMessageSender(
     };
   }
 
-  const thread = threads?.find((t) => t.threadId === metadata.threadId);
+  const thread = threads?.find((t) => t.threadId === threadId);
   if (!thread) {
     return { name: null, email: null, image: null };
   }

@@ -16,21 +16,22 @@ import {
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 
-import type { TaskMetadata } from "@/attentionItems/models/attentionItem";
+import type { AttentionItemDto } from "@/attentionItems/models/attentionItem";
 import { TASK_STATUS_LABELS } from "@/tasks/models/task";
 import { useTaskBatch } from "@/tasks/hooks/queries/useTaskBatch";
 
 interface Props {
-  metadata: TaskMetadata;
+  item: AttentionItemDto;
 }
 
-export function TaskBody({ metadata }: Props) {
-  const isBatch = Boolean(metadata.taskBatchId);
+export function TaskBody({ item }: Props) {
+  const isBatch = item.source.kind === "task_batch";
   const [expanded, setExpanded] = useState(false);
   // Lazy: batch contents are fetched only when expanded.
-  const { data: batch, isLoading } = useTaskBatch(metadata.taskBatchId, {
-    enabled: expanded,
-  });
+  const { data: batch, isLoading } = useTaskBatch(
+    isBatch ? item.source.id : undefined,
+    { enabled: expanded },
+  );
 
   return (
     <Stack gap="xs">
@@ -51,7 +52,7 @@ export function TaskBody({ metadata }: Props) {
             </ActionIcon>
           )}
           <Text size="sm" style={{ minWidth: 0 }} truncate>
-            {metadata.title}
+            {item.preview.title}
           </Text>
         </Group>
         <Tooltip label="Open in tasks" withArrow>
@@ -63,9 +64,9 @@ export function TaskBody({ metadata }: Props) {
               <Link
                 to="/tasks"
                 search={
-                  metadata.taskBatchId
-                    ? { tab: "my-tasks", focusBatchId: metadata.taskBatchId }
-                    : { tab: "my-tasks", focusTaskId: metadata.taskId }
+                  isBatch
+                    ? { tab: "my-tasks", focusBatchId: item.source.id }
+                    : { tab: "my-tasks", focusTaskId: item.source.id }
                 }
                 {...props}
               />

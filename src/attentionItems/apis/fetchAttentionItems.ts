@@ -10,7 +10,7 @@ export async function fetchAttentionItems(
   const params = new URLSearchParams();
 
   if (filters.status) params.set("status", filters.status);
-  if (filters.type) params.set("type", filters.type);
+  if (filters.sourceKind) params.set("sourceKind", filters.sourceKind);
   if (filters.cursor) params.set("cursor", filters.cursor);
   if (typeof filters.limit === "number") {
     params.set("limit", String(filters.limit));

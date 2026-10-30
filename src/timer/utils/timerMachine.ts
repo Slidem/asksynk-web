@@ -52,7 +52,8 @@ function allowedCommandsFor(
   const result: AllowedCommand[] = [];
   for (const command of table.commands) {
     const rows = table.transitions.filter(
-      (row) => row.on.command === command && !row.noop && matchesState(row, timer),
+      (row) =>
+        row.on.command === command && !row.noop && matchesState(row, timer),
     );
     if (rows.length === 0) continue;
     if (command === "start") {

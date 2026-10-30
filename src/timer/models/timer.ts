@@ -2,7 +2,10 @@ export type TimerStatus = "idle" | "running" | "paused" | "completed";
 export type TimerMode = "focus" | "short_break" | "long_break";
 export type TimerCommand = "start" | "pause" | "resume" | "stop" | "reset";
 export type TimerTrigger = "timeout" | "inactivity" | "settings_changed";
-export type SessionEndReason = "manual_reset" | "inactivity" | "settings_changed";
+export type SessionEndReason =
+  | "manual_reset"
+  | "inactivity"
+  | "settings_changed";
 
 export type TimerCommandRequest =
   | { command: "start"; mode: TimerMode }

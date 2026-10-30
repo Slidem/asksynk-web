@@ -8,13 +8,8 @@ import {
 
 import type {
   AttentionItemDto,
-  AttentionItemMetadata,
-  AttentionItemType,
-  SuggestedTaskMetadata,
-  TaggedMessageMetadata,
-  TaskMetadata,
+  AttentionSourceKind,
 } from "@/attentionItems/models/attentionItem";
-import { htmlToPreview } from "@/lib/htmlToPreview";
 
 import { SuggestedTaskBody } from "./bodies/SuggestedTaskBody";
 import { TaggedMessageBody } from "./bodies/TaggedMessageBody";
@@ -23,60 +18,42 @@ import { UnknownTypeBody } from "./bodies/UnknownTypeBody";
 
 type IconComponent = ComponentType<{ size?: number | string }>;
 
-interface AttentionItemTypeConfig<
-  M extends AttentionItemMetadata = AttentionItemMetadata,
-> {
+interface AttentionItemKindConfig {
   Icon: IconComponent;
-  Body: ComponentType<{ item: AttentionItemDto; metadata: M }>;
-  getDisplayTitle: (metadata: M) => string;
+  Body: ComponentType<{ item: AttentionItemDto }>;
 }
 
-const TYPE_LABELS: Record<AttentionItemType, string> = {
-  tagged_message: "Tagged message",
-  incoming_email: "Incoming email",
-  slack_message: "Slack message",
-  whatsapp_message: "WhatsApp message",
-  suggested_timeblock: "Suggested timeblock",
-  task: "Task",
-  suggested_task: "Suggested task",
-};
-
-const TAGGED_MESSAGE_CONFIG: AttentionItemTypeConfig<TaggedMessageMetadata> = {
+const MESSAGE_CONFIG: AttentionItemKindConfig = {
   Icon: IconMessage,
   Body: TaggedMessageBody,
-  getDisplayTitle: (m) => htmlToPreview(m.content, 80) || "Empty message",
 };
 
-const TASK_CONFIG: AttentionItemTypeConfig<TaskMetadata> = {
+const TASK_CONFIG: AttentionItemKindConfig = {
   Icon: IconChecklist,
   Body: TaskBody,
-  getDisplayTitle: (m) => m.title || "Task",
 };
 
-const SUGGESTED_TASK_CONFIG: AttentionItemTypeConfig<SuggestedTaskMetadata> = {
+const TASK_SUGGESTION_CONFIG: AttentionItemKindConfig = {
   Icon: IconClipboardCheck,
   Body: SuggestedTaskBody,
-  getDisplayTitle: (m) => m.title || "Suggested task",
 };
 
-const UNKNOWN_CONFIG: AttentionItemTypeConfig = {
+// Unknown kinds (future channels) render generically from `preview`.
+const UNKNOWN_CONFIG: AttentionItemKindConfig = {
   Icon: IconBell,
   Body: UnknownTypeBody,
-  getDisplayTitle: (m) => TYPE_LABELS[m.type] ?? "Attention item",
 };
 
-const REGISTRY: Partial<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Record<AttentionItemType, AttentionItemTypeConfig<any>>
-> = {
-  tagged_message: TAGGED_MESSAGE_CONFIG,
-  task: TASK_CONFIG,
-  suggested_task: SUGGESTED_TASK_CONFIG,
-};
+const REGISTRY: Partial<Record<AttentionSourceKind, AttentionItemKindConfig>> =
+  {
+    message: MESSAGE_CONFIG,
+    task: TASK_CONFIG,
+    task_batch: TASK_CONFIG,
+    task_suggestion: TASK_SUGGESTION_CONFIG,
+  };
 
 export function getAttentionItemConfig(
-  type: AttentionItemType,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): AttentionItemTypeConfig<any> {
-  return REGISTRY[type] ?? UNKNOWN_CONFIG;
+  kind: AttentionSourceKind,
+): AttentionItemKindConfig {
+  return REGISTRY[kind] ?? UNKNOWN_CONFIG;
 }
