@@ -11,7 +11,6 @@ interface Range {
 }
 
 export function useUserCalendarEvents(userId: string, range: Range | null) {
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   const queryKey = useMemo(
     () => (range ? calendarEventsQueryKey(range.start, range.end, userId) : []),
@@ -21,7 +20,7 @@ export function useUserCalendarEvents(userId: string, range: Range | null) {
   return useQuery({
     queryKey,
     queryFn: () =>
-      fetchCalendarEvents(range!.start, range!.end, timezone, userId),
+      fetchCalendarEvents(range!.start, range!.end, userId),
     enabled: !!range,
     placeholderData: keepPreviousData,
     select: (data) => data.map(dtoToCalendarEvent),

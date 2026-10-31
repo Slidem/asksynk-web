@@ -12,6 +12,7 @@ export type CalendarEvent = {
   rrule: string | null;
   durationSeconds: number;
   instanceStart: Date;
+  allDay?: boolean;
   calendarId?: string;
   source?: string;
   readOnly?: boolean;

@@ -14,6 +14,7 @@ type OpenProps =
   | {
       mode: "delete";
       eventId: string;
+      instanceId: string;
       instanceStart: Date;
     };
 
@@ -21,6 +22,7 @@ type RecurringConfirmDialogState = {
   opened: boolean;
   mode: RecurringConfirmMode;
   eventId: string;
+  instanceId: string;
   instanceStart: Date | null;
   pendingUpdate: UpdateCalendarEventInput | null;
   resolver: ((result: RecurringConfirmResult) => void) | null;
@@ -32,6 +34,7 @@ type RecurringConfirmDialogState = {
 const resetState = {
   opened: false,
   eventId: "",
+  instanceId: "",
   instanceStart: null,
   pendingUpdate: null,
   resolver: null,
@@ -42,6 +45,7 @@ export const useRecurringConfirmDialogStore =
     opened: false,
     mode: "edit",
     eventId: "",
+    instanceId: "",
     instanceStart: null,
     pendingUpdate: null,
     resolver: null,
@@ -51,6 +55,7 @@ export const useRecurringConfirmDialogStore =
           opened: true,
           mode: props.mode,
           eventId: props.eventId,
+          instanceId: props.mode === "delete" ? props.instanceId : "",
           instanceStart: props.instanceStart,
           pendingUpdate: props.mode === "edit" ? props.pendingUpdate : null,
           resolver: resolve,

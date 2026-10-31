@@ -1,4 +1,7 @@
-import { toISOStringWithTimezone } from "@/lib/date";
+import dayjs from "dayjs";
+import type { DateValue } from "@mantine/dates";
+
+import { toLocalDateIn } from "@/lib/date";
 import { cleanString, fromNullable, mapDefined } from "@/lib/optional";
 import type { CalendarEvent } from "@/schedule/models/calendarEvent";
 import type {
@@ -11,8 +14,19 @@ import type { CalendarEventFormValues } from "@/schedule/models/calendarEventFor
 export function dtoToCalendarEvent(
   dto: CalendarEventInstanceDto,
 ): CalendarEvent {
-  const start = new Date(dto.instanceStart);
-  const end = new Date(start.getTime() + dto.durationSeconds * 1000);
+  const instanceStart = new Date(dto.instanceStart);
+  const instanceEnd = new Date(
+    instanceStart.getTime() + dto.durationSeconds * 1000,
+  );
+
+  // All-day: same calendar dates for every viewer, whatever their timezone
+  const start = dto.allDay
+    ? toLocalDateIn(instanceStart, dto.timezone)
+    : instanceStart;
+
+  const end = dto.allDay
+    ? toLocalDateIn(instanceEnd, dto.timezone)
+    : instanceEnd;
   return {
     id: dto.instanceId,
     eventId: dto.eventId,
@@ -26,19 +40,23 @@ export function dtoToCalendarEvent(
     tagIds: dto.tagIds,
     rrule: dto.rrule,
     durationSeconds: dto.durationSeconds,
-    instanceStart: start,
+    instanceStart,
+    allDay: dto.allDay,
     calendarId: dto.calendarId,
     source: dto.source,
     readOnly: dto.readOnly,
   };
 }
 
+// dayjs parses picker strings as local time in every browser
+const toDate = (value: DateValue): Date => dayjs(value).toDate();
+
 export function formToCreateInput(
   form: CalendarEventFormValues,
   id: string,
 ): CreateCalendarEventInput {
-  const start = form.start!;
-  const end = form.end!;
+  const start = toDate(form.start);
+  const end = toDate(form.end);
   const durationSeconds = Math.round((end.getTime() - start.getTime()) / 1000);
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -48,7 +66,7 @@ export function formToCreateInput(
     description: cleanString(form.description),
     location: cleanString(form.location),
     link: cleanString(form.link),
-    start: toISOStringWithTimezone(start),
+    start: start.toISOString(),
     durationSeconds,
     timezone,
     rrule: cleanString(form.recurrence)
@@ -64,8 +82,8 @@ export function formToUpdateInput(
 ): UpdateCalendarEventInput {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  const startDate = form.start ? new Date(form.start!) : undefined;
-  const endDate = form.end ? new Date(form.end!) : undefined;
+  const startDate = form.start ? toDate(form.start) : undefined;
+  const endDate = form.end ? toDate(form.end) : undefined;
 
   return {
     title: mapDefined(form.title, (v) => v.trim()),
@@ -79,7 +97,7 @@ export function formToUpdateInput(
     ),
     ...(startDate &&
       endDate && {
-        start: toISOStringWithTimezone(startDate),
+        start: startDate.toISOString(),
         durationSeconds: Math.round(
           (endDate.getTime() - startDate.getTime()) / 1000,
         ),

@@ -7,11 +7,10 @@ import { usePublicCalendarEventsQueryData } from "@/public-schedule/hooks/querie
 export function usePublicCalendarEventsQuery(slug: string) {
   const { viewStart, viewEnd, queryKey } =
     usePublicCalendarEventsQueryData(slug);
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   return useQuery({
     queryKey,
-    queryFn: () => fetchPublicCalendarEvents(viewStart, viewEnd, timezone),
+    queryFn: () => fetchPublicCalendarEvents(viewStart, viewEnd),
     placeholderData: keepPreviousData,
     select: (data) => data.map(dtoToCalendarEvent),
     enabled: !!viewStart && !!viewEnd,

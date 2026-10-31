@@ -1,16 +1,13 @@
 import { apiFetch, buildApiUrl } from "@/lib/api";
-import { toISOStringWithTimezone } from "@/lib/date";
 import type { CalendarEventInstanceDto } from "@/schedule/models/calendarEventDto";
 
 export async function fetchPublicCalendarEvents(
   start: Date,
   end: Date,
-  timezone: string,
 ): Promise<CalendarEventInstanceDto[]> {
   const params = new URLSearchParams({
-    start: toISOStringWithTimezone(start),
-    end: toISOStringWithTimezone(end),
-    timezone,
+    start: start.toISOString(),
+    end: end.toISOString(),
   });
 
   const response = await apiFetch(

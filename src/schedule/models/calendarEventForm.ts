@@ -1,11 +1,14 @@
+import type { DateValue } from "@mantine/dates";
+
 export type CalendarEventFormValues = {
   title: string;
   description: string;
   location: string;
   link: string;
   color: string;
-  start: Date | null;
-  end: Date | null;
+  // Mantine DateTimePicker emits local "YYYY-MM-DD HH:mm:ss" strings on change
+  start: DateValue;
+  end: DateValue;
   tagIds: string[];
   recurrence: string;
 };

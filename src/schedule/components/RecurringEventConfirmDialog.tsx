@@ -9,10 +9,9 @@ import {
   useManageRecurringEventDialog,
   useRecurringEventDialogData,
 } from "@/schedule/hooks/dialogs/recurringEventDialogHooks";
-import { toISOStringWithTimezone } from "@/lib/date";
 
 export function RecurringEventConfirmDialog() {
-  const { opened, mode, eventId, instanceStart, pendingUpdate } =
+  const { opened, mode, eventId, instanceId, instanceStart, pendingUpdate } =
     useRecurringEventDialogData();
   const { close: closeConfirm, confirm: confirmDialog } =
     useManageRecurringEventDialog();
@@ -28,13 +27,13 @@ export function RecurringEventConfirmDialog() {
   };
 
   const handleThisOnly = () => {
-    const start = toISOStringWithTimezone(instanceStart!);
+    const start = instanceStart!.toISOString();
 
     if (mode === "delete") {
       cancelOccurrence.mutate({
         eventId,
         occurrenceStart: start,
-        instanceId: `${eventId}::${start}`,
+        instanceId,
       });
     } else {
       detachInstance.mutate({
@@ -48,7 +47,7 @@ export function RecurringEventConfirmDialog() {
   };
 
   const handleAllOrFuture = () => {
-    const start = toISOStringWithTimezone(instanceStart!);
+    const start = instanceStart!.toISOString();
 
     if (mode === "delete") {
       deleteEvent.mutate(eventId);

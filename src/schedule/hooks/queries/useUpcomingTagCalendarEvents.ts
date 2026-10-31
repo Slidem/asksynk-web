@@ -13,7 +13,6 @@ export function useUpcomingTagCalendarEvents(
   userId?: string | null,
 ) {
   const { start, end } = useOneWeekCalendarPeriod();
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   // On a public view the guest session already scopes /calendar-events to the
   // view owner, so omit userId (guests can't query another user's calendar by id).
@@ -21,7 +20,7 @@ export function useUpcomingTagCalendarEvents(
 
   return useQuery({
     queryKey: calendarEventsQueryKey(start, end, effectiveUserId),
-    queryFn: () => fetchCalendarEvents(start, end, timezone, effectiveUserId),
+    queryFn: () => fetchCalendarEvents(start, end, effectiveUserId),
     select: (data) =>
       data
         .map(dtoToCalendarEvent)

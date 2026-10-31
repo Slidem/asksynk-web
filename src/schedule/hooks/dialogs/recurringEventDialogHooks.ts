@@ -18,6 +18,7 @@ export const useRecurringEventDialogData = () => {
       opened: s.opened,
       mode: s.mode,
       eventId: s.eventId,
+      instanceId: s.instanceId,
       instanceStart: s.instanceStart,
       pendingUpdate: s.pendingUpdate,
     })),

@@ -158,6 +158,7 @@ export function CalendarEventDialog() {
       openRecurringConfirm({
         mode: "delete",
         eventId: openedEvent.eventId,
+        instanceId: openedEvent.id,
         instanceStart: openedEvent.instanceStart,
       });
     } else {

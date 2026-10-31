@@ -1,3 +1,11 @@
+import dayjs from "dayjs";
+
+// Calendar date of an instant in `timezone`, as local midnight (all-day events)
+export const toLocalDateIn = (date: Date, timezone: string) =>
+  dayjs(
+    new Intl.DateTimeFormat("en-CA", { timeZone: timezone }).format(date),
+  ).toDate();
+
 export const toISOStringWithTimezone = (date: Date) => {
   return (
     date.getFullYear() +

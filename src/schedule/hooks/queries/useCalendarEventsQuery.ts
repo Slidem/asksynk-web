@@ -7,12 +7,11 @@ import { useCalendarEventsQueryData } from "./useCalendarEventsQueryData";
 export function useCalendarEventsQuery() {
   const { viewStart, viewEnd, selectedUserId, queryKey } =
     useCalendarEventsQueryData();
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   return useQuery({
     queryKey,
     queryFn: () =>
-      fetchCalendarEvents(viewStart, viewEnd, timezone, selectedUserId),
+      fetchCalendarEvents(viewStart, viewEnd, selectedUserId),
     placeholderData: keepPreviousData,
     select: (data) => data.map(dtoToCalendarEvent),
     enabled: !!viewStart && !!viewEnd,
